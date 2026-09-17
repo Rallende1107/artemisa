@@ -1,0 +1,40 @@
+{% extends page_template|default:'admin_panel/base_admin.html' %}
+{% load i18n %}
+
+{% comment %} Fondo y título los declara la vista (PanelSectionHome: background_image/title).
+   Dos modos: `groups` → UNA página con un título simple por grupo (sin desplegables);
+   si no, grilla plana. La rejilla (máx. 5 por fila, tarjetas iguales) vive en card.css.
+   `page_template`/`home_url` permiten reusar esta home en otros paneles (importación). {% endcomment %}
+
+{% block content %}
+  <div class="page-head">
+    <div class="breadcrumbs"><a href="{% url home_url|default:'panel:home' %}">{% trans "panel" %}</a><span class="sep">/</span><span>{{ page_title }}</span></div>
+    <h1 class="page-title">{{ page_title }}</h1>
+    <p class="page-sub">{% trans "Elige una entidad para gestionarla." %}</p>
+  </div>
+
+  {% if groups %}
+    {% for g in groups %}
+      <section class="section">
+        <div class="section__head"><h2>{{ g.title }}</h2><span class="section__rule"></span></div>
+        <div class="card-grid">
+          {% for it in g.items %}
+            <a class="card{% if it.bg %} card--bg{% endif %}" href="{{ it.href }}"{% if it.bg %} style="--card-bg:url('{{ it.bg }}')"{% endif %}>
+              <div class="card__top"><div class="card__icon">{{ it.icon|safe }}</div></div>
+              <div class="card__name">{{ it.label }}</div>
+            </a>
+          {% endfor %}
+        </div>
+      </section>
+    {% endfor %}
+  {% else %}
+    <div class="card-grid">
+      {% for it in items %}
+        <a class="card{% if it.bg %} card--bg{% endif %}" href="{{ it.href }}"{% if it.bg %} style="--card-bg:url('{{ it.bg }}')"{% endif %}>
+          <div class="card__top"><div class="card__icon">{{ it.icon|safe }}</div></div>
+          <div class="card__name">{{ it.label }}</div>
+        </a>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}

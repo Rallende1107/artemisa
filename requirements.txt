@@ -1,0 +1,22 @@
+# Dependencias de Artemisa — TODAS en un solo archivo:
+#   pip install -r requirements.txt
+asgiref==3.12.1
+Django==6.1.0
+celery==5.6.3
+pillow==12.3.0
+redis==8.1.0
+requests==2.34.2
+sqlparse==0.6.0
+tzdata==2026.3
+python-dotenv==1.1.1         # carga el .env (config por entorno)
+whitenoise==6.11.0           # sirve estáticos (dev y prod)
+django-import-export==4.4.1  # importar/exportar por tabla en el /admin/
+gunicorn==23.0.0             # WSGI (el web del stack Docker)
+psycopg[binary]==3.2.12      # driver de Postgres (la BD del stack)
+
+# --- Opcionales (descomenta si los activas) ---
+django-storages==1.14.6    # subida de media a Cloudflare R2 (USE_R2=1)
+boto3==1.43.96             # cliente S3 para R2
+django-celery-beat==2.1.0  # tareas programadas gestionadas en BD
+django-celery-results==2.6.0  # resultados de Celery en la BD
+

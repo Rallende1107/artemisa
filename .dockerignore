@@ -1,0 +1,19 @@
+# Nada de esto entra a la imagen: entorno local, datos y secretos.
+.git
+.gitignore
+.venv
+.claude
+.env
+__pycache__
+**/__pycache__
+*.pyc
+db.sqlite3
+dump/
+media/
+scripts/
+staticfiles/
+docs/
+mejoras.md
+personaje_ejemplo.txt
+Dockerfile
+docker-compose.yml

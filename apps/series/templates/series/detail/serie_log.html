@@ -1,0 +1,28 @@
+{% extends 'detail/base_detail.html' %}
+{% load i18n ficha %}
+{% comment %}FICHA de log de series (gestión): nivel, proceso y momento en el lateral; el mensaje completo como traza en el cuerpo.
+Lo propio de esta entidad se escribe AQUÍ; la Ficha técnica (id, slug, activo, fechas) la pone el cuadro.{% endcomment %}
+
+{% block side %}
+  <div class="mal-row"><span class="k">{% trans 'Nivel' %}:</span><span class="v">{{ object.get_level_display }} ({{ object.level }})</span></div>
+  {% if object.process %}<div class="mal-row"><span class="k">{% trans 'Proceso' %}:</span><span class="v">{{ object.process }}</span></div>{% endif %}
+  {% if object.timestamp %}<div class="mal-row"><span class="k">{% trans 'Momento' %}:</span><span class="v">{{ object.display_timestamp }}</span></div>{% endif %}
+{% endblock %}
+
+{% block cuerpo %}
+  <section class="dsection" data-tab="detalles" data-label="{% trans 'Mensaje' %}" style="padding-top:0;">
+    <h3>{% trans 'Mensaje' %}</h3>
+    {% if object.message %}<pre class="log-traza">{{ object.message }}</pre>{% else %}<p class="page-sub">—</p>{% endif %}
+  </section>
+  {% if es_gestion %}
+  {# Ficha técnica (solo gestión): lo que el registro ES — id, slug, activo, fechas. Muévela o amplíala aquí. #}
+  <section class="dsection" data-tab="tecnica" data-label="{% trans 'Ficha técnica' %}" style="padding-top:0;">
+    <h3>{% trans 'Ficha técnica' %}</h3>
+    <div class="mal-row"><span class="k">Id:</span><span class="v">{{ object.pk }}</span></div>
+    {% if object.slug %}<div class="mal-row"><span class="k">Slug:</span><span class="v">{{ object.slug }}</span></div>{% endif %}
+    {% if object.is_active is not None %}<div class="mal-row"><span class="k">{% trans 'Activo' %}:</span><span class="v">{{ object.display_is_active }}</span></div>{% endif %}
+    {% if object.created_at %}<div class="mal-row"><span class="k">{% trans 'Creado' %}:</span><span class="v">{{ object.display_created }}</span></div>{% endif %}
+    {% if object.updated_at %}<div class="mal-row"><span class="k">{% trans 'Actualizado' %}:</span><span class="v">{{ object.display_updated }}</span></div>{% endif %}
+  </section>
+  {% endif %}
+{% endblock %}

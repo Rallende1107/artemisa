@@ -1,0 +1,148 @@
+/*
+    =====================================================================
+    00-tokens.css  ·  ÚNICA fuente de verdad: color, tipografía, medidas
+    Ningún otro archivo define colores literales. Todo sale de aquí.
+    =====================================================================
+*/
+:root {
+    /* ---- Grounds / superficies ---- */
+    --ground:      #0a0a0f;
+    --surface:     #12121a;
+    --elevated:    #1b1b26;
+    --elevated-2:  #22222f;
+    /* versiones TRANSLÚCIDAS (dejan ver el fondo de la sección, como la index) */
+    --glass:       rgba(18, 18, 26, 0.55);   /* surface  translúcida */
+    --glass-2:     rgba(27, 27, 38, 0.55);   /* elevated translúcida */
+
+    /* ---- LISTAS (DataTables) en cristal: glassmorphism oscuro. PERILLAS de René ----
+       El contenedor .dt-wrap es un cristal que tira a NEGRO con transparencia y un blur suave;
+       cabeceras, filas y controles (botones, buscador, paginación) van encima, también translúcidos.
+       Documentado en docs/transparencias.md → «Listas (DataTables) glass». */
+    /* ---- CRISTAL LÍQUIDO general (formularios, login, fichas, paneles de detalle): components/glass.css.
+       Mismos valores que las listas; si quieres que TODO se mueva junto, toca estos. */
+    --lq-bg:       rgba(0, 0, 0, 0.42);
+    --lq-blur:     2px;
+    --lq-saturate: 140%;
+    --lq-shine:    rgba(255, 255, 255, 0.10);
+    --lq-rim:      rgba(255, 255, 255, 0.14);
+    --lq-shadow:   0 12px 32px rgba(0, 0, 0, 0.35);
+    --lq-border:   rgba(255, 255, 255, 0.08);
+    --lq-text:     #eef0f6;
+    --lq-muted:    #d6d9e3;
+    --dt-glass-bg:     rgba(0, 0, 0, 0.42);        /* cristal de la lista: ↑ alpha = más oscuro/sólido */
+    --dt-glass-blur:   2px;                        /* desenfoque del cristal: mínimo (2–3 px, valor René) */
+    --dt-glass-saturate: 140%;                     /* «liquid glass»: el fondo detrás se ve un poco más vivo */
+    --dt-glass-shine:  rgba(255, 255, 255, 0.10);  /* brillo especular arriba-izquierda (0 = sin brillo) */
+    --dt-glass-rim:    rgba(255, 255, 255, 0.14);  /* filo de luz de 1 px en el borde superior */
+    --dt-glass-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);  /* sombra que despega el cristal del fondo */
+    --dt-glass-border: rgba(255, 255, 255, 0.08);  /* filo del cristal */
+    --dt-glass-head:   rgba(0, 0, 0, 0.35);        /* cabecera de la tabla, un poco más oscura */
+    --dt-glass-row:    rgba(255, 255, 255, 0.025); /* rayado de filas pares */
+    --dt-glass-hover:  rgba(0, 174, 239, 0.09);    /* fila bajo el ratón (cian tenue) */
+    --dt-glass-line:   rgba(255, 255, 255, 0.07);  /* líneas entre filas */
+    --dt-glass-ctrl:   rgba(0, 0, 0, 0.38);        /* botones, buscador, «mostrar N», paginación, menú de fila */
+    --dt-glass-menu:   rgba(0, 0, 0, 0.78);        /* DESPLEGABLES (Acciones de fila, Columnas): más oscuros que el resto para leerse sobre cualquier fondo */
+    --dt-glass-menu-blur: 8px;                     /* desenfoque propio de los desplegables (más que el cristal de la lista; valor René) */
+    --dt-glass-btn:    rgba(0, 0, 0, 0.58);        /* BOTONES de la lista (Copiar, CSV…, paginación): más oscuros que el cristal para que se vean */
+    --dt-glass-btn-text: #ffffff;                  /* texto de botón activo: blanco */
+    --dt-glass-btn-off:  #c9cdd8;                  /* texto de botón desactivado (« ‹ en la primera página): gris claro, casi blanco (valor René) */
+    --dt-glass-text:   #eef0f6;                    /* texto de las celdas (claro) */
+    --dt-glass-muted:  #d6d9e3;                    /* cabeceras y texto secundario: blanco apagado (valor René: textos claros, no grises) */
+
+    /* ---- Acento (neón cian) + tintes ---- */
+    /* TRÍADA DE LA CASA = los primarios del logo (CMY de imprenta) */
+    --accent:           #00aeef;   /* CIAN · primario: navegación, links, hover */
+    --warn:             #ec008c;   /* MAGENTA · peligro: Limpiar, Salir, borrar */
+    --warn-glow:        rgba(236, 0, 140, 0.35);
+    --ok:               #fff200;   /* AMARILLO · activo: expandido, éxito, encendido */
+    --ok-glow:          rgba(255, 242, 0, 0.35);
+    --accent-dim:       #0891a3;
+    --accent-hover:     #1a8cff;   /* azul del centro de la hoja (borde en hover) */
+    --accent-hover-glow:rgba(26, 140, 255, 0.50);
+    --accent-glow: rgba(0, 174, 239, 0.35);
+    --accent-03:   rgba(0, 174, 239, 0.03);
+    --accent-04:   rgba(0, 174, 239, 0.04);
+    --accent-06:   rgba(0, 174, 239, 0.06);
+    --accent-07:   rgba(0, 174, 239, 0.07);
+    --accent-08:   rgba(0, 174, 239, 0.08);
+    --accent-10:   rgba(0, 174, 239, 0.10);
+    --accent-12:   rgba(0, 174, 239, 0.12);
+
+    /* ---- Texto ---- */
+    --text:     #e8e8f0;
+    --text-2:   #c3c3d0;
+    --muted:    #7a7a8c;
+    --faint:    #4a4a5a;
+
+    /* ---- Bordes ---- */
+    --border:      rgba(0, 174, 239, 0.14);
+    --border-soft: rgba(255, 255, 255, 0.06);
+
+    /* ---- Semánticos + tintes (el --ok vive ARRIBA, en la tríada) ---- */
+    --ok-10:       rgba(255, 242, 0, 0.10);
+    --ok-25:       rgba(255, 242, 0, 0.25);
+    --success:     #2fdf84;   /* VERDE · éxito de una acción (toasts) — distinto del --ok amarillo de "activo" */
+    --success-25:  rgba(47, 223, 132, 0.25);
+    --warning:     #ffb020;
+    --warning-25:  rgba(255, 176, 32, 0.25);
+    --danger:      #ff4d5e;
+    --danger-08:   rgba(255, 77, 94, 0.08);
+    --danger-22:   rgba(255, 77, 94, 0.22);
+    --adult:       #ff2d6f;
+    --fuchsia:     #ff2d6f;   /* hover alternativo (índices/enlaces) */
+
+    /* ---- Capas translúcidas de UI ---- */
+    /* CROMO DEL SHELL: mismo tinte (20,20,30), estilo medio-dark (decisión vigente).
+       La FOTO se mantiene visible con el velo suave (--overlay-*) — el cromo es
+       quien pone lo oscuro. --chrome-bg también viste la tarjeta de auth
+       (--auth-card-bg). Ver docs/transparencias.md. */
+    --chrome-bg:   rgba(0, 0, 0, 0.47);   /* ← EL dial del cromo (valor de René): negro puro 47% */
+    /* Ganchos por pieza — hoy los TRES homólogos (heredan del dial);
+       rgba propio solo si un día una pieza va distinta: */
+    --header-bg:   var(--chrome-bg);
+    --sidebar-bg:  var(--chrome-bg);
+    --sidebar-veil: rgba(8, 8, 14, 0.45);   /* velo oscuro extra del sidebar (0 = solo el cromo) */
+    --footer-bg:   var(--chrome-bg);
+    /* Header público flotante: degradado oscuro→transparente (no tapa la imagen, solo da legibilidad al nav) */
+    --header-scrim: linear-gradient(180deg, rgba(8, 8, 13, 0.92) 0%, rgba(8, 8, 13, 0.55) 52%, rgba(8, 8, 13, 0) 100%);
+    --panel:       rgba(18, 18, 26, 0.75);
+    --auth-card-bg: var(--chrome-bg);   /* tarjeta de login/registro/reset — DIAL propio (parte del cromo por defecto; súbele el alpha si quieres el form más sólido) */
+    --hover-soft:  rgba(255, 255, 255, 0.03);
+    --white:       #ffffff;
+    --white-04:    rgba(255, 255, 255, 0.04);
+    --white-05:    rgba(255, 255, 255, 0.05);
+    --white-50:    rgba(255, 255, 255, 0.50);
+
+    /* ---- Overlay del fondo por categoría (más claro = imagen más visible) ---- */
+    --overlay-top:    rgba(8, 8, 13, 0.34);
+    --overlay-bottom: rgba(8, 8, 13, 0.34);
+
+    /* ---- Sombras ---- */
+    --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.40);
+    --shadow-pop:  0 16px 44px rgba(0, 0, 0, 0.55);
+    --shadow-toast:0 12px 40px rgba(0, 0, 0, 0.50), 0 0 20px var(--accent-12);
+
+    /* ---- Medidas ---- */
+    --header-h: 56px;
+    --side-w:   244px;
+    --rail-w:   66px;   /* sidebar colapsado a solo-iconos (rail) */
+    --radius:   10px;
+    --radius-lg:14px;
+
+    /* ---- Tipografía ---- */
+    --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", "Consolas", monospace;
+    --sans: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+    /* ---- Fondo por categoría (lo fija {% fondo %} por vista) ---- */
+    --bg-cat: none;
+    --bg-opacity: 1;
+
+    /* ---- Z-index ---- */
+    --z-bg: 0;
+    --z-main: 10;
+    --z-scrim: 25;
+    --z-sidebar: 30;
+    --z-header: 40;
+    --z-pop: 70;
+    --z-toast: 90;
+}

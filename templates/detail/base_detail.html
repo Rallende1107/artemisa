@@ -1,0 +1,101 @@
+{% extends page_template %}
+{% load static i18n collection_tags %}
+{% block title %}{{ object }} · {{ block.super }}{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/components/ficha.css' %}?v={{ ASSET_VERSION }}">
+{% endblock %}
+
+{% block content %}
+  {# Migas: el script global del header las mueve a la barra superior. Gestión: panel / sección / lista / objeto #}
+  {# (la sección se omite si se llama igual que la lista); público: lista / objeto. #}
+  <div class="breadcrumbs">
+    {% if es_gestion %}
+      <a href="{% url 'panel:home' %}">{% trans "panel" %}</a><span class="sep">/</span>
+      {% if section_url and section_label|lower != label_plural|lower %}<a href="{% url section_url %}">{{ section_label|lower }}</a><span class="sep">/</span>{% endif %}
+    {% endif %}
+    {% if list_url %}<a href="{% url list_url %}">{{ label_plural }}</a><span class="sep">/</span>{% endif %}
+    <span>{{ object }}</span>
+  </div>
+
+  <div class="ficha-wrap">
+    <div class="mal-grid">
+      <aside class="mal-side">
+        {% block poster %}
+        <div class="poster-box">
+          {% if poster %}<img src="{{ poster }}" alt="{{ object }}">
+          {% else %}<img src="{% static 'image/default/sin-imagen.webp' %}" alt="{% trans 'Sin imagen' %}" loading="lazy">{% endif %}
+        </div>
+        {% endblock %}
+
+        {# Bajo el póster: en público la colección (Add to List / Favorites); en gestión los botones #}
+        {% if collect_kind %}{% collect_bar object collect_kind %}{% endif %}
+        {% if can_update or toggle_actions or can_delete or can_reprocess or extra_actions or post_actions %}
+          <div class="chip-row" style="margin:10px 0 14px;">{% include 'admin_panel/_detail_actions.html' %}</div>
+        {% endif %}
+
+        {% block titulos %}{% endblock %}
+        <h4>{% trans 'Información' %}</h4>
+        {% block side %}{% endblock %}
+        {% block stats %}{% endblock %}
+      </aside>
+
+      <div class="mal-main">
+        <div class="mal-head">
+          <h1>{{ object }}</h1>
+          {% block subtitulo %}{% endblock %}
+        </div>
+        <nav class="mal-tabs" id="ficha-tabs" hidden></nav>
+        <div id="ficha-secciones">
+          {% block cuerpo %}{% endblock %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% include 'partials/_lightbox.html' %}
+
+  <script>
+    // Pestañas EN LA PÁGINA: una por data-tab de las secciones (en su orden, «detalles» primera). El lateral
+    // no cambia; solo se muestra la sección de la pestaña. Los enlaces href="#clave" del cuerpo también cambian.
+    (function () {
+      var nav = document.getElementById("ficha-tabs"), cont = document.getElementById("ficha-secciones");
+      if (!nav || !cont) return;
+      var secciones = Array.prototype.slice.call(cont.querySelectorAll("[data-tab]"));
+      var claves = []; secciones.forEach(function (s) { if (claves.indexOf(s.dataset.tab) < 0) claves.push(s.dataset.tab); });
+      if (claves.indexOf("detalles") > 0) { claves.splice(claves.indexOf("detalles"), 1); claves.unshift("detalles"); }
+      if (claves.length < 2) return;
+      function muestra(clave) {
+        secciones.forEach(function (s) { s.hidden = s.dataset.tab !== clave; });
+        nav.querySelectorAll(".mal-tab").forEach(function (b) { b.classList.toggle("on", b.dataset.tab === clave); });
+        if (history.replaceState) history.replaceState(null, "", "#" + clave);
+        window.scrollTo({ top: Math.min(window.scrollY, nav.getBoundingClientRect().top + window.scrollY - 80), behavior: "instant" });
+      }
+      claves.forEach(function (clave) {
+        var sec = secciones.filter(function (s) { return s.dataset.tab === clave; })[0];
+        var b = document.createElement("button"); b.type = "button"; b.className = "mal-tab"; b.dataset.tab = clave;
+        b.textContent = sec.dataset.label || clave; b.addEventListener("click", function () { muestra(clave); });
+        nav.appendChild(b);
+      });
+      cont.querySelectorAll('a[href^="#"]').forEach(function (a) {
+        var clave = a.getAttribute("href").slice(1);
+        if (claves.indexOf(clave) >= 0) a.addEventListener("click", function (e) { e.preventDefault(); muestra(clave); });
+      });
+      nav.hidden = false;
+      var inicial = location.hash.replace("#", "");
+      muestra(claves.indexOf(inicial) >= 0 ? inicial : claves[0]);
+    })();
+    // «+N más»: despliega/pliega el .mal-resto que precede al botón (títulos por idioma, idiomas de más…)
+    document.querySelectorAll(".mal-toggle").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var resto = btn.dataset.abre ? document.getElementById(btn.dataset.abre) : btn.previousElementSibling;
+        while (resto && !btn.dataset.abre && !resto.classList.contains("mal-resto")) resto = resto.previousElementSibling;
+        if (!resto) return;
+        resto.hidden = !resto.hidden;
+        btn.textContent = resto.hidden ? btn.dataset.mas : "menos";
+      });
+    });
+  </script>
+{% endblock %}
+
+{% block foot_meta %}detail{% endblock %}

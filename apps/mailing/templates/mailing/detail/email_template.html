@@ -1,0 +1,66 @@
+{% extends 'admin_panel/detail.html' %}
+
+{% comment %}
+  Detalle PROPIO de la plantilla de correo: 2 columnas al ancho completo —
+  datos a la izquierda (translúcido) y la VISTA PREVIA grande a la derecha,
+  llenando el espacio. Botón «Ampliar» abre el correo en un modal a pantalla.
+{% endcomment %}
+{% block detalle %}
+  <div class="detail-shell">
+    <aside class="detail-side">
+      <div class="info-list glass">
+        {% for f in facts %}<div class="info-list__row"><span class="k">{{ f.label }}</span><span class="v">{{ f.value|default:"—" }}</span></div>{% endfor %}
+      </div>
+      <div class="chip-row">
+        <a class="chip" href="{% url update_url object.pk %}"><span class="ico"><i class="bi bi-pencil"></i></span> Editar</a>
+        <a class="chip chip--danger js-delete" href="{% url delete_url object.pk %}" data-name="{{ object }}"><span class="ico"><i class="bi bi-trash"></i></span> Borrar</a>
+      </div>
+    </aside>
+
+    <div class="detail-main">
+      <div class="mail-cta glass">
+        <div class="mail-cta__tag"><i class="bi bi-envelope-paper"></i> Correo</div>
+        <div class="mail-cta__subject">{{ preview_subject }}</div>
+        <button type="button" class="chip chip--accent mail-cta__btn" data-open-modal="mail-full">
+          <span class="ico"><i class="bi bi-eye"></i></span> Ver vista previa
+        </button>
+        <p class="mail-cta__note">Se abre el correo renderizado con datos de ejemplo ({% for k, v in sample_vars.items %}<code>{{ k }}</code>{% if not forloop.last %} · {% endif %}{% endfor %}). Edítalo con «Editar».</p>
+      </div>
+    </div>
+  </div>
+
+  <dialog id="mail-full" class="modal modal--wide">
+    <div class="modal__head">
+      <strong>{{ preview_subject }}</strong>
+      <button class="modal__x" data-close-modal aria-label="Cerrar">✕</button>
+    </div>
+    <div class="modal__body" style="padding:0">
+      <iframe srcdoc="{{ preview_doc }}" title="Vista previa ampliada" sandbox="" style="width:100%;height:70vh;border:0;background:#e9e9ee;display:block"></iframe>
+    </div>
+  </dialog>
+
+  <style>
+    .mail-cta { border-radius:14px; padding:34px 28px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:14px; }
+    .mail-cta__tag { font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); display:inline-flex; align-items:center; gap:7px; }
+    .mail-cta__subject { font-size:20px; font-weight:700; color:var(--text); max-width:60ch; }
+    .mail-cta__btn { font-size:15px; padding:11px 22px; }
+    .mail-cta__note { color:var(--faint); font-size:12.5px; max-width:60ch; margin:0; }
+    .mail-cta__note code { color:var(--text-2); }
+    /* modal autónomo (el panel no carga public.js) */
+    dialog.modal { border:1px solid var(--border-soft); border-radius:14px; background:var(--surface); color:var(--text); box-shadow:0 24px 70px rgba(0,0,0,.6); }
+    dialog.modal::backdrop { background:rgba(0,0,0,.62); backdrop-filter:blur(2px); }
+    .modal__head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; border-bottom:1px solid var(--border-soft); }
+    .modal__x { background:none; border:0; color:var(--faint); font-size:17px; cursor:pointer; }
+    .modal__x:hover { color:var(--text); }
+    .modal--wide { width:min(1000px,94vw); max-width:none; padding:0; }
+  </style>
+  <script>
+    (function(){
+      var d = document.getElementById('mail-full');
+      if(!d) return;
+      document.querySelectorAll('[data-open-modal="mail-full"]').forEach(function(b){ b.addEventListener('click', function(){ d.showModal(); }); });
+      d.querySelectorAll('[data-close-modal]').forEach(function(b){ b.addEventListener('click', function(){ d.close(); }); });
+      d.addEventListener('click', function(e){ if(e.target === d) d.close(); });
+    })();
+  </script>
+{% endblock detalle %}

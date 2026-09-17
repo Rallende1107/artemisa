@@ -1,0 +1,41 @@
+{% comment %}
+Campo IMAGEN — regla de René (2026-09-02):
+· CON imagen actual → miniatura chica de la ACTUAL (SIEMPRE la actual, nunca se
+  reemplaza por la elegida) + controles llenando el resto: selector, «Ver imagen»
+  (lightbox de las fichas; si ya elegiste una nueva, el modal muestra ambas =
+  antes/después) y «Eliminar la actual» (botón que conmuta el checkbox `-clear`
+  oculto — nativo de ClearableFileInput o el `clear_field` propio del form).
+· SIN imagen actual → formulario NORMAL: solo el selector de archivo.
+· En pantallas chicas (≤560px) la miniatura se oculta (form.css).
+Uso:
+    {% include 'admin_panel/_campo_imagen.html' with field=form.image %}
+    {% include 'admin_panel/_campo_imagen.html' with field=form.avatar clear_field=form.avatar_clear %}
+Requiere partials/_lightbox.html en la página (lo incluyen admin_panel/form.html
+y perfil_editar) y css/components/ficha.css.
+{% endcomment %}
+{% if field.value %}
+<label>{{ field.label }}{% if field.field.required %} <span class="req">*</span>{% endif %}</label>
+<div class="img-field">
+  <figure class="img-slot">
+    <figcaption>Imagen actual</figcaption>
+    <div class="img-preview gallery">
+      <img class="shot" data-img-actual src="{{ MEDIA_URL }}{{ field.value }}" alt="{{ field.label }} actual">
+      {# la nueva NO se muestra aquí: solo entra al lightbox (2/2) cuando se elige #}
+      <img data-img-nueva hidden alt="{{ field.label }} nueva">
+    </div>
+  </figure>
+  <div class="img-controls">
+    <input type="file" name="{{ field.html_name }}" id="{{ field.id_for_label }}" accept="image/*" class="js-img-input">
+    <button type="button" class="js-img-ver"><i class="bi bi-eye"></i> Ver imagen</button>
+    {# el checkbox real viaja OCULTO; el botón lo conmuta (forms.js) #}
+    <span hidden>{% if clear_field %}{{ clear_field }}{% else %}<input type="checkbox" name="{{ field.html_name }}-clear" id="{{ field.html_name }}-clear_id">{% endif %}</span>
+    <button type="button" class="js-img-clear"><i class="bi bi-trash"></i> Eliminar la actual</button>
+  </div>
+</div>
+{% else %}
+{# sin imagen actual → campo normal, sin marco ni botones #}
+<label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="req">*</span>{% endif %}</label>
+<input type="file" name="{{ field.html_name }}" id="{{ field.id_for_label }}" accept="image/*">
+{% endif %}
+{% for e in field.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+{% if field.help_text %}<span class="field__hint">{{ field.help_text }}</span>{% endif %}

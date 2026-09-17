@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/components/hero.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/landing.css' %}?v={{ ASSET_VERSION }}">
+{% endblock %}
+
+{% block content %}
+  {# Hero #}
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero__glow"></div>
+      <div class="hero__inner" style="grid-template-columns:1fr;">
+        <div class="hero__body" style="max-width:780px;">
+          <span class="eyebrow" style="color:var(--accent)">Frikiverso</span>
+          <h1>{% blocktrans %}Todos tus gustos <span style="color:var(--accent)">frikis</span>, en un solo lugar{% endblocktrans %}</h1>
+          <p style="font-size:16px;">{% trans "Anime, manga, series, películas, música y juegos. Descubre miles de títulos y arma tu propia colección." %}</p>
+          <div class="cta-row">
+            {% if user.is_authenticated %}
+              <a class="btn-hero" href="{% url 'collections:mine' %}"><i class="bi bi-collection"></i> {% trans "Mi colección" %}</a>
+              <a class="btn-line" href="{% url 'otaku:home' %}"><i class="bi bi-compass"></i> {% trans "Explorar" %}</a>
+            {% else %}
+              <a class="btn-hero" href="{% url 'users:register' %}"><i class="bi bi-person-plus"></i> {% trans "¡Únete a nosotros!" %}</a>
+              <a class="btn-line" href="{% url 'users:login' %}"><i class="bi bi-box-arrow-in-right"></i> {% trans "Ingresar" %}</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    {# Somos frikis #}
+    <div class="lb about-band">
+      <span class="eyebrow">{% trans "Quiénes somos" %}</span>
+      <h2>{% blocktrans %}Somos <span class="accent">frikis!!!</span>{% endblocktrans %}</h2>
+      <p>{% trans "En Frikiverso nos apasiona reunir los mejores contenidos de anime, manga, juegos, películas y música para que los colecciones. Nuestro objetivo es mantener a fanáticos como tú al día y entretenidos." %}</p>
+    </div>
+
+    {# Qué encontrarás — arte real por categoría #}
+    <div class="lb">
+      <span class="eyebrow">{% trans "Qué encontrarás" %}</span>
+      <h2>{% trans "Explora las secciones" %}</h2>
+      <div class="svc-grid">
+        {% for s in secciones %}
+        <a class="svc" href="{{ s.url }}"><img src="{% static s.image %}" alt="{{ s.title }}" loading="lazy"><div class="svc__lbl"><h3>{{ s.title }}</h3><p>{{ s.text }}</p></div></a>
+        {% endfor %}
+      </div>
+    </div>
+
+    {# Características #}
+    <div class="lb">
+      <span class="eyebrow">{% trans "Más características" %}</span>
+      <div class="feats" style="margin-top:12px;">
+        <span class="feat-pill"><span class="s">★</span> {% trans "100% online" %}</span>
+        <span class="feat-pill"><span class="s">★</span> {% trans "Datos de MyAnimeList" %}</span>
+        <span class="feat-pill"><span class="s">★</span> {% trans "Juegos de VNDB / F95Zone" %}</span>
+        <span class="feat-pill"><span class="s">★</span> {% trans "Música de Deezer" %}</span>
+        <span class="feat-pill"><span class="s">★</span> {% trans "Tus propias colecciones" %}</span>
+      </div>
+    </div>
+
+    {# Logos de servicios #}
+    <div class="logos-strip">
+      <div class="lbl">{% trans "Datos y disponibilidad" %}</div>
+      <div class="logos">
+        <!-- gaming -->
+        <img src="{% static 'image/icons/platforms/gaming/Epic-Games.webp' %}" alt="Epic Games" loading="lazy">
+        <img src="{% static 'image/icons/platforms/gaming/F95-Zone.webp' %}" alt="F95 Zone" loading="lazy">
+        <img src="{% static 'image/icons/platforms/gaming/Itch.webp' %}" alt="Itch.io" loading="lazy">
+        <img src="{% static 'image/icons/platforms/gaming/Renpy.webp' %}" alt="Ren'Py" loading="lazy">
+        <img src="{% static 'image/icons/platforms/gaming/Steam.webp' %}" alt="Steam" loading="lazy">
+        <img src="{% static 'image/icons/platforms/gaming/Twitch.webp' %}" alt="Twitch" loading="lazy">
+        <!-- media -->
+        <img src="{% static 'image/icons/platforms/media/Spotify.webp' %}" alt="Spotify" loading="lazy">
+        <img src="{% static 'image/icons/platforms/media/Youtube-Music.webp' %}" alt="Youtube Music" loading="lazy">
+        <!-- monetization -->
+        <img src="{% static 'image/icons/platforms/monetization/Boosty.webp' %}" alt="Boosty" loading="lazy">
+        <img src="{% static 'image/icons/platforms/monetization/Buy-Me-a-Coffee.webp' %}" alt="Buy Me a Coffee" loading="lazy">
+        <img src="{% static 'image/icons/platforms/monetization/Patreon.webp' %}" alt="Patreon" loading="lazy">
+        <img src="{% static 'image/icons/platforms/monetization/SubscribeStar.webp' %}" alt="SubscribeStar" loading="lazy">
+        <!-- social-->
+        <img src="{% static 'image/icons/platforms/social/Discord.webp' %}" alt="Discord" loading="lazy">
+        <img src="{% static 'image/icons/platforms/social/Facebook.webp' %}" alt="Facebook" loading="lazy">
+        <img src="{% static 'image/icons/platforms/social/Instagram.webp' %}" alt="Instagram" loading="lazy">
+        <img src="{% static 'image/icons/platforms/social/Linktree.webp' %}" alt="Linktree" loading="lazy">
+        <img src="{% static 'image/icons/platforms/social/Reddit.webp' %}" alt="Reddit" loading="lazy">
+        <img src="{% static 'image/icons/platforms/social/Twitter.webp' %}" alt="Twitter" loading="lazy">
+
+    </div>
+    </div>
+
+    {# Únete (no logueado) / Ayuda (logueado) #}
+    <div class="join">
+      {% if user.is_authenticated %}
+        <h2>{% trans "¿Dudas o sugerencias?" %}</h2>
+        <p>{% trans "Estamos para ayudarte. Gestiona tu colección o escríbenos cuando quieras." %}</p>
+        <div class="cta-row">
+          <a class="btn-hero" href="{% url 'collections:mine' %}"><i class="bi bi-collection"></i> {% trans "Mi colección" %}</a>
+          <a class="btn-line" href="{% url 'pages:contact' %}"><i class="bi bi-envelope"></i> {% trans "Contacto" %}</a>
+        </div>
+      {% else %}
+        <h2>{% trans "Únete a Frikiverso" %}</h2>
+        {% url 'pages:contact' as contacto_url %}
+        <p>{% blocktrans %}Crea tu cuenta gratis y empieza a coleccionar tus favoritos. ¿Dudas? <a href="{{ contacto_url }}" style="color:var(--accent)">Contáctanos</a>.{% endblocktrans %}</p>
+        <div class="cta-row">
+          <a class="btn-hero" href="{% url 'users:register' %}"><i class="bi bi-person-plus"></i> {% trans "Crear cuenta" %}</a>
+          <a class="btn-line" href="{% url 'users:login' %}"><i class="bi bi-box-arrow-in-right"></i> {% trans "Ya tengo cuenta" %}</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

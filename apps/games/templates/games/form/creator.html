@@ -1,0 +1,31 @@
+{% comment %} Campos de creador — patrón Hades/Poseidon.
+   PARCIAL que INCLUYE admin_panel/form.html (el cuadro: card, botones, csrf) porque la
+   vista Create/Update lo declara: form_template = "…/form/<modelo>.html".
+   Edita libremente el orden/HTML de cada campo aquí. Los booleanos se
+   auto-agrupan abajo, no van en este bloque.
+   Sincroniza:  python manage.py sync_forms  {% endcomment %}
+
+    <div class="field">
+      <label for="{{ form.name.id_for_label }}">{{ form.name.label }}{% if form.name.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.name }}
+      {% for e in form.name.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.name.help_text %}<span class="field__hint">{{ form.name.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.type.id_for_label }}">{{ form.type.label }}{% if form.type.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.type }}
+      {% for e in form.type.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.type.help_text %}<span class="field__hint">{{ form.type.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.languages.id_for_label }}">{{ form.languages.label }}{% if form.languages.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.languages }}
+      {% for e in form.languages.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.languages.help_text %}<span class="field__hint">{{ form.languages.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.description.id_for_label }}">{{ form.description.label }}{% if form.description.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.description }}
+      {% for e in form.description.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.description.help_text %}<span class="field__hint">{{ form.description.help_text }}</span>{% endif %}
+    </div>

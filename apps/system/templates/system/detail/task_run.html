@@ -1,0 +1,37 @@
+{% extends 'detail/base_detail.html' %}
+{% load i18n ficha %}
+{% comment %}FICHA de tarea (gestión): sus datos en el lateral (una fila por campo) y los textos largos en el cuerpo.
+Lo propio de esta entidad se escribe AQUÍ; la Ficha técnica (id, slug, activo, fechas) la pone el cuadro.{% endcomment %}
+
+{% block side %}
+  {% if object.name %}<div class="mal-row"><span class="k">{% trans 'Tarea' %}:</span><span class="v">{{ object.name }}</span></div>{% endif %}
+  {% if object.task_id %}<div class="mal-row"><span class="k">{% trans 'Id' %}:</span><span class="v">{{ object.task_id }}</span></div>{% endif %}
+  {% if object.fuente %}<div class="mal-row"><span class="k">{% trans 'Fuente' %}:</span><span class="v">{{ object.fuente }}</span></div>{% endif %}
+  {% if object.status %}<div class="mal-row"><span class="k">{% trans 'Estado' %}:</span><span class="v">{{ object.status }}</span></div>{% endif %}
+  <div class="mal-row"><span class="k">{% trans 'Cancelación pedida' %}:</span><span class="v">{{ object.cancel_requested|yesno:_("Sí,No") }}</span></div>
+  {% if object.user %}<div class="mal-row"><span class="k">{% trans 'Lanzada por' %}:</span><span class="v">{% ficha object.user as href %}{% if href %}<a href="{{ href }}">{{ object.user }}</a>{% else %}{{ object.user }}{% endif %}</span></div>{% endif %}
+  {% if object.queued_at %}<div class="mal-row"><span class="k">{% trans 'Encolada' %}:</span><span class="v">{{ object.queued_at|date:"d-m-Y H:i" }}</span></div>{% endif %}
+  {% if object.started_at %}<div class="mal-row"><span class="k">{% trans 'Inicio' %}:</span><span class="v">{{ object.started_at|date:"d-m-Y H:i" }}</span></div>{% endif %}
+  {% if object.finished_at %}<div class="mal-row"><span class="k">{% trans 'Fin' %}:</span><span class="v">{{ object.finished_at|date:"d-m-Y H:i" }}</span></div>{% endif %}
+  {% if object.duracion %}<div class="mal-row"><span class="k">{% trans 'Duración (s)' %}:</span><span class="v">{{ object.duracion }}</span></div>{% endif %}
+{% endblock %}
+
+{% block cuerpo %}
+  <section class="dsection" data-tab="detalles" data-label="{% trans 'Detalles' %}" style="padding-top:0;">
+    <h3>{% trans 'Argumentos' %}</h3>
+    <div class="synopsis-area">{% if object.args %}<p class="synopsis">{{ object.args|linebreaksbr }}</p>{% endif %}</div>
+    <h3>{% trans 'Resultado / error' %}</h3>
+    <div class="synopsis-area">{% if object.result %}<p class="synopsis">{{ object.result|linebreaksbr }}</p>{% endif %}</div>
+  </section>
+  {% if es_gestion %}
+  {# Ficha técnica (solo gestión): lo que el registro ES — id, slug, activo, fechas. Muévela o amplíala aquí. #}
+  <section class="dsection" data-tab="tecnica" data-label="{% trans 'Ficha técnica' %}" style="padding-top:0;">
+    <h3>{% trans 'Ficha técnica' %}</h3>
+    <div class="mal-row"><span class="k">Id:</span><span class="v">{{ object.pk }}</span></div>
+    {% if object.slug %}<div class="mal-row"><span class="k">Slug:</span><span class="v">{{ object.slug }}</span></div>{% endif %}
+    {% if object.is_active is not None %}<div class="mal-row"><span class="k">{% trans 'Activo' %}:</span><span class="v">{{ object.display_is_active }}</span></div>{% endif %}
+    {% if object.created_at %}<div class="mal-row"><span class="k">{% trans 'Creado' %}:</span><span class="v">{{ object.display_created }}</span></div>{% endif %}
+    {% if object.updated_at %}<div class="mal-row"><span class="k">{% trans 'Actualizado' %}:</span><span class="v">{{ object.display_updated }}</span></div>{% endif %}
+  </section>
+  {% endif %}
+{% endblock %}

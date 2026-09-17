@@ -1,0 +1,45 @@
+{% comment %} Campos de álbum — patrón Hades/Poseidon.
+   PARCIAL que INCLUYE admin_panel/form.html (el cuadro: card, botones, csrf) porque la
+   vista Create/Update lo declara: form_template = "…/form/<modelo>.html".
+   Edita libremente el orden/HTML de cada campo aquí. Los booleanos se
+   auto-agrupan abajo, no van en este bloque.
+   Sincroniza:  python manage.py sync_forms  {% endcomment %}
+
+    <div class="field">
+      <label for="{{ form.title.id_for_label }}">{{ form.title.label }}{% if form.title.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.title }}
+      {% for e in form.title.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.title.help_text %}<span class="field__hint">{{ form.title.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.artist.id_for_label }}">{{ form.artist.label }}{% if form.artist.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.artist }}
+      {% for e in form.artist.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.artist.help_text %}<span class="field__hint">{{ form.artist.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.album_type.id_for_label }}">{{ form.album_type.label }}{% if form.album_type.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.album_type }}
+      {% for e in form.album_type.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.album_type.help_text %}<span class="field__hint">{{ form.album_type.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.release_date.id_for_label }}">{{ form.release_date.label }}{% if form.release_date.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.release_date }}
+      {% for e in form.release_date.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.release_date.help_text %}<span class="field__hint">{{ form.release_date.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.description.id_for_label }}">{{ form.description.label }}{% if form.description.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.description }}
+      {% for e in form.description.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.description.help_text %}<span class="field__hint">{{ form.description.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.genres.id_for_label }}">{{ form.genres.label }}{% if form.genres.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.genres }}
+      {% for e in form.genres.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.genres.help_text %}<span class="field__hint">{{ form.genres.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+    </div>

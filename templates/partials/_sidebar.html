@@ -1,0 +1,49 @@
+{% load i18n %}
+{# Sidebar público: administración (arriba, solo staff) + secciones + cuenta #}
+<aside class="sidebar" id="sidebar">
+
+  {% if user.is_staff %}
+  {# Accesos de administración arriba (solo staff; el usuario normal no los ve) #}
+  <nav class="nav-group">
+    <div class="nav-group__label eyebrow">{% trans "Administración" %}</div>
+    <a class="nav-item" href="{% url 'panel:home' %}"><span class="ico"><i class="bi bi-grid-1x2"></i></span> {% trans "Panel de gestión" %}</a>
+    {% if user.is_superuser %}<a class="nav-item" href="/admin/"><span class="ico"><i class="bi bi-shield-lock"></i></span> {% trans "Admin Django" %}</a>{% endif %}
+  </nav>
+  {% endif %}
+
+  <nav class="nav-group">
+    <div class="nav-group__label eyebrow">{% trans "Explorar" %}</div>
+    <a class="nav-item{% if active_section == 'inicio' %} active{% endif %}" href="{% url 'pages:index' %}">
+      <span class="ico"><i class="bi bi-house"></i></span> {% trans "Inicio" %}
+    </a>
+    {% for s in SECCIONES %}
+      <a class="nav-item{% if active_section == s.slug %} active{% endif %}" href="{{ s.url }}">
+        <span class="ico"><i class="bi {{ s.icon }}"></i></span> {{ s.label }}
+      </a>
+    {% endfor %}
+  </nav>
+
+  {% if user.is_authenticated %}
+  <nav class="nav-group">
+    <div class="nav-group__label eyebrow">{% trans 'Tu cuenta' %}</div>
+    <a class="nav-item{% if active_section == 'coleccion' %} active{% endif %}" href="{% url 'collections:mine' %}"><span class="ico"><i class="bi bi-collection"></i></span> {% trans 'Mi colección' %}</a>
+    <a class="nav-item{% if active_section == 'perfil' %} active{% endif %}" href="{% url 'users:profile' %}">
+      <span class="ico"><i class="bi bi-person-circle"></i></span> {% trans 'Mi perfil' %}
+    </a>
+    <a class="nav-item" href="{% url 'pages:my-messages' %}">
+      <span class="ico"><i class="bi bi-envelope"></i></span> {% trans 'Mis mensajes' %}
+    </a>
+  </nav>
+  {% endif %}
+
+  {# Legal: al fondo del sidebar (secundario) #}
+  <nav class="nav-group nav-group--legal">
+    <div class="nav-group__label eyebrow">{% trans "Legal" %}</div>
+    <a class="nav-item{% if active_section == 'nosotros' %} active{% endif %}" href="{% url 'pages:about' %}"><span class="ico"><i class="bi bi-info-circle"></i></span> {% trans "Nosotros" %}</a>
+    <a class="nav-item{% if active_section == 'terminos' %} active{% endif %}" href="{% url 'pages:terms' %}"><span class="ico"><i class="bi bi-file-earmark-text"></i></span> {% trans "Términos de uso" %}</a>
+    <a class="nav-item{% if active_section == 'privacidad' %} active{% endif %}" href="{% url 'pages:privacy' %}"><span class="ico"><i class="bi bi-shield-check"></i></span> {% trans "Privacidad" %}</a>
+    <a class="nav-item{% if active_section == 'contacto' %} active{% endif %}" href="{% url 'pages:contact' %}"><span class="ico"><i class="bi bi-envelope"></i></span> {% trans "Contacto" %}</a>
+  </nav>
+
+  <div class="sidebar__foot"><span class="status-dot">●</span> {{ SITE_NAME }} · {% trans "en línea" %}</div>
+</aside>

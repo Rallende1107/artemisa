@@ -1,0 +1,7 @@
+{% extends 'detail/base_data.html' %}
+{% load i18n ficha %}
+{% comment %}FICHA de datos staff de anime (gestión): cuadro compartido detail/base_data.html; aquí solo el id externo.{% endcomment %}
+
+{% block id_externo %}
+  {% if object.mal_id %}<div class="mal-row"><span class="k">{% trans 'mal_id' %}:</span><span class="v">{{ object.mal_id }}</span></div>{% endif %}
+{% endblock %}

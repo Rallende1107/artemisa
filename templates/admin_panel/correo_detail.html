@@ -1,0 +1,5 @@
+{% extends 'admin_panel/detail.html' %}
+
+{# Acciones del correo enviado: Reenviar (siempre) + Borrar. Mismas arriba y abajo. #}
+{% block detail_actions_top %}{% include 'admin_panel/_correo_actions.html' %}{% endblock %}
+{% block detail_actions %}{% include 'admin_panel/_correo_actions.html' %}{% endblock %}

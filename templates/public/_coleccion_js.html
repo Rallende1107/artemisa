@@ -1,0 +1,37 @@
+{% load i18n %}
+{# Pieza: «Añadir» / «En mi colección» (quitar) desde la fila o la tarjeta: POST con CSRF y vuelta a esta página #}
+  {% if user.is_authenticated %}
+  <script>
+    // «Añadir» / «En mi colección» (= quitar) desde la fila o la tarjeta: POST con CSRF y
+    // vuelta a esta misma página.
+    var QUITAR = "{% url 'collections:remove' 'TIPO' 0 %}";
+    function postear(action, campos) {
+      var f = document.createElement("form");
+      f.method = "post"; f.action = action;
+      var html = '<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">' +
+                 '<input type="hidden" name="next" value="{{ request.get_full_path|escapejs }}">';
+      Object.keys(campos).forEach(function (k) { html += '<input type="hidden" name="' + k + '" value="' + campos[k] + '">'; });
+      f.innerHTML = html; document.body.appendChild(f); f.submit();
+    }
+    document.addEventListener("click", function (e) {
+      var b = e.target.closest && e.target.closest(".js-add-col, .js-remove-col");
+      if (!b) return;
+      e.preventDefault(); e.stopPropagation();
+      if (b.classList.contains("js-add-col")) {
+        postear("{% url 'collections:add' %}", { kind: b.dataset.kind, object_id: b.dataset.id });
+        return;
+      }
+      var url = QUITAR.replace("TIPO", b.dataset.tipo).replace("/0/", "/" + b.dataset.pk + "/");
+      if (window.artNotify) {
+        window.artNotify.confirm({
+          title: "{% trans '¿Quitar de tu colección?' %}",
+          html: "<b>«" + (b.dataset.name || "") + "»</b>",
+          confirmButtonText: "{% trans 'Sí, quitar' %}",
+          customClass: { confirmButton: "swal2-danger" },
+        }).then(function (r) { if (r.isConfirmed) postear(url, {}); });
+      } else if (confirm("¿Quitar «" + (b.dataset.name || "") + "» de tu colección?")) {
+        postear(url, {});
+      }
+    });
+  </script>
+  {% endif %}

@@ -1,0 +1,25 @@
+{% extends page_template|default:'admin_panel/base_admin.html' %}
+{% load i18n %}
+
+{% comment %}Dashboard reutilizable (PanelHomeView y subclases). Fondo/título/subtítulo/base los declara
+la vista. Solo navega: una card por app; los logs viven en el home de cada app.{% endcomment %}
+
+{% block content %}
+  <div class="page-head">
+    <div class="breadcrumbs"><span>{% trans "panel" %}</span></div>
+    <h1 class="page-title">{{ page_title }}</h1>
+    <p class="page-sub">{{ page_sub }}{% if contact_count %} {% trans "Mensajes de contacto sin gestionar:" %} {{ contact_count }}.{% endif %}</p>
+  </div>
+
+  <div class="card-grid">
+    {% for it in cards %}
+      <a class="card{% if it.bg %} card--bg{% endif %}" href="{{ it.href }}"{% if it.bg %} style="--card-bg:url('{{ it.bg }}')"{% endif %}>
+        <div class="card__top"><div class="card__icon">{{ it.icon|safe }}</div></div>
+        <div class="card__name">{{ it.label }}</div>
+      </a>
+    {% endfor %}
+  </div>
+
+{% endblock %}
+
+{% block foot_meta %}{% endblock %}

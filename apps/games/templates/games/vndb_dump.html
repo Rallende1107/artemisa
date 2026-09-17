@@ -1,0 +1,41 @@
+{% extends 'panel/base.html' %}
+{% load i18n %}
+{% comment %}Cargar un dump de VNDB · paso 1: el formulario (subir / releer el último). El resumen es otra vista: vndb_dump_summary.html{% endcomment %}
+
+{% block title %}{{ title }} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div class="breadcrumbs">
+      <a href="{% url 'panel:home' %}">{% trans "panel" %}</a><span class="sep">/</span>
+      <a href="{% url section_url %}">{{ section_label }}</a><span class="sep">/</span>
+      <span>{% trans "dump de VNDB" %}</span>
+    </div>
+    <h1 class="page-title">{{ title }}</h1>
+    <p class="page-sub">{{ ayuda }}</p>
+  </div>
+
+  <div class="form-card" style="max-width:720px">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% for e in form.non_field_errors %}<div class="field__err">{{ e }}</div>{% endfor %}
+      <div class="field{% if form.archivo.errors %} field--error{% endif %}">
+        <label for="archivo">{{ form.archivo.label }}</label>
+        {{ form.archivo }}
+        {% for e in form.archivo.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+        <span class="field__hint">{% trans "Solo .json o .json.gz. Un registro suelto, una lista o uno por línea: las tres formas valen. Se guarda en dump/ con la fecha y se muestra el resumen antes de escribir nada." %}</span>
+      </div>
+      {# lo que hace la pantalla, y salir. «Cancelar» va en rojo porque es la salida, no una opción más. #}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:18px">
+        <button class="btn-save" type="submit" name="paso" value="subir">{% trans "Leer el archivo" %}</button>
+        <a class="btn-cancel" href="{{ cancel_href }}">{% trans "Cancelar" %}</a>
+      </div>
+      {% if ultimo %}
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border-soft)">
+        <p class="field__hint" style="margin:0 0 10px">{% trans "¿Sin archivo a mano?" %}</p>
+        <button class="btn-soft" type="submit" name="paso" value="ultimo" formnovalidate>{% trans "Releer el último" %} ({{ ultimo.name }})</button>
+      </div>
+      {% endif %}
+    </form>
+  </div>
+{% endblock %}

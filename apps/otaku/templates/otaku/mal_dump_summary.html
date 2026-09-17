@@ -1,0 +1,38 @@
+{% extends 'panel/base.html' %}
+{% load i18n %}
+{% comment %}Cargar un dump de MAL · paso 2: el resumen de lo que va a entrar y «Sí, continuar», que guarda el crudo aquí mismo.{% endcomment %}
+
+{% block title %}{{ title }} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div class="breadcrumbs">
+      <a href="{% url 'panel:home' %}">{% trans "panel" %}</a><span class="sep">/</span>
+      <a href="{% url section_url %}">{{ section_label }}</a><span class="sep">/</span>
+      <a href="{{ load_href }}">{% trans "dump de MAL" %}</a><span class="sep">/</span>
+      <span>{% trans "resumen" %}</span>
+    </div>
+    <h1 class="page-title">{{ title }}</h1>
+    <p class="page-sub">{% trans "Esto es lo que va a entrar. Nada se escribe hasta pulsar «Sí, continuar», y solo se llenan las tablas de datos crudos: procesar es otro paso." %}</p>
+  </div>
+
+  <div class="form-card" style="max-width:720px">
+    <h2 style="margin-top:0">{% trans "Resumen" %} · {{ nombre }}</h2>
+    <table class="tabla-simple" style="width:100%;margin-bottom:16px">
+      <tr><th style="text-align:left">{% trans "Registros en el dump" %}</th><td>{{ resumen.total }}</td></tr>
+      <tr><th style="text-align:left;padding-left:20px">{% trans "Con id, distintos" %}</th><td>{{ resumen.unicos }}</td></tr>
+      <tr><th style="text-align:left;padding-left:20px">{% trans "Repetidos en el archivo" %}</th><td>{{ resumen.repetidos }}</td></tr>
+      <tr><th style="text-align:left;padding-left:20px">{% trans "Sin id (se descartan)" %}</th><td>{{ resumen.sin_id }}</td></tr>
+      <tr><th style="text-align:left">{% trans "Se crearán" %} ({{ resumen.label }})</th><td>{{ resumen.crear }}</td></tr>
+      <tr><th style="text-align:left">{% trans "Ya están y se reemplazan" %}</th><td>{{ resumen.actualizar }}</td></tr>
+      <tr><th style="text-align:left">{% trans "Con imágenes (dentro del registro)" %}</th><td>{{ resumen.con_imagenes }}</td></tr>
+    </table>
+    <form method="post" style="margin-top:20px">
+      {% csrf_token %}
+      <div class="form-actions" style="border:0;padding:0;margin:0">
+        <button class="btn-save" type="submit">{% trans "Sí, continuar" %}</button>
+        <a class="btn-cancel" href="{{ cancel_href }}">{% trans "No, cancelar" %}</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

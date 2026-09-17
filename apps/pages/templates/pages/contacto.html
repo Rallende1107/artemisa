@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/components/form.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/contact.css' %}?v={{ ASSET_VERSION }}">
+{% endblock %}
+{% block content %}
+  <div class="wrap" style="padding-bottom:50px;">
+    <div class="contact-head">
+      <span class="eyebrow">{% trans "Contacto" %}</span>
+      <h1>{% trans "Escríbenos" %}</h1>
+      <p>{% trans "¿Dudas, sugerencias o un error que reportar? Envíanos un mensaje. Lo recibimos y te respondemos por correo." %}</p>
+    </div>
+
+    {% for m in messages %}
+      <div class="flash flash--{{ m.tags }}">{{ m }}</div>
+    {% endfor %}
+    <form class="form-card" method="post" style="margin-top:18px;">
+      {% csrf_token %}
+      <div class="form-grid">
+        {# FILA 1 · nombre + email → 2 columnas parejas (sin espacio muerto) #}
+        <div class="form-row">
+          <div class="field"><label for="c-name">{% trans "Nombre" %} <span class="req">{% trans "(requerido)" %}</span></label><input id="c-name" name="nombre" type="text" placeholder="{% trans "Tu nombre" %}"></div>
+          <div class="field"><label for="c-email">{% trans "Email" %} <span class="req">{% trans "(requerido)" %}</span></label><input id="c-email" name="email" type="email" placeholder="correo@dominio.com"></div>
+        </div>
+        <div class="field full"><label for="c-subject">{% trans "Asunto" %}</label><input id="c-subject" name="asunto" type="text" placeholder="{% trans "¿Sobre qué nos escribes?" %}"></div>
+        <div class="field full"><label for="c-msg">{% trans "Mensaje" %} <span class="req">{% trans "(requerido)" %}</span></label><textarea id="c-msg" name="mensaje" placeholder="{% trans "Cuéntanos…" %}" style="min-height:130px"></textarea></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-save" type="submit" title="{% trans "Enviar" %}">✉ {% trans "Enviar mensaje" %}</button>
+        <button class="btn-cancel" type="reset" title="{% trans "Borra lo escrito" %}">⌫ {% trans "Limpiar" %}</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

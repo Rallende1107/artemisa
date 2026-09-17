@@ -1,0 +1,55 @@
+/* COMPONENTE: auth  ↔  partials/_auth.html  (login / registro)  — reutiliza .field de form.css */
+/* Rellena el hueco que el shell ya reserva (NO exige su propio 100vh: eso
+   duplicaba el alto y provocaba scroll en login/registro/reset). Ver la regla
+   `.main__content:has(> .auth)` en 02-layout.css que lo vuelve columna flex. */
+.auth { flex: 1 1 auto; min-height: 0; display: grid; place-items: center; padding: 28px 24px; position: relative; }
+.auth__glow { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: min(600px, 100%); height: 400px; z-index: -1; background: radial-gradient(circle, var(--accent-08), transparent 60%); pointer-events: none; }
+.auth__card {
+  width: 100%; max-width: 420px; padding: 34px 30px;
+  background: var(--auth-card-bg);          /* dial propio (docs/transparencias.md); el blur mantiene la legibilidad */
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);  /* glass: la imagen se ve difuminada detrás */
+  border: 1px solid var(--border-soft); border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+.auth__mark { width: 52px; height: 52px; margin: 0 auto 18px; display: grid; place-items: center; border: 1px solid var(--accent); border-radius: 13px; color: var(--accent); font-family: var(--mono); font-size: 24px; box-shadow: 0 0 20px var(--accent-glow), inset 0 0 12px var(--accent-12); }
+.auth__card h1 { text-align: center; font-size: 21px; margin-bottom: 4px; }
+.auth__card .sub { text-align: center; color: var(--muted); font-size: 13.5px; margin-bottom: 24px; }
+.auth__card .form-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+.field__row { display: flex; justify-content: space-between; align-items: baseline; }
+.field__row a { font-size: 12px; color: var(--muted); }
+.field__row a:hover { color: var(--accent); }
+.auth__submit { width: 100%; height: 46px; margin-top: 8px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 700; color: var(--ground); background: var(--accent); border: 3px solid transparent; border-radius: 10px; transition: transform .12s, border-color .12s, filter .12s; }
+.auth__submit:hover { border-color: var(--accent-hover); transform: translateY(-2px); filter: brightness(1.05); }
+.auth__submit:active { transform: translateY(0); filter: brightness(.96); }
+.auth__submit:disabled { opacity: .45; cursor: not-allowed; filter: grayscale(.35); }
+.auth__submit:disabled:hover { transform: none; border-color: transparent; }
+
+/* Alerta de error (login/auth): caja danger con icono, no texto plano. */
+.auth__error {
+  display: flex; align-items: flex-start; gap: 9px;
+  margin-bottom: 16px; padding: 11px 14px;
+  background: var(--danger-08); border: 1px solid var(--danger-22);
+  border-radius: 9px; color: var(--danger); font-size: 13px; line-height: 1.45;
+}
+.auth__error::before { content: "⚠"; font-size: 15px; line-height: 1.2; flex: none; }
+.auth__reset { text-align: center; margin-top: 14px; font-size: 13px; }
+.auth__reset a { color: var(--muted); }
+.auth__reset a:hover { color: var(--accent); }
+.auth__foot { text-align: center; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--border-soft); font-size: 13px; color: var(--muted); }
+.auth__foot a { color: var(--accent); }
+.auth__note { display: flex; gap: 8px; align-items: flex-start; margin-top: 18px; padding: 11px 13px; background: rgba(255,45,111,.06); border: 1px solid rgba(255,45,111,.2); border-radius: 9px; font-size: 12px; color: var(--muted); }
+.auth__note b { color: var(--adult); }
+
+/* ---- Modal nativo (<dialog>) — requisitos de contraseña, etc. ---- */
+.hint-link { background: none; border: 0; color: var(--accent); font-size: 12.5px; cursor: pointer; padding: 2px 0; display: inline-flex; align-items: center; gap: 6px; }
+.hint-link:hover { text-decoration: underline; }
+.modal { border: 1px solid var(--border); border-radius: 16px; padding: 0; background: var(--elevated); color: var(--text); max-width: 440px; width: 92%; box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+.modal::backdrop { background: rgba(0,0,0,.6); backdrop-filter: blur(3px); }
+.modal__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 20px; border-bottom: 1px solid var(--border-soft); }
+.modal__head h2 { font-size: 16px; display: flex; align-items: center; gap: 8px; }
+.modal__x { background: none; border: 0; color: var(--muted); font-size: 26px; line-height: 1; cursor: pointer; padding: 0 4px; }
+.modal__x:hover { color: var(--text); }
+.modal__body { padding: 18px 20px; font-size: 14px; color: var(--text-2); }
+.modal__body ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 9px; }
+.modal__body li { line-height: 1.4; }
+.modal__foot { padding: 14px 20px 18px; display: flex; justify-content: flex-end; }

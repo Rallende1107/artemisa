@@ -1,0 +1,28 @@
+{% comment %} Campos de PeopleLog — PARCIAL que incluye admin_panel/form.html (card, botones, csrf).
+   Lo declaran las vistas Create/Update con form_template. `is_active` (booleano) lo auto-agrupa el cuadro.
+   Sincroniza:  python manage.py sync_forms  {% endcomment %}
+
+    {# ROW · nivel + proceso #}
+    <div class="form-row">
+      <div class="field">
+        <label for="{{ form.level.id_for_label }}">{{ form.level.label }}{% if form.level.field.required %} <span class="req">*</span>{% endif %}</label>
+        {{ form.level }}
+        {% for e in form.level.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+        {% if form.level.help_text %}<span class="field__hint">{{ form.level.help_text }}</span>{% endif %}
+      </div>
+      <div class="field">
+        <label for="{{ form.process.id_for_label }}">{{ form.process.label }}{% if form.process.field.required %} <span class="req">*</span>{% endif %}</label>
+        {{ form.process }}
+        {% for e in form.process.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+        {% if form.process.help_text %}<span class="field__hint">{{ form.process.help_text }}</span>{% endif %}
+      </div>
+    </div>
+    {# ROW · mensaje SOLO (textarea = fila completa) #}
+    <div class="form-row">
+      <div class="field">
+        <label for="{{ form.message.id_for_label }}">{{ form.message.label }}{% if form.message.field.required %} <span class="req">*</span>{% endif %}</label>
+        {{ form.message }}
+        {% for e in form.message.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+        {% if form.message.help_text %}<span class="field__hint">{{ form.message.help_text }}</span>{% endif %}
+      </div>
+    </div>

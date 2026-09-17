@@ -1,0 +1,28 @@
+{% comment %} Campos de imagen de anime — patrón Hades/Poseidon.
+   PARCIAL que INCLUYE admin_panel/form.html (el cuadro: card, botones, csrf) porque la
+   vista Create/Update lo declara: form_template = "…/form/<modelo>.html".
+   Edita libremente el orden/HTML de cada campo aquí. Los booleanos se
+   auto-agrupan abajo, no van en este bloque.
+   Sincroniza:  python manage.py sync_forms  {% endcomment %}
+
+    <div class="field">
+      <label for="{{ form.anime.id_for_label }}">{{ form.anime.label }}{% if form.anime.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.anime }}
+      {% for e in form.anime.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.anime.help_text %}<span class="field__hint">{{ form.anime.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.order.id_for_label }}">{{ form.order.label }}</label>
+      {{ form.order }}
+      {% for e in form.order.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.order.help_text %}<span class="field__hint">{{ form.order.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      {% include 'admin_panel/_campo_imagen.html' with field=form.image %}
+    </div>
+    <div class="field">
+      <label for="{{ form.image_url.id_for_label }}">{{ form.image_url.label }}{% if form.image_url.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.image_url }}
+      {% for e in form.image_url.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.image_url.help_text %}<span class="field__hint">{{ form.image_url.help_text }}</span>{% endif %}
+    </div>

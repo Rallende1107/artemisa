@@ -1,0 +1,34 @@
+<div class="form-row">
+    <div class="field">
+        <label for="{{ form.full_name.id_for_label }}">{{ form.full_name.label }}{% if form.full_name.field.required %} <span class="req">*</span>{% endif %}</label>
+        {{ form.full_name }}
+        {% for e in form.full_name.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+        {% if form.full_name.help_text %}<span class="field__hint">{{ form.full_name.help_text }}</span>{% endif %}
+    </div>
+</div>
+
+<div class="form-row">
+    <div class="field">
+        <label for="{{ form.biography.id_for_label }}">{{ form.biography.label }}{% if form.biography.field.required %} <span class="req">*</span>{% endif %}</label>
+        {{ form.biography }}
+        {% for e in form.biography.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+        {% if form.biography.help_text %}<span class="field__hint">{{ form.biography.help_text }}</span>{% endif %}
+    </div>
+</div>
+
+<div class="form-row">
+    <div class="field">
+      <label for="{{ form.birth_date.id_for_label }}">{{ form.birth_date.label }}{% if form.birth_date.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.birth_date }}
+      {% for e in form.birth_date.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.birth_date.help_text %}<span class="field__hint">{{ form.birth_date.help_text }}</span>{% endif %}
+    </div>
+
+    <div class="field">
+      <label for="{{ form.country.id_for_label }}">{{ form.country.label }}{% if form.country.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.country }}
+      {% for e in form.country.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.country.help_text %}<span class="field__hint">{{ form.country.help_text }}</span>{% endif %}
+    </div>
+</div>
+

@@ -1,0 +1,21 @@
+{% comment %} Campos de relación entre películas — PARCIAL que INCLUYE admin_panel/form.html (el cuadro: card, botones, csrf)
+   porque la vista Create/Update lo declara: form_template = "movies/form/movie_relation.html". {% endcomment %}
+
+    <div class="field">
+      <label for="{{ form.movie.id_for_label }}">{{ form.movie.label }} <span class="req">*</span></label>
+      {{ form.movie }}
+      {% for e in form.movie.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.movie.help_text %}<span class="field__hint">{{ form.movie.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.relation_type.id_for_label }}">{{ form.relation_type.label }}</label>
+      {{ form.relation_type }}
+      {% for e in form.relation_type.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.relation_type.help_text %}<span class="field__hint">{{ form.relation_type.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.related.id_for_label }}">{{ form.related.label }} <span class="req">*</span></label>
+      {{ form.related }}
+      {% for e in form.related.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.related.help_text %}<span class="field__hint">{{ form.related.help_text }}</span>{% endif %}
+    </div>

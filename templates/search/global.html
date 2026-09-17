@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% comment %}BUSCADOR GLOBAL: cruza todos los medios, 6 por categoría y «Ver
+más» hacia el catálogo del medio con la búsqueda ya puesta (?q=).{% endcomment %}
+
+{% block title %}{{ page_title }} · {{ block.super }}{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/components/ficha.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/catalogo.css' %}?v={{ ASSET_VERSION }}">
+{% endblock %}
+
+{% block content %}
+  <div class="cat-wrap">
+    <div class="page-head" style="text-align:center;">
+      <h1 class="page-title"><i class="bi bi-search"></i> {% trans 'Buscar' %}</h1>
+    </div>
+
+    <form method="get" action="{% url 'pages:search' %}"
+          style="display:flex;gap:10px;justify-content:center;margin-bottom:30px;">
+      <input type="search" name="q" value="{{ q }}" placeholder="{% trans 'Anime, canción, persona, juego…' %}"
+             aria-label="Buscar en todo el sitio" autofocus
+             style="width:min(520px,90%);height:44px;padding:0 16px;border-radius:11px;
+                    background:var(--glass-2);border:1px solid var(--border-soft);
+                    color:var(--text);font-size:14px;">
+      <button type="submit" class="btn-filtrar">{% trans 'Buscar' %}</button>
+    </form>
+
+    {% for g in grupos %}
+      <section class="dsection">
+        <h3>{{ g.titulo }}
+          {% if g.hay_mas %}
+            <a class="page-sub" style="margin-left:auto;font-size:12px" href="{{ g.url_mas }}">{% trans 'Ver más' %} →</a>
+          {% endif %}
+        </h3>
+        <div class="cards-grid cards-grid--wide">
+          {% for it in g.items %}
+            <a href="{{ it.url }}" class="card">
+              <div class="card-image-container">
+                {% if it.image %}<img src="{{ it.image }}" alt="{{ it.name }}" loading="lazy">
+                {% else %}<img src="{% static 'image/default/sin-imagen.webp' %}" alt="Sin imagen" loading="lazy">{% endif %}
+              </div>
+              <div class="card-title">{{ it.name }}</div>
+              {% if it.sub %}<div class="card-sub">{{ it.sub }}</div>{% endif %}
+            </a>
+          {% endfor %}
+        </div>
+      </section>
+    {% empty %}
+      {% if q %}<p class="page-sub" style="text-align:center;">{% blocktrans %}Nada encontrado para «{{ q }}».{% endblocktrans %}</p>
+      {% else %}<p class="page-sub" style="text-align:center;">{% trans 'Escribe algo para buscar en todo Frikiverso.' %}</p>{% endif %}
+    {% endfor %}
+  </div>
+{% endblock %}

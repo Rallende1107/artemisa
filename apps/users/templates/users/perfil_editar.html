@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/components/form.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/ficha.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'vendor/flatpickr/flatpickr.min.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/flatpickr-theme.css' %}?v={{ ASSET_VERSION }}">
+  <style>.field__err{color:var(--danger);font-size:12px}</style>
+{% endblock %}
+
+{% block content %}
+  <div class="wrap" style="padding-top:22px;">
+    <div class="page-head">
+      <div class="breadcrumbs"><a href="{% url 'users:profile' %}">mi perfil</a><span class="sep">/</span><span>editar</span></div>
+      <h1 class="page-title">{{ page_title }}</h1>
+    </div>
+
+    <form class="form-card" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div style="color:var(--danger);margin-bottom:12px">{{ form.non_field_errors }}</div>{% endif %}
+      <div class="form-grid">
+        {# FILA 1 · nombre + apellidos → 2 columnas #}
+        <div class="form-row">
+          <div class="field">
+            <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+            {{ form.first_name }}
+            {% for e in form.first_name.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+          </div>
+          <div class="field">
+            <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+            {{ form.last_name }}
+            {% for e in form.last_name.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+          </div>
+        </div>
+        {# FILA 2 · correo solo → fila completa #}
+        <div class="form-row">
+          <div class="field">
+            <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+            {{ form.email }}
+            {% for e in form.email.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+          </div>
+        </div>
+        {# FILA 3 · teléfono (+56 fijo) + nacimiento → 2 columnas #}
+        <div class="form-row">
+          <div class="field">
+            <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+            <div class="input-prefix"><span>+56</span>{{ form.phone }}</div>
+            <span class="field__hint">Solo tu celular: 9 dígitos (empieza con 9). El +56 lo ponemos nosotros.</span>
+            {% for e in form.phone.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+          </div>
+          <div class="field">
+            <label for="{{ form.birth_date.id_for_label }}">{{ form.birth_date.label }}</label>
+            {{ form.birth_date }}
+            {% for e in form.birth_date.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+          </div>
+        </div>
+        {# ROW · avatar SOLO en su row, con antes/después #}
+        <div class="form-row">
+          <div class="field">
+            {% include 'admin_panel/_campo_imagen.html' with field=form.avatar clear_field=form.avatar_clear %}
+          </div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-save" type="submit">Guardar cambios</button>
+        <a class="btn-cancel" href="{% url 'users:profile' %}">Cancelar</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  {% include 'partials/_lightbox.html' %}   {# modal Ver imagen del campo imagen #}
+  <script src="{% static 'vendor/flatpickr/flatpickr.min.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script src="{% static 'vendor/flatpickr/es.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script src="{% static 'js/forms.js' %}?v={{ ASSET_VERSION }}"></script>
+{% endblock %}

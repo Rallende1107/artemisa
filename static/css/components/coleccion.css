@@ -1,0 +1,29 @@
+/* COMPONENTE: coleccion  ↔  partials/_coleccion.html  (biblioteca personal) */
+.col-head { padding: 38px 0 10px; }
+.col-head .eyebrow { color: var(--accent); display: block; margin-bottom: 8px; }
+.col-head h1 { font-size: 30px; letter-spacing: -.02em; }
+.col-head p { color: var(--muted); margin-top: 4px; }
+
+.stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; padding: 18px 0 24px; }
+.stat-tile { padding: 16px; background: var(--surface); border: 1px solid var(--border-soft); border-radius: 12px; }
+.stat-tile .v { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stat-tile .v.c { color: var(--accent); } .stat-tile .v.g { color: var(--ok); } .stat-tile .v.s { color: var(--warning); }
+.stat-tile .k { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+
+.col-filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding-bottom: 22px; border-bottom: 1px solid var(--border-soft); margin-bottom: 24px; }
+.fchip { height: 32px; padding: 0 14px; background: var(--surface); border: 1px solid var(--border-soft); border-radius: 20px; color: var(--muted); font-size: 13px; transition: all .14s; }
+.fchip:hover { color: var(--text); border-color: var(--border); }
+.fchip.active { color: var(--accent); border-color: var(--accent); background: var(--accent-06); }
+.fsel { height: 32px; padding: 0 12px; background: var(--surface); border: 1px solid var(--border-soft); border-radius: 8px; color: var(--muted); font-size: 13px; font-family: var(--mono); }
+
+/* Estado + nota sobre la portada */
+.mini-pill { display: inline-flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 10.5px; padding: 2px 8px; border-radius: 20px; }
+.mini-pill .d { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.s-active  { color: var(--accent); background: var(--accent-08); border: 1px solid var(--border); }
+.s-done    { color: var(--ok);     background: var(--ok-10); border: 1px solid var(--ok-25); }
+.s-pending { color: var(--muted);  background: var(--white-05); border: 1px solid var(--border-soft); }
+.s-dropped { color: var(--danger); background: var(--danger-08); border: 1px solid var(--danger-22); }
+.cover__sub.with-score { display: flex; align-items: center; }
+.cover__score { margin-left: auto; color: var(--warning); }
+
+@media (max-width: 640px) { .stat-row { grid-template-columns: 1fr 1fr; } }

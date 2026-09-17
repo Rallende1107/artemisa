@@ -1,0 +1,189 @@
+{% extends page_template|default:'panel/base.html' %}
+{% load static %}
+{% comment %}
+  RESULTADOS de la búsqueda por nombre (BaseImportSearch): TODOS los candidatos que devuelve la fuente, en una
+  tabla normal (no DataTable) paginada en servidor. Cada fila tiene su casilla: los nuevos se importan; los que
+  «ya están» se RE-OBTIENEN (se vuelve a pedir su ficha). Las marcas sobreviven al cambiar de página (se guardan
+  en el navegador por búsqueda) y se envían todas juntas con «Importar marcados». «Volver» regresa al lanzador.
+{% endcomment %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/components/table.css' %}?v={{ ASSET_VERSION }}">
+  <style>
+    .buscar-caja { max-width: 640px; }
+    .resultados__barra { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+                         padding: 12px 16px; border-bottom: 1px solid var(--border-soft); }
+    .resultados__barra .cuenta { font: 12.5px var(--mono); color: var(--muted); margin-right: auto; }
+    .resultados__barra .cuenta b { color: var(--ink-soft); }
+    .resultados__barra .btn-cancel { height: 30px; padding: 0 12px; font-size: 12.5px; border-radius: 7px; }
+    .th-thumb, .td-thumb { width: 52px; }
+    .td-thumb img { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; display: block; }
+    .td-thumb .hueco { display: block; width: 40px; height: 40px; border-radius: 8px; background: var(--accent-06); }
+    .fila--ya { opacity: .6; }
+    tbody tr:has(input[name="ids"]:checked) { background: var(--accent-08); opacity: 1; }
+    .td-sub { color: var(--muted); font-size: 12.5px; }
+    .col-stat { width: auto; white-space: nowrap; }
+    .col-stat .stat { white-space: nowrap; }
+    .acciones { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+                padding: 14px 16px; border-top: 1px solid var(--border-soft); }
+    .acciones .destino { margin-left: auto; font: 12px var(--mono); color: var(--ink-dim); }
+    .acciones .destino b { color: var(--ink-soft); font-weight: 500; }
+    .acciones .otras { font: 12px var(--mono); color: var(--muted); }
+    .paginas { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font: 12.5px var(--mono); color: var(--muted); }
+    .paginas a, .paginas .actual { min-width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center;
+                                   padding: 0 8px; border-radius: 7px; border: 1px solid var(--border-soft); text-decoration: none; color: var(--ink-soft); }
+    .paginas a:hover { color: var(--accent); border-color: var(--accent); }
+    .paginas .actual { color: var(--accent); border-color: var(--accent); background: var(--accent-06); }
+    .paginas .puntos { padding: 0 4px; }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div class="breadcrumbs">
+      <a href="{% url 'panel:home' %}">panel</a><span class="sep">/</span>
+      {% if section_url %}<a href="{% url section_url %}">{{ section_label|lower }}</a><span class="sep">/</span>{% endif %}
+      {% if back_href %}<a href="{{ back_href }}">importar · {{ source_key }} · {{ label|lower }}</a><span class="sep">/</span>{% endif %}
+      <span>resultados</span>
+    </div>
+    <h1 class="page-title">{{ page_title }}{% if q %} · «{{ q }}»{% endif %}</h1>
+    <p class="page-sub">{{ ayuda }}</p>
+  </div>
+
+  {# --- volver a buscar sin salir de aquí --- #}
+  <form class="form-card buscar-caja" method="get" style="margin-bottom:18px"
+        data-espera="Buscando en {{ source_label }}…" data-espera-texto="Puede tardar unos segundos.">
+    <div class="field">
+      <label for="{{ caja.q.id_for_label }}">{{ caja.q.label }}</label>
+      <input type="search" name="q" id="{{ caja.q.id_for_label }}" value="{{ q }}"
+             maxlength="{{ caja.q.field.max_length }}" placeholder="{{ caja.q.field.widget.attrs.placeholder }}" autocomplete="off">
+    </div>
+    <div class="form-actions" style="display:flex;gap:12px;margin-top:14px">
+      <button type="submit" class="btn-primary">Buscar</button>
+      {% if back_href %}<a class="btn-cancel" href="{{ back_href }}">← Volver</a>{% endif %}
+    </div>
+  </form>
+
+  {% if q %}
+    {% if resultados %}
+    <form method="post" id="importar-resultados" data-clave="{{ request.path }}|{{ q }}" data-espera="Encolando la importación…">
+      {% csrf_token %}
+      <div class="table-wrap">
+        <div class="resultados__barra">
+          <span class="cuenta"><b>{{ total }}</b> resultado{{ total|pluralize }} · <b>{{ nuevos }}</b> sin descargar{% if pagina.paginator.num_pages > 1 %} · página {{ pagina.number }} de {{ pagina.paginator.num_pages }}{% endif %}</span>
+          <button type="button" class="btn-cancel" id="marcar-nuevos"{% if not nuevos %} disabled{% endif %}>Marcar los nuevos</button>
+          <button type="button" class="btn-cancel" id="marcar-todos">Marcar todos</button>
+          <button type="button" class="btn-cancel" id="marcar-ninguno">Quitar marcas</button>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th class="th-sel"><input type="checkbox" id="marcar-cabecera" title="Marcar toda la página"></th>
+                {% if con_imagen %}<th class="th-thumb"></th>{% endif %}
+                <th>{{ label }}</th>
+                <th class="th-id">id</th>
+                <th class="col-stat">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in resultados %}
+                <tr{% if r.ya %} class="fila--ya"{% endif %}>
+                  <td class="td-sel">
+                    <input type="checkbox" name="ids" value="{{ r.id }}" data-ya="{% if r.ya %}1{% else %}0{% endif %}"
+                           title="{% if r.ya %}Marcar para volver a pedir su ficha{% else %}Marcar para importar{% endif %}">
+                  </td>
+                  {% if con_imagen %}<td class="td-thumb">
+                    {% if r.imagen %}<img src="{{ r.imagen }}" alt="" loading="lazy">{% else %}<span class="hueco"></span>{% endif %}
+                  </td>{% endif %}
+                  <td>
+                    <div class="td-name">{{ r.titulo }}</div>
+                    {% if r.sub %}<div class="td-sub">{{ r.sub }}</div>{% endif %}
+                  </td>
+                  <td class="td-id">
+                    {% if r.link %}<a class="link-cyan" href="{{ r.link }}" target="_blank" rel="noopener">{{ r.id }} ↗</a>
+                    {% else %}{{ r.id }}{% endif %}
+                  </td>
+                  <td class="col-stat">
+                    {% if r.ya %}<span class="stat on" title="Si lo marcas, se vuelve a pedir su ficha">Ya está</span>{% else %}<span class="stat off">Nuevo</span>{% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="acciones">
+          <button type="submit" class="btn-primary" id="btn-importar" disabled>Importar marcados</button>
+          {% if back_href %}<a class="btn-cancel" href="{{ back_href }}">← Volver</a>{% endif %}
+          <span class="otras" id="otras-paginas" hidden></span>
+          {% if pagina.paginator.num_pages > 1 %}
+          <nav class="paginas" aria-label="Páginas de resultados">
+            {% if pagina.has_previous %}<a href="?q={{ q|urlencode }}&page={{ pagina.previous_page_number }}" title="Anterior">‹</a>{% endif %}
+            {% for n in pagina.paginator.get_elided_page_range %}
+              {% if n == pagina.paginator.ELLIPSIS %}<span class="puntos">…</span>
+              {% elif n == pagina.number %}<span class="actual">{{ n }}</span>
+              {% else %}<a href="?q={{ q|urlencode }}&page={{ n }}">{{ n }}</a>{% endif %}
+            {% endfor %}
+            {% if pagina.has_next %}<a href="?q={{ q|urlencode }}&page={{ pagina.next_page_number }}" title="Siguiente">›</a>{% endif %}
+          </nav>
+          {% endif %}
+          {% if success_label %}<span class="destino">al terminar → <b>{{ success_label }}</b></span>{% endif %}
+        </div>
+      </div>
+    </form>
+    <script>
+      (function () {
+        var form = document.getElementById('importar-resultados');
+        var casillas = Array.prototype.slice.call(form.querySelectorAll('input[name="ids"]'));
+        var boton = document.getElementById('btn-importar');
+        var cabecera = document.getElementById('marcar-cabecera');
+        var otras = document.getElementById('otras-paginas');
+        var clave = 'importar-marcas:' + form.dataset.clave;
+
+        /* Las marcas viven en el navegador POR BÚSQUEDA (misma ruta + mismo texto), así sobreviven al cambio de
+           página: {id: esNuevo}. Al enviar, las de otras páginas van como campos ocultos. */
+        function leer() { try { return JSON.parse(sessionStorage.getItem(clave) || '{}'); } catch (e) { return {}; } }
+        function guardar(m) { try { sessionStorage.setItem(clave, JSON.stringify(m)); } catch (e) {} }
+        function enPagina(id) { return casillas.some(function (c) { return c.value === id; }); }
+
+        function contar() {
+          var marcas = leer();
+          casillas.forEach(function (c) { if (c.checked) { marcas[c.value] = c.dataset.ya === '0'; } else { delete marcas[c.value]; } });
+          guardar(marcas);
+          var ids = Object.keys(marcas), nuevos = ids.filter(function (id) { return marcas[id]; }).length, otraVez = ids.length - nuevos;
+          var fuera = ids.filter(function (id) { return !enPagina(id); }).length;
+          boton.disabled = ids.length === 0;
+          var partes = [];
+          if (nuevos) { partes.push(nuevos + ' nuevo' + (nuevos > 1 ? 's' : '')); }
+          if (otraVez) { partes.push(otraVez + ' re-obtener'); }
+          boton.textContent = ids.length ? 'Importar ' + ids.length + ' (' + partes.join(' · ') + ')' : 'Importar marcados';
+          otras.hidden = fuera === 0;
+          otras.textContent = fuera ? fuera + ' marcado' + (fuera > 1 ? 's' : '') + ' en otras páginas' : '';
+          var aqui = casillas.filter(function (c) { return c.checked; }).length;
+          cabecera.checked = aqui > 0 && aqui === casillas.length;
+          cabecera.indeterminate = aqui > 0 && aqui < casillas.length;
+        }
+        function marcar(filtro) { casillas.forEach(function (c) { c.checked = filtro(c); }); contar(); }
+
+        var previas = leer();                                    /* al entrar: recuperar lo marcado antes */
+        casillas.forEach(function (c) { c.checked = c.value in previas; c.addEventListener('change', contar); });
+        cabecera.addEventListener('change', function () { var v = cabecera.checked; marcar(function () { return v; }); });
+        document.getElementById('marcar-nuevos').addEventListener('click', function () { marcar(function (c) { return c.dataset.ya === '0'; }); });
+        document.getElementById('marcar-todos').addEventListener('click', function () { marcar(function () { return true; }); });
+        document.getElementById('marcar-ninguno').addEventListener('click', function () { guardar({}); marcar(function () { return false; }); });
+        form.addEventListener('submit', function () {             /* las de otras páginas viajan ocultas */
+          var marcas = leer();
+          Object.keys(marcas).forEach(function (id) {
+            if (enPagina(id)) { return; }
+            var h = document.createElement('input'); h.type = 'hidden'; h.name = 'ids'; h.value = id; form.appendChild(h);
+          });
+          guardar({});
+        });
+        contar();
+      })();
+    </script>
+    {% else %}
+      <p class="page-sub">Sin resultados para «{{ q }}».</p>
+    {% endif %}
+  {% endif %}
+{% endblock %}

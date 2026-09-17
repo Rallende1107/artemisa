@@ -1,0 +1,17 @@
+{# Nodo recursivo del sidebar genérico (vars: node, top). Reusa las clases del sidebar a mano. #}
+{% if node.kind == "group" %}
+  <div class="nav-group__label eyebrow">{{ node.label }}</div>
+  {% for child in node.children %}{% include 'panel/_nav_node.html' with node=child top=top %}{% endfor %}
+{% elif node.kind == "tree" %}
+  <details class="nav-tree{% if not top %} nav-tree--sub{% endif %}"{% if top and active_entity in node.open_for %} open{% endif %}>
+    {% if top %}
+      <summary><a class="nav-tree__home{% if active_entity == node.entity %} active{% endif %}"{% if node.url %} href="{% url node.url %}"{% endif %} onclick="event.stopPropagation()">{% if node.icon %}<span class="ico"><i class="bi {{ node.icon }}"></i></span> {% endif %}{{ node.label }}</a></summary>
+    {% else %}
+      <summary>{{ node.label }}</summary>
+    {% endif %}
+    {% for child in node.children %}{% include 'panel/_nav_node.html' with node=child top=False %}{% endfor %}
+  </details>
+{% elif node.super_only and not user.is_superuser %}{# oculto para no-superusuarios #}
+{% else %}
+  <a class="nav-item{% if node.entity and active_entity == node.entity %} active{% endif %}"{% if node.href %} href="{{ node.href }}"{% elif node.url and node.args|length == 2 %} href="{% url node.url node.args.0 node.args.1 %}{% if node.query %}?{{ node.query }}{% endif %}"{% elif node.url and node.args %} href="{% url node.url node.args.0 %}{% if node.query %}?{{ node.query }}{% endif %}"{% elif node.url %} href="{% url node.url %}{% if node.query %}?{{ node.query }}{% endif %}"{% endif %}>{% if node.icon %}<span class="ico"><i class="bi {{ node.icon }}"></i></span> {% endif %}{{ node.label }}</a>
+{% endif %}

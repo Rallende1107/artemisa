@@ -1,0 +1,55 @@
+{% comment %} Campos de canción de anime — patrón Hades/Poseidon.
+   PARCIAL que INCLUYE admin_panel/form.html (el cuadro: card, botones, csrf) porque la
+   vista Create/Update lo declara: form_template = "…/form/<modelo>.html".
+   Edita libremente el orden/HTML de cada campo aquí. Los booleanos se
+   auto-agrupan abajo, no van en este bloque.
+   Sincroniza:  python manage.py sync_forms  {% endcomment %}
+
+    <div class="field">
+      <label for="{{ form.anime.id_for_label }}">{{ form.anime.label }}{% if form.anime.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.anime }}
+      {% for e in form.anime.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.anime.help_text %}<span class="field__hint">{{ form.anime.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.type.id_for_label }}">{{ form.type.label }}{% if form.type.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.type }}
+      {% for e in form.type.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.type.help_text %}<span class="field__hint">{{ form.type.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.song_id.id_for_label }}">{{ form.song_id.label }}{% if form.song_id.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.song_id }}
+      {% for e in form.song_id.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.song_id.help_text %}<span class="field__hint">{{ form.song_id.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.artist_credit.id_for_label }}">{{ form.artist_credit.label }}</label>
+      {{ form.artist_credit }}
+      {% for e in form.artist_credit.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.artist_credit.help_text %}<span class="field__hint">{{ form.artist_credit.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.artists.id_for_label }}">{{ form.artists.label }}{% if form.artists.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.artists }}
+      {% for e in form.artists.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.artists.help_text %}<span class="field__hint">{{ form.artists.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.title.id_for_label }}">{{ form.title.label }}{% if form.title.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.title }}
+      {% for e in form.title.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.title.help_text %}<span class="field__hint">{{ form.title.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.title_kanji.id_for_label }}">{{ form.title_kanji.label }}{% if form.title_kanji.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.title_kanji }}
+      {% for e in form.title_kanji.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.title_kanji.help_text %}<span class="field__hint">{{ form.title_kanji.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.title_eng.id_for_label }}">{{ form.title_eng.label }}{% if form.title_eng.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.title_eng }}
+      {% for e in form.title_eng.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.title_eng.help_text %}<span class="field__hint">{{ form.title_eng.help_text }}</span>{% endif %}
+    </div>

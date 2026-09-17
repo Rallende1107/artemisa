@@ -1,0 +1,116 @@
+{% extends 'detail/base_detail.html' %}
+{% load i18n ficha %}
+{% comment %}FICHA de anime (gestión y público) sobre detail/base_detail.html, calcada de MAL. La vista solo pasa
+pestañas y «por»; lo que se pinta lo dan los métodos del modelo: titulos, personajes (con su voz), equipo,
+banda_sonora, relaciones. Pestañas de la página: Detalles (sinopsis + mini recuentos), Personajes, Equipo,
+Banda sonora (tabla MAL), Relaciones e Imágenes.{% endcomment %}
+
+{% block subtitulo %}{% if object.title_jap %}<div class="orig">{{ object.title_jap }}</div>{% endif %}{% endblock %}
+
+{% block titulos %}{% include 'detail/_titulos.html' with titulos=object.titulos pk=object.pk %}{% endblock %}
+
+{% block side %}
+  {% if object.anime_type %}<div class="mal-row"><span class="k">{% trans 'Tipo' %}:</span><span class="v"><a href="{% by by_url 'tipo' object.anime_type %}">{{ object.anime_type }}</a></span></div>{% endif %}
+  {% if object.episodes %}<div class="mal-row"><span class="k">{% trans 'Episodios' %}:</span><span class="v">{{ object.episodes }}</span></div>{% endif %}
+  {% if object.status %}<div class="mal-row"><span class="k">{% trans 'Estado' %}:</span><span class="v"><a href="{% by by_url 'estado' object.status %}">{{ object.status }}</a></span></div>{% endif %}
+  {% if object.from_date %}<div class="mal-row"><span class="k">{% trans 'Emisión' %}:</span><span class="v">{{ object.from_date|date:"d M Y" }}{% if object.to_date %} – {{ object.to_date|date:"d M Y" }}{% endif %}</span></div>
+  {% elif object.year %}<div class="mal-row"><span class="k">{% trans 'Año' %}:</span><span class="v">{{ object.year }}</span></div>{% endif %}
+  {% if object.season %}<div class="mal-row"><span class="k">{% trans 'Temporada' %}:</span><span class="v"><a href="{% url 'panel:anime_by' 'season' object.season %}">{{ object.get_season_display }}</a>{% if object.from_date %} · {{ object.from_date }}{% endif %}</span></div>{% endif %}
+  {% with lista=object.studios.all %}{% if lista %}<div class="mal-row"><span class="k">{% trans 'Estudios' %}:</span><span class="v">{% for c in lista %}<a href="{% ficha c %}">{{ c }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>{% endif %}{% endwith %}
+  {% with lista=object.producers.all %}{% if lista %}<div class="mal-row"><span class="k">{% trans 'Productoras' %}:</span><span class="v">{% for c in lista %}<a href="{% ficha c %}">{{ c }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>{% endif %}{% endwith %}
+  {% with lista=object.licensors.all %}{% if lista %}<div class="mal-row"><span class="k">{% trans 'Licenciatarias' %}:</span><span class="v">{% for c in lista %}<a href="{% ficha c %}">{{ c }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>{% endif %}{% endwith %}
+  {% if object.source %}<div class="mal-row"><span class="k">{% trans 'Fuente' %}:</span><span class="v"><a href="{% by by_url 'fuente' object.source %}">{{ object.source }}</a></span></div>{% endif %}
+  {% with lista=object.genres.all %}{% if lista %}<div class="mal-row"><span class="k">{% trans 'Géneros' %}:</span><span class="v">{% for g in lista %}<a href="{% by by_url 'genero' g %}">{{ g }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>{% endif %}{% endwith %}
+  {% with lista=object.themes.all %}{% if lista %}<div class="mal-row"><span class="k">{% trans 'Temas' %}:</span><span class="v">{% for g in lista %}<a href="{% by by_url 'tema' g %}">{{ g }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>{% endif %}{% endwith %}
+  {% with lista=object.demographics.all %}{% if lista %}<div class="mal-row"><span class="k">{% trans 'Demografía' %}:</span><span class="v">{% for g in lista %}<a href="{% by by_url 'demografia' g %}">{{ g }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>{% endif %}{% endwith %}
+  {% if object.rating %}<div class="mal-row"><span class="k">{% trans 'Clasificación' %}:</span><span class="v"><a href="{% url 'panel:anime_by' 'rating' object.rating %}">{{ object.get_rating_display }}</a></span></div>{% endif %}
+  {% if object.mal_id > 0 %}<div class="mal-row"><span class="k">MAL:</span><span class="v"><a href="https://myanimelist.net/anime/{{ object.mal_id }}" target="_blank" rel="noopener">{{ object.mal_id }}</a></span></div>{% endif %}
+{% endblock %}
+
+{% block cuerpo %}
+  {% with personajes=object.personajes equipo=object.equipo canciones=object.canciones grupos=object.banda_sonora relaciones=object.relaciones fotos=object|fotos %}
+
+  {# ---- Detalles: sinopsis + mini recuentos (relaciones, personajes con su voz, equipo, banda sonora) ---- #}
+  <section class="dsection" data-tab="detalles" data-label="{% trans 'Detalles' %}" style="padding-top:0;">
+    <h3>{% trans 'Sinopsis' %}</h3>
+    <div class="synopsis-area">
+      {% if object.synopsis %}<p class="synopsis">{{ object.synopsis|linebreaksbr }}</p>{% endif %}
+    </div>
+
+    {% if relaciones %}
+      <h3 style="margin-top:24px;">{% trans 'Relaciones' %}<a class="page-sub mas" href="#relaciones">{% trans 'Más relaciones' %} ({{ relaciones|length }}) →</a></h3>
+      {% include 'detail/_relaciones.html' with filas=relaciones|slice:":6" columnas="2" %}
+    {% endif %}
+    {% if personajes %}
+      <h3 style="margin-top:24px;">{% trans 'Personajes y actores de voz' %}<a class="page-sub mas" href="#personajes">{% trans 'Más personajes' %} ({{ personajes|length }}) →</a></h3>
+      {% include 'detail/_personajes.html' with filas=personajes|slice:":10" columnas="2" %}
+    {% endif %}
+    {% if equipo %}
+      <h3 style="margin-top:24px;">{% trans 'Equipo' %}<a class="page-sub mas" href="#equipo">{% trans 'Más equipo' %} ({{ equipo|length }}) →</a></h3>
+      {% include 'detail/_personas.html' with filas=equipo|slice:":6" columnas="2" %}
+    {% endif %}
+    {% if canciones %}
+      <h3 style="margin-top:24px;">{% trans 'Banda sonora' %}<a class="page-sub mas" href="#canciones">{% trans 'Ver la banda sonora' %} ({{ canciones|length }}) →</a></h3>
+      <div class="ost-cols">
+        {% for etiqueta, lista in grupos %}
+          <div>
+            <div class="ost-h">{{ etiqueta }} <span class="page-sub">({{ lista|length }})</span></div>
+            {% for c in lista|slice:":3" %}
+              <div class="ost-song"><div class="mr-name">{% if c.song_id %}{{ c.song_id }}. {% endif %}{{ c.title }}</div><div class="mr-sub">{% for texto, a in c.credito %}{% if a %}{% ficha a as href %}{% if href %}<a href="{{ href }}">{{ texto }}</a>{% else %}{{ texto }}{% endif %}{% else %}{{ texto }}{% endif %}{% empty %}—{% endfor %}</div></div>
+            {% empty %}<div class="mr-sub">—</div>{% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </section>
+
+  {% if relaciones %}
+    <section class="dsection" data-tab="relaciones" data-label="{% trans 'Relaciones' %}" style="padding-top:0;">
+      <h3>{% trans 'Relaciones' %} <span class="page-sub" style="font-size:12px">({{ relaciones|length }})</span></h3>
+      {% include 'detail/_relaciones.html' with filas=relaciones columnas="2" %}
+    </section>
+  {% endif %}
+
+  {% if personajes %}
+    <section class="dsection" data-tab="personajes" data-label="{% trans 'Personajes' %}" style="padding-top:0;">
+      <h3>{% trans 'Personajes y actores de voz' %} <span class="page-sub" style="font-size:12px">({{ personajes|length }})</span>
+        {% if tab_url.personajes and personajes|length > 30 %}<a class="page-sub mas" href="{{ tab_url.personajes }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      {% include 'detail/_personajes.html' with filas=personajes columnas="2" %}
+    </section>
+  {% endif %}
+
+  {% if equipo %}
+    <section class="dsection" data-tab="equipo" data-label="{% trans 'Equipo' %}" style="padding-top:0;">
+      <h3>{% trans 'Equipo' %} <span class="page-sub" style="font-size:12px">({{ equipo|length }})</span>
+        {% if tab_url.equipo and equipo|length > 30 %}<a class="page-sub mas" href="{{ tab_url.equipo }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      {% include 'detail/_personas.html' with filas=equipo columnas="2" %}
+    </section>
+  {% endif %}
+
+  {% if canciones %}
+    <section class="dsection" data-tab="canciones" data-label="{% trans 'Banda sonora' %}" style="padding-top:0;">
+      {% include 'detail/_canciones.html' with grupos=grupos %}
+    </section>
+  {% endif %}
+
+  {% if fotos %}
+    <section class="dsection" data-tab="imagenes" data-label="{% trans 'Imágenes' %}" style="padding-top:0;">
+      <h3>{% trans 'Imágenes' %} <span class="page-sub" style="font-size:12px">({{ fotos|length }})</span>
+        {% if tab_url.imagenes and fotos|length > 40 %}<a class="page-sub mas" href="{{ tab_url.imagenes }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      <div class="gallery">{% for f in fotos %}{% if f|imagen %}<img class="shot" src="{{ f|imagen }}" alt="{{ object }}" loading="lazy">{% endif %}{% endfor %}</div>
+    </section>
+  {% endif %}
+
+  {% endwith %}
+  {% if es_gestion %}
+  {# Ficha técnica (solo gestión): lo que el registro ES — id, slug, activo, fechas. Muévela o amplíala aquí. #}
+  <section class="dsection" data-tab="tecnica" data-label="{% trans 'Ficha técnica' %}" style="padding-top:0;">
+    <h3>{% trans 'Ficha técnica' %}</h3>
+    <div class="mal-row"><span class="k">Id:</span><span class="v">{{ object.pk }}</span></div>
+    {% if object.slug %}<div class="mal-row"><span class="k">Slug:</span><span class="v">{{ object.slug }}</span></div>{% endif %}
+    {% if object.is_active is not None %}<div class="mal-row"><span class="k">{% trans 'Activo' %}:</span><span class="v">{{ object.display_is_active }}</span></div>{% endif %}
+    {% if object.created_at %}<div class="mal-row"><span class="k">{% trans 'Creado' %}:</span><span class="v">{{ object.display_created }}</span></div>{% endif %}
+    {% if object.updated_at %}<div class="mal-row"><span class="k">{% trans 'Actualizado' %}:</span><span class="v">{{ object.display_updated }}</span></div>{% endif %}
+  </section>
+  {% endif %}
+{% endblock %}

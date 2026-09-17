@@ -1,0 +1,25 @@
+{% comment %}Acciones de usuario (solo superusuario). Se incluye arriba y abajo.{% endcomment %}
+{% if user.is_superuser %}
+  <a class="chip" href="{% url 'panel:user_update' object.pk %}"><span class="ico"><i class="bi bi-pencil"></i></span> Editar</a>
+  <a class="chip" href="{% url 'panel:user_reset' object.pk %}"><span class="ico"><i class="bi bi-key"></i></span> Resetear contraseña</a>
+
+  <form method="post" action="{% url 'panel:user_toggle' object.pk 'is_active' %}" style="display:inline">{% csrf_token %}
+    {% if object.is_active %}
+      <button class="chip chip--danger" type="submit"><span class="ico"><i class="bi bi-slash-circle"></i></span> Bloquear</button>
+    {% else %}
+      <button class="chip" type="submit"><span class="ico"><i class="bi bi-check-circle"></i></span> Activar</button>
+    {% endif %}
+  </form>
+
+  <form method="post" action="{% url 'panel:user_toggle' object.pk 'is_staff' %}" style="display:inline">{% csrf_token %}
+    <button class="chip" type="submit"><span class="ico"><i class="bi bi-person-gear"></i></span> {% if object.is_staff %}Quitar staff{% else %}Hacer staff{% endif %}</button>
+  </form>
+
+  <form method="post" action="{% url 'panel:user_toggle' object.pk 'is_superuser' %}" style="display:inline">{% csrf_token %}
+    <button class="chip" type="submit"><span class="ico"><i class="bi bi-shield-lock"></i></span> {% if object.is_superuser %}Quitar superuser{% else %}Hacer superuser{% endif %}</button>
+  </form>
+
+  <a class="chip chip--danger js-delete" href="{% url 'panel:user_delete' object.pk %}" data-name="{{ object }}"><span class="ico"><i class="bi bi-trash"></i></span> Borrar</a>
+{% else %}
+  <span class="page-sub">Solo un superusuario puede gestionar usuarios.</span>
+{% endif %}

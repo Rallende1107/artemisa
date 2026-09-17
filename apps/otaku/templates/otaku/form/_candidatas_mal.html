@@ -1,0 +1,114 @@
+{% load i18n %}
+{% comment %}MODAL de CANDIDATAS del formulario MAL (persona o compañía). Al guardar con un nombre que ya existe, la página
+vuelve con tus datos rellenos y este modal encima: buscador, la lista (5 a la vista, con scroll) con los datos básicos
+para distinguirlas, y por cada una «Enlazar» (abre esa entidad con tus datos MAL ya puestos) o «Editar ficha MAL» si ya
+la tiene. Abajo: «Es otra persona: crearla» (solo personas) y «Cancelar», que descarta la creación entera.
+Nunca se enlaza por nombre a ciegas: eliges tú. El estilo vive en static/css/components/candidatas-mal.css.
+Lo incluyen otaku/form/person_mal.html y company_mal.html.{% endcomment %}
+{# la casilla oculta «es otra persona» (solo al crear personas): la marca el botón del modal #}
+{% if form.fields.es_otra %}{{ form.es_otra }}{% endif %}
+{% with candidatas=form.candidatas %}
+{% if candidatas %}
+<template id="candidatas-mal">
+  <div class="cmal-head">
+    <div>
+      <h2 class="cmal-head__title">
+        {% if form.fields.es_otra %}{% blocktrans count n=candidatas|length %}Ya hay 1 persona llamada{% plural %}Ya hay {{ n }} personas llamadas{% endblocktrans %}{% else %}{% trans "Ya existe la compañía" %}{% endif %}
+        <span class="cmal-head__name">«{{ candidatas.0.obj }}»</span>
+      </h2>
+      <p class="cmal-head__hint">
+        {% if form.fields.es_otra %}{% trans "Si es una de ellas, enlázala: tus datos de MyAnimeList viajan con ella. Si es alguien distinto, créala igualmente." %}{% else %}{% trans "Enlázala para añadirle la ficha de MyAnimeList; tus datos viajan con ella." %}{% endif %}
+      </p>
+    </div>
+  </div>
+
+  {% if candidatas|length > 1 %}
+  <div class="cmal-search">
+    <input type="search" class="cmal-search__input" placeholder="{% trans 'Filtrar por país, fecha o id…' %}" aria-label="{% trans 'Filtrar' %}" autocomplete="off">
+    <span class="cmal-search__count"><span class="cmal-visibles">{{ candidatas|length }}</span> / {{ candidatas|length }}</span>
+  </div>
+  {% endif %}
+
+  <ul class="cmal-list">
+    {% for c in candidatas %}
+      <li class="cmal-item{% if c.enlace.tiene %} cmal-item--con-ficha{% endif %}"
+          data-texto="{{ c.obj|lower }} #{{ c.obj.pk }} {{ c.obj.country|default:''|lower }} {{ c.obj.birth_date|default:'' }} {{ c.obj.birth_date|date:'d-m-Y'|default:'' }} {{ c.obj.founded_year|default:'' }}">
+        <div class="cmal-avatar">{{ c.iniciales }}</div>
+        <div class="cmal-body">
+          <div class="cmal-name">
+            <span>{{ c.obj }}</span>
+            <small class="cmal-id">#{{ c.obj.pk }}</small>
+            {% if c.enlace.tiene %}<small class="cmal-badge">{% trans "con ficha MAL" %}</small>{% endif %}
+          </div>
+          <div class="cmal-meta">
+            {% if form.fields.es_otra %}
+              <span>{% if c.obj.birth_date %}{{ c.obj.birth_date|date:"d-m-Y" }}{% else %}<span class="cmal-vacio">{% trans "sin fecha" %}</span>{% endif %}</span>
+            {% else %}
+              <span>{% if c.obj.founded_year %}{% trans "fundada en" %} {{ c.obj.founded_year }}{% else %}<span class="cmal-vacio">{% trans "sin fundación" %}</span>{% endif %}</span>
+            {% endif %}
+            <span>{% if c.obj.country %}{{ c.obj.country }}{% else %}<span class="cmal-vacio">{% trans "sin país" %}</span>{% endif %}</span>
+          </div>
+        </div>
+        {% if c.enlace %}
+          {% if c.enlace.tiene %}
+            <a class="cmal-accion cmal-accion--editar" href="{{ c.enlace.url }}">{% trans "Editar ficha MAL" %}</a>
+          {% else %}
+            <a class="cmal-accion cmal-accion--enlazar" href="{{ c.enlace.url }}?{{ form.prefill_query }}">{% trans "Enlazar" %}</a>
+          {% endif %}
+        {% endif %}
+      </li>
+    {% endfor %}
+    <li class="cmal-empty">{% trans "Ninguna coincide con el filtro." %}</li>
+  </ul>
+</template>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (!window.Swal) return;
+    var plantilla = document.getElementById("candidatas-mal");
+    var form = plantilla.closest("form");
+    var esPersona = {% if form.fields.es_otra %}true{% else %}false{% endif %};
+    var cancelar = "{% url cancel_url %}";
+
+    Swal.fire({
+      html: plantilla.innerHTML,
+      customClass: { popup: "candidatas-mal-popup" },
+      showConfirmButton: esPersona,
+      confirmButtonText: '{% trans "Es otra persona: crearla" %}',
+      showCancelButton: true,
+      cancelButtonText: "{% trans 'Cancelar' %}",
+      reverseButtons: true,
+      allowOutsideClick: false,
+      focusConfirm: false,
+      didOpen: function (popup) {
+        var buscar = popup.querySelector(".cmal-search__input");
+        if (!buscar) return;
+        var items = popup.querySelectorAll(".cmal-item");
+        var vacio = popup.querySelector(".cmal-empty");
+        var visibles = popup.querySelector(".cmal-visibles");
+        buscar.addEventListener("input", function () {
+          var q = buscar.value.trim().toLowerCase(), n = 0;
+          items.forEach(function (li) {
+            var ok = !q || li.dataset.texto.indexOf(q) !== -1;
+            li.style.display = ok ? "" : "none";
+            if (ok) n++;
+          });
+          visibles.textContent = n;
+          vacio.classList.toggle("is-visible", n === 0);
+        });
+        buscar.focus();
+      },
+    }).then(function (r) {
+      if (r.isConfirmed && esPersona) {
+        // «Es otra persona»: se marca y se vuelve a guardar con los mismos datos
+        form.querySelector("[name='es_otra']").value = "on";
+        form.submit();
+      } else if (r.dismiss === Swal.DismissReason.cancel || r.dismiss === Swal.DismissReason.esc) {
+        // «Cancelar»: se descarta la creación entera
+        window.location.href = cancelar;
+      }
+    });
+  });
+</script>
+{% endif %}
+{% endwith %}

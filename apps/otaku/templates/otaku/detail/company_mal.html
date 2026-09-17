@@ -1,0 +1,32 @@
+{% extends 'detail/base_detail.html' %}
+{% load i18n ficha %}
+{% comment %}FICHA de compañía (MAL) (gestión): la compañía neutra a la que pertenece y su id en MyAnimeList.
+Lo propio de esta entidad se escribe AQUÍ; la Ficha técnica la pone el cuadro.{% endcomment %}
+
+{% block side %}
+  {% if object.company %}<div class="mal-row"><span class="k">{% trans 'Compañía' %}:</span><span class="v">{% ficha object.company as href %}{% if href %}<a href="{{ href }}">{{ object.company }}</a>{% else %}{{ object.company }}{% endif %}</span></div>{% endif %}
+  <div class="mal-row"><span class="k">{% trans 'Tipo en MAL' %}:</span><span class="v">{{ object.get_kind_display }}</span></div>
+  <div class="mal-row"><span class="k">{% trans 'MAL id' %}:</span><span class="v"><a href="{{ object.mal_url }}" target="_blank" rel="noopener">{{ object.mal_id }}</a></span></div>
+  {% if object.name_japanese %}<div class="mal-row"><span class="k">{% trans 'Nombre japonés' %}:</span><span class="v">{{ object.name_japanese }}</span></div>{% endif %}
+  {% if object.established %}<div class="mal-row"><span class="k">{% trans 'Fundada' %}:</span><span class="v">{{ object.established }}</span></div>{% endif %}
+  {% if object.favorites %}<div class="mal-row"><span class="k">{% trans 'Favoritos (MAL)' %}:</span><span class="v">{{ object.favorites }}</span></div>{% endif %}
+  {% for u in object.links %}<div class="mal-row"><span class="v"><a href="{{ u }}" target="_blank" rel="noopener">{{ u }}</a></span></div>{% endfor %}
+{% endblock %}
+
+{% block cuerpo %}
+  {% if object.about %}
+  <section class="dsection" data-tab="detalles" data-label="{% trans 'Detalles' %}" style="padding-top:0;">
+    <h3>{% trans 'About (MAL)' %}</h3>
+    <div class="synopsis-area"><p class="synopsis">{{ object.about|linebreaksbr }}</p></div>
+  </section>
+  {% endif %}
+  {% if es_gestion %}
+  <section class="dsection" data-tab="tecnica" data-label="{% trans 'Ficha técnica' %}" style="padding-top:0;">
+    <h3>{% trans 'Ficha técnica' %}</h3>
+    <div class="mal-row"><span class="k">Id:</span><span class="v">{{ object.pk }}</span></div>
+    {% if object.is_active is not None %}<div class="mal-row"><span class="k">{% trans 'Activo' %}:</span><span class="v">{{ object.display_is_active }}</span></div>{% endif %}
+    {% if object.created_at %}<div class="mal-row"><span class="k">{% trans 'Creado' %}:</span><span class="v">{{ object.display_created }}</span></div>{% endif %}
+    {% if object.updated_at %}<div class="mal-row"><span class="k">{% trans 'Actualizado' %}:</span><span class="v">{{ object.display_updated }}</span></div>{% endif %}
+  </section>
+  {% endif %}
+{% endblock %}

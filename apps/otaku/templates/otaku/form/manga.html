@@ -1,0 +1,117 @@
+{% comment %} Campos de manga — patrón Hades/Poseidon.
+   PARCIAL que INCLUYE admin_panel/form.html (el cuadro: card, botones, csrf) porque la
+   vista Create/Update lo declara: form_template = "…/form/<modelo>.html".
+   Edita libremente el orden/HTML de cada campo aquí. Los booleanos se
+   auto-agrupan abajo, no van en este bloque.
+   Sincroniza:  python manage.py sync_forms  {% endcomment %}
+
+    <div class="field">
+      <label for="{{ form.title.id_for_label }}">{{ form.title.label }}{% if form.title.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.title }}
+      {% for e in form.title.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.title.help_text %}<span class="field__hint">{{ form.title.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.title_eng.id_for_label }}">{{ form.title_eng.label }}{% if form.title_eng.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.title_eng }}
+      {% for e in form.title_eng.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.title_eng.help_text %}<span class="field__hint">{{ form.title_eng.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.title_jap.id_for_label }}">{{ form.title_jap.label }}{% if form.title_jap.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.title_jap }}
+      {% for e in form.title_jap.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.title_jap.help_text %}<span class="field__hint">{{ form.title_jap.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.synopsis.id_for_label }}">{{ form.synopsis.label }}{% if form.synopsis.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.synopsis }}
+      {% for e in form.synopsis.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.synopsis.help_text %}<span class="field__hint">{{ form.synopsis.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.manga_type.id_for_label }}">{{ form.manga_type.label }}{% if form.manga_type.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.manga_type }}
+      {% for e in form.manga_type.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.manga_type.help_text %}<span class="field__hint">{{ form.manga_type.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.source.id_for_label }}">{{ form.source.label }}{% if form.source.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.source }}
+      {% for e in form.source.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.source.help_text %}<span class="field__hint">{{ form.source.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.rating.id_for_label }}">{{ form.rating.label }}{% if form.rating.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.rating }}
+      {% for e in form.rating.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.rating.help_text %}<span class="field__hint">{{ form.rating.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.status.id_for_label }}">{{ form.status.label }}{% if form.status.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.status }}
+      {% for e in form.status.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.status.help_text %}<span class="field__hint">{{ form.status.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.season.id_for_label }}">{{ form.season.label }}</label>
+      {{ form.season }}
+      {% for e in form.season.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.season.help_text %}<span class="field__hint">{{ form.season.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.year.id_for_label }}">{{ form.year.label }}{% if form.year.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.year }}
+      {% for e in form.year.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.year.help_text %}<span class="field__hint">{{ form.year.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.chapters.id_for_label }}">{{ form.chapters.label }}{% if form.chapters.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.chapters }}
+      {% for e in form.chapters.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.chapters.help_text %}<span class="field__hint">{{ form.chapters.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.volumes.id_for_label }}">{{ form.volumes.label }}{% if form.volumes.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.volumes }}
+      {% for e in form.volumes.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.volumes.help_text %}<span class="field__hint">{{ form.volumes.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.serializations.id_for_label }}">{{ form.serializations.label }}{% if form.serializations.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.serializations }}
+      {% for e in form.serializations.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.serializations.help_text %}<span class="field__hint">{{ form.serializations.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.genres.id_for_label }}">{{ form.genres.label }}{% if form.genres.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.genres }}
+      {% for e in form.genres.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.genres.help_text %}<span class="field__hint">{{ form.genres.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.themes.id_for_label }}">{{ form.themes.label }}{% if form.themes.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.themes }}
+      {% for e in form.themes.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.themes.help_text %}<span class="field__hint">{{ form.themes.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.demographics.id_for_label }}">{{ form.demographics.label }}{% if form.demographics.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.demographics }}
+      {% for e in form.demographics.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.demographics.help_text %}<span class="field__hint">{{ form.demographics.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.from_date.id_for_label }}">{{ form.from_date.label }}{% if form.from_date.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.from_date }}
+      {% for e in form.from_date.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.from_date.help_text %}<span class="field__hint">{{ form.from_date.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.to_date.id_for_label }}">{{ form.to_date.label }}{% if form.to_date.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.to_date }}
+      {% for e in form.to_date.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.to_date.help_text %}<span class="field__hint">{{ form.to_date.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+    </div>

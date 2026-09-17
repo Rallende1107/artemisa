@@ -1,0 +1,21 @@
+{% load i18n %}
+{% comment %}Acciones por defecto del detalle (editar · toggles · borrar). Se incluye
+   arriba (cabecera) y abajo (bloque Acciones) para tenerlas siempre a mano.{% endcomment %}
+{% if can_update %}<a class="chip" href="{% url update_url object.pk %}"><span class="ico"><i class="bi bi-pencil"></i></span> {% trans "Editar" %}</a>{% endif %}
+{% for t in toggle_actions %}
+  <form method="post" action="{{ t.url }}" style="display:inline"{% if t.confirm %} data-confirm="¿{{ t.label }} «{{ object }}»?"{% endif %}>{% csrf_token %}
+    <button class="chip" type="submit"><span class="ico"><i class="bi bi-{{ t.icon }}"></i></span> {{ t.label }}</button>
+  </form>
+{% endfor %}
+{% if can_reprocess %}
+  <form method="post" action="" style="display:inline">{% csrf_token %}<input type="hidden" name="accion" value="reprocesar">
+    <button class="chip" type="submit"><span class="ico"><i class="bi bi-arrow-repeat"></i></span> {% trans "Reprocesar" %}</button>
+  </form>
+{% endif %}
+{% for a in post_actions %}
+  <form method="post" action="{{ a.url }}" style="display:inline">{% csrf_token %}
+    <button class="chip" type="submit"><span class="ico"><i class="bi bi-{{ a.icon }}"></i></span> {{ a.label }}</button>
+  </form>
+{% endfor %}
+{% for a in extra_actions %}<a class="chip" href="{{ a.url }}"><span class="ico"><i class="bi bi-{{ a.icon }}"></i></span> {{ a.label }}</a>{% endfor %}
+{% if can_delete %}<a class="chip chip--danger js-delete" href="{% url delete_url object.pk %}" data-name="{{ object }}"><span class="ico"><i class="bi bi-trash"></i></span> {% trans "Borrar" %}</a>{% endif %}

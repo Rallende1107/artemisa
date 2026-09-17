@@ -1,0 +1,7 @@
+{# Sidebar GENÉRICO de cualquier panel: se pinta desde `sidebar.nav` (context processor core.context_processors.sidebar). #}
+<aside class="sidebar" id="sidebar">
+  <div class="nav-group">
+    {% for node in sidebar.nav %}{% include 'panel/_nav_node.html' with node=node top=True %}{% endfor %}
+  </div>
+  <div class="sidebar__foot"><span class="status-dot">●</span> {{ sidebar.footer }}</div>
+</aside>

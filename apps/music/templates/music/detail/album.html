@@ -1,0 +1,64 @@
+{% extends 'detail/base_detail.html' %}
+{% load static i18n ficha %}
+{% comment %}FICHA de álbum (gestión y público): información en el side; secciones Detalles (reseña y pistas
+numeradas) e Imágenes, cada una con su pestaña en la página.{% endcomment %}
+
+{% block subtitulo %}{% if object.artist %}<div class="orig">{{ object.artist }}</div>{% endif %}{% endblock %}
+
+{% block side %}
+  {% if object.artist %}<div class="mal-row"><span class="k">{% trans 'Artista' %}:</span><span class="v"><a href="{% if es_gestion %}{% url 'panel:artist_detail' object.artist.pk %}{% else %}{% url 'music:artist-detail' object.artist.pk %}{% endif %}">{{ object.artist }}</a></span></div>{% endif %}
+  {% if object.album_type %}<div class="mal-row"><span class="k">{% trans 'Tipo' %}:</span><span class="v"><a href="{% by by_url 'tipo' object.album_type %}">{{ object.album_type }}</a></span></div>{% endif %}
+  {% if object.release_date %}<div class="mal-row"><span class="k">{% trans 'Lanzamiento' %}:</span><span class="v">{{ object.display_release_date }}</span></div>{% endif %}
+  {% with generos=object.genres.all %}{% if generos %}
+    <div class="mal-row"><span class="k">{% trans 'Géneros' %}:</span><span class="v">{% for g in generos %}<a href="{% by by_url 'genero' g %}">{{ g }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>
+  {% endif %}{% endwith %}
+  <div class="mal-row"><span class="k">{% trans 'Pistas' %}:</span><span class="v">{{ object.songs.count }}</span></div>
+  {% if es_gestion %}
+    {% if object.deezer_id %}<div class="mal-row"><span class="k">Deezer:</span><span class="v"><a href="https://www.deezer.com/album/{{ object.deezer_id }}" target="_blank" rel="noopener">{{ object.deezer_id }}</a></span></div>{% endif %}
+    <div class="mal-row"><span class="k">{% trans 'Activo' %}:</span><span class="v">{{ object.display_is_active }}</span></div>
+    <div class="mal-row"><span class="k">{% trans 'Creado' %}:</span><span class="v">{{ object.display_created }}</span></div>
+  {% endif %}
+{% endblock %}
+
+{% block cuerpo %}
+  <section class="dsection" data-tab="detalles" data-label="{% trans 'Detalles' %}" style="padding-top:0;">
+    {% if object.description %}
+      <h3>{% trans 'Reseña' %}</h3>
+      <p class="synopsis">{{ object.description|linebreaksbr }}</p>
+    {% endif %}
+    {% with pistas=object.songs.all %}
+      <h3{% if object.description %} style="margin-top:22px;"{% endif %}>{% trans 'Canciones' %} <span class="page-sub" style="font-size:12px">({{ pistas|length }})</span>
+        {% if tab_url.canciones and pistas|length > 30 %}<a class="page-sub" style="margin-left:auto;font-size:12px" href="{{ tab_url.canciones }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      {% if pistas %}
+        <ol class="tracklist">
+          {% for p in pistas %}
+            <li><span class="tk-n">{{ p.album_song_id|default:forloop.counter|stringformat:"02d" }}</span>
+              <a href="{% if es_gestion %}{% url 'panel:song_detail' p.pk %}{% else %}{% url 'music:song-detail' p.pk %}{% endif %}">{{ p.title_short|default:p.title }}</a>
+              {% if p.title_version %}<span class="tk-sub">{{ p.title_version }}</span>{% endif %}</li>
+          {% endfor %}
+        </ol>
+      {% else %}<p class="page-sub">{% trans 'Sin canciones registradas.' %}</p>{% endif %}
+    {% endwith %}
+  </section>
+
+  {% with fotos=object|fotos %}{% if fotos %}
+    <section class="dsection" data-tab="imagenes" data-label="{% trans 'Imágenes' %}">
+      <h3>{% trans 'Imágenes' %} <span class="page-sub" style="font-size:12px">({{ fotos|length }})</span>
+        {% if tab_url.imagenes and fotos|length > 40 %}<a class="page-sub" style="margin-left:auto;font-size:12px" href="{{ tab_url.imagenes }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      <div class="gallery">
+        {% for f in fotos %}{% if f|imagen %}<img class="shot" src="{{ f|imagen }}" alt="{{ object }}" loading="lazy">{% endif %}{% endfor %}
+      </div>
+    </section>
+  {% endif %}{% endwith %}
+  {% if es_gestion %}
+  {# Ficha técnica (solo gestión): lo que el registro ES — id, slug, activo, fechas. Muévela o amplíala aquí. #}
+  <section class="dsection" data-tab="tecnica" data-label="{% trans 'Ficha técnica' %}" style="padding-top:0;">
+    <h3>{% trans 'Ficha técnica' %}</h3>
+    <div class="mal-row"><span class="k">Id:</span><span class="v">{{ object.pk }}</span></div>
+    {% if object.slug %}<div class="mal-row"><span class="k">Slug:</span><span class="v">{{ object.slug }}</span></div>{% endif %}
+    {% if object.is_active is not None %}<div class="mal-row"><span class="k">{% trans 'Activo' %}:</span><span class="v">{{ object.display_is_active }}</span></div>{% endif %}
+    {% if object.created_at %}<div class="mal-row"><span class="k">{% trans 'Creado' %}:</span><span class="v">{{ object.display_created }}</span></div>{% endif %}
+    {% if object.updated_at %}<div class="mal-row"><span class="k">{% trans 'Actualizado' %}:</span><span class="v">{{ object.display_updated }}</span></div>{% endif %}
+  </section>
+  {% endif %}
+{% endblock %}

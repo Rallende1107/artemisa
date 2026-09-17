@@ -1,0 +1,59 @@
+{% extends 'admin_panel/detail.html' %}
+
+{% comment %}
+  Detalle PROPIO del mensaje de contacto: datos a la izquierda y el HILO a la
+  derecha (mensaje original + respuestas) con RESPONDER INLINE — se contesta
+  aquí mismo y se dispara el correo «te respondimos», sin ir a otra entidad.
+{% endcomment %}
+{% block detalle %}
+  <div class="detail-shell">
+    <aside class="detail-side">
+      <div class="info-list glass">
+        {% for f in facts %}<div class="info-list__row"><span class="k">{{ f.label }}</span><span class="v">{{ f.value|default:"—" }}</span></div>{% endfor %}
+      </div>
+      <div class="chip-row">
+        <a class="chip" href="{% url update_url object.pk %}"><span class="ico"><i class="bi bi-pencil"></i></span> Editar</a>
+        <a class="chip chip--danger js-delete" href="{% url delete_url object.pk %}" data-name="{{ object }}"><span class="ico"><i class="bi bi-trash"></i></span> Borrar</a>
+      </div>
+    </aside>
+
+    <div class="detail-main">
+      <div class="hilo-panel glass">
+        <div class="hilo-panel__msg">
+          <div class="hilo-panel__meta"><i class="bi bi-person"></i> {{ object.name }} &lt;{{ object.email }}&gt; · {{ object.display_created }}</div>
+          <div class="hilo-panel__cuerpo">{{ object.message|linebreaksbr }}</div>
+        </div>
+
+        {% for r in respuestas %}
+          <div class="hilo-panel__resp {% if not r.is_active %}hilo-panel__resp--off{% endif %}">
+            <div class="hilo-panel__meta"><i class="bi bi-reply-fill"></i>
+              {{ r.author|default:"staff" }} · {{ r.created_at|date:"d M Y, H:i" }}
+              {% if not r.is_active %}<span class="hilo-panel__off">(desactivada: el usuario no la ve)</span>{% endif %}</div>
+            <div class="hilo-panel__cuerpo">{{ r.body|linebreaksbr }}</div>
+          </div>
+        {% empty %}
+          <p class="hilo-panel__meta"><i class="bi bi-hourglass-split"></i> Aún sin respuesta.</p>
+        {% endfor %}
+
+        <form method="post" class="hilo-panel__form">
+          {% csrf_token %}
+          <textarea name="body" rows="4" required placeholder="Escribe la respuesta… (se guarda en el hilo y se avisa por correo)"></textarea>
+          <button type="submit" class="chip chip--accent"><span class="ico"><i class="bi bi-send"></i></span> Responder y avisar por correo</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .hilo-panel { border-radius: 14px; padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+    .hilo-panel__meta { font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-bottom: 6px; }
+    .hilo-panel__cuerpo { color: var(--text-2); font-size: 14px; line-height: 1.7; }
+    .hilo-panel__resp { padding: 12px 16px; border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; background: var(--glass); }
+    .hilo-panel__resp--off { border-left-color: var(--warn); opacity: .7; }
+    .hilo-panel__off { color: var(--warn); }
+    .hilo-panel__form { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+    .hilo-panel__form textarea { background: var(--glass-2); border: 1px solid var(--border-soft); border-radius: 10px; color: var(--text); padding: 10px 12px; font: inherit; font-size: 14px; resize: vertical; }
+    .hilo-panel__form textarea:focus { outline: none; border-color: var(--accent); }
+    .hilo-panel__form .chip { align-self: flex-end; }
+  </style>
+{% endblock detalle %}

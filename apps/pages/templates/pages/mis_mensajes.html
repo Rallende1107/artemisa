@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% comment %}MIS MENSAJES: DataTable de la casa (buscar/ordenar/paginar, SIN
+botones de exportación) y el hilo completo en un MODAL por fila.{% endcomment %}
+
+{% block title %}{% trans 'Mis mensajes' %} · {{ block.super }}{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'vendor/datatables/dataTables.dataTables.min.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'vendor/datatables/responsive.dataTables.min.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/datatables-theme.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/mensajes.css' %}?v={{ ASSET_VERSION }}">
+{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div class="breadcrumbs"><a href="{% url 'pages:contact' %}">{% trans 'contacto' %}</a><span class="sep">/</span><span>{% trans 'mis mensajes' %}</span></div>
+    <h1 class="page-title">{% trans 'Mis mensajes' %}</h1>
+    <p class="page-sub">{% trans 'Cada vez que nos escribiste y lo que te respondimos. Toca una fila para ver el hilo.' %}</p>
+  </div>
+
+  {% if hilos %}
+    <div class="msj-tabla" style="overflow-x:auto;">
+      <table id="msj-dt" class="display" style="width:100%">
+        <thead><tr>
+          <th>{% trans 'Asunto' %}</th><th>{% trans 'Recibido' %}</th>
+          <th>{% trans 'Estado' %}</th><th>{% trans 'Respuestas' %}</th><th></th>
+        </tr></thead>
+        <tbody>
+          {% for m in hilos %}
+            <tr class="msj-fila" data-abre="hilo-{{ m.pk }}" tabindex="0" role="button"
+                aria-label="{% trans 'Ver hilo' %}: {{ m.subject|default:_('(sin asunto)') }}">
+              <td class="msj-asunto">{{ m.subject|default:_('(sin asunto)') }}</td>
+              <td class="msj-fecha" data-order="{{ m.created_at|date:'U' }}">{{ m.created_at|date:"d M Y, H:i" }}</td>
+              <td data-order="{{ m.get_status_display }}"><span class="hilo__estado hilo__estado--{{ m.status }}">{{ m.get_status_display }}</span></td>
+              <td class="dt-center">{{ m.replies.all|length }}</td>
+              <td class="msj-ver"><i class="bi bi-chat-text"></i></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% for m in hilos %}
+      <dialog id="hilo-{{ m.pk }}" class="msj-modal">
+        <div class="msj-modal__head">
+          <div>
+            <strong>{{ m.subject|default:_('(sin asunto)') }}</strong>
+            <div class="hilo__meta">{{ m.created_at|date:"d M Y, H:i" }} · {{ m.get_status_display }}</div>
+          </div>
+          <button class="msj-modal__x" data-cierra aria-label="{% trans 'Cerrar' %}">✕</button>
+        </div>
+        <div class="msj-modal__body">
+          <p class="hilo__cuerpo">{{ m.message|linebreaksbr }}</p>
+          {% for r in m.replies.all %}
+            <div class="hilo__respuesta">
+              <div class="hilo__meta"><i class="bi bi-reply-fill"></i>
+                {{ SITE_NAME }} · {{ r.created_at|date:"d M Y, H:i" }}</div>
+              <p class="hilo__cuerpo">{{ r.body|linebreaksbr }}</p>
+            </div>
+          {% empty %}
+            <p class="hilo__meta hilo__espera"><i class="bi bi-hourglass-split"></i> {% trans 'Aún sin respuesta.' %}</p>
+          {% endfor %}
+        </div>
+      </dialog>
+    {% endfor %}
+
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}?v={{ ASSET_VERSION }}"></script>
+    <script src="{% static 'vendor/datatables/dataTables.min.js' %}?v={{ ASSET_VERSION }}"></script>
+    <script src="{% static 'vendor/datatables/dataTables.responsive.min.js' %}?v={{ ASSET_VERSION }}"></script>
+    <script>
+      (function () {
+        // DataTable de la casa en modo CLIENTE (pocas filas): buscar + ordenar
+        // + paginar, sin botones de exportación (aquí no aportan).
+        new DataTable("#msj-dt", {
+          responsive: true,
+          pageLength: 15,
+          lengthMenu: [10, 15, 25, 50],
+          order: [[1, "desc"]],
+          columnDefs: [{ targets: -1, orderable: false, searchable: false }],
+          language: {
+            search: "{% trans 'Buscar:' %}",
+            lengthMenu: "{% trans 'Mostrar _MENU_ filas' %}",
+            info: "{% trans 'Mostrando _START_–_END_ de _TOTAL_' %}",
+            infoEmpty: "{% trans 'Sin registros' %}",
+            infoFiltered: "{% trans '(filtrado de _MAX_)' %}",
+            zeroRecords: "{% trans 'Sin coincidencias' %}",
+            emptyTable: "{% trans 'Sin registros todavía' %}",
+            paginate: { first: "«", previous: "‹", next: "›", last: "»" },
+          },
+        });
+
+        // Abrir el MODAL del hilo (delegado: sobrevive a orden y paginación).
+        document.querySelector(".msj-tabla").addEventListener("click", function (e) {
+          var fila = e.target.closest(".msj-fila");
+          if (!fila) return;
+          var d = document.getElementById(fila.dataset.abre);
+          if (d) d.showModal();
+        });
+        document.querySelectorAll(".msj-modal").forEach(function (d) {
+          d.querySelectorAll("[data-cierra]").forEach(function (b) { b.addEventListener("click", function () { d.close(); }); });
+          d.addEventListener("click", function (e) { if (e.target === d) d.close(); });
+        });
+        window.addEventListener("pageshow", function () { document.querySelectorAll("dialog[open]").forEach(function (d) { d.close(); }); });
+      })();
+    </script>
+  {% else %}
+    <p class="page-sub">{% trans 'Todavía no nos has escrito.' %}
+      <a href="{% url 'pages:contact' %}" style="color:var(--accent)">{% trans 'Contáctanos' %} →</a></p>
+  {% endif %}
+{% endblock %}

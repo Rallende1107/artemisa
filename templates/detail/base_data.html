@@ -1,0 +1,28 @@
+{% extends 'detail/base_detail.html' %}
+{% load i18n ficha %}
+{% comment %}FICHA DE DATOS CRUDOS (gestión): sin póster ni pestañas. Lateral «Información» con el id externo (block id_externo),
+la URL, el estado del fetch y del procesamiento y las fechas; el cuerpo es el JSON entero (json_bonito), sin límite de alto.
+Botón «Reprocesar» cuando la vista declara `reprocesar`. Cada data_*.html solo pone su block id_externo.{% endcomment %}
+
+{% block poster %}{% endblock %}
+
+{% block side %}
+  {% block id_externo %}{% endblock %}
+  {% if object.url %}<div class="mal-row"><span class="k">{% trans 'URL' %}:</span><span class="v"><a href="{{ object.url }}" target="_blank" rel="noopener" style="word-break:break-all">{{ object.url }}</a></span></div>{% endif %}
+  {% if object.data_status is not None %}<div class="mal-row"><span class="k">{% trans 'Fetch OK' %}:</span><span class="v">{{ object.data_status|yesno:_("Sí,No") }}</span></div>{% endif %}
+  {% if object.status_code %}<div class="mal-row"><span class="k">{% trans 'HTTP' %}:</span><span class="v">{{ object.status_code }}</span></div>{% endif %}
+  {% if object.data_processed is not None %}<div class="mal-row"><span class="k">{% trans 'Estado' %}:</span><span class="v">{% if object.data_processed %}{% trans 'Procesado' %}{% else %}{% trans 'Pendiente' %}{% endif %}</span></div>{% endif %}
+  <div class="mal-row"><span class="k">{% trans 'Obtenido' %}:</span><span class="v">{{ object.display_created }}</span></div>
+  <div class="mal-row"><span class="k">{% trans 'Actualizado' %}:</span><span class="v">{{ object.display_updated }}</span></div>
+  {% if object.is_active is not None %}<div class="mal-row"><span class="k">{% trans 'Activo' %}:</span><span class="v">{{ object.display_is_active }}</span></div>{% endif %}
+  <div class="mal-row"><span class="k">Id:</span><span class="v">{{ object.pk }}</span></div>
+{% endblock %}
+
+{% block cuerpo %}
+  <div class="dsection" style="padding-top:0;">
+    {% block datos %}
+      <h3>{% trans 'Datos' %}</h3>
+      {% if object.data %}<pre class="json-crudo">{{ object.data|json_bonito }}</pre>{% else %}<p class="synopsis">{% trans 'Sin datos.' %}</p>{% endif %}
+    {% endblock %}
+  </div>
+{% endblock %}

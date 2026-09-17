@@ -1,0 +1,63 @@
+{% extends 'detail/base_detail.html' %}
+{% load i18n ficha %}
+
+{% block side %}
+    {% if object.name %}
+        <div class="mal-row">
+            <span class="k">{% trans 'Nombre' %}:</span>
+            <span class="v">{{ object.name }}</span>
+        </div>
+    {% endif %}
+
+    {% if object.code %}
+        <div class="mal-row">
+            <span class="k">{% trans 'Código' %}:</span>
+            <span class="v">{{ object.code }}</span>
+        </div>
+    {% endif %}
+
+    {% if object.is_active %}
+        <div class="mal-row">
+            <span class="k">{% trans 'Activo' %}:</span>
+            <span class="v">{{ object.display_description }}</span>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block cuerpo %}
+    <section class="dsection" data-tab="detalles" data-label="{% trans 'Detalles' %}" style="padding-top:0;">
+        <h3>{% trans 'Descripción' %}</h3>
+        <div class="synopsis-area">
+            <!-- {% if object.description %} -->
+                <p class="synopsis">{{ object.display_description|linebreaksbr }}</p>
+            <!-- {% endif %} -->
+        </div>
+    </section>
+
+    {% if es_gestion %}
+    <section class="dsection" data-tab="tecnica" data-label="{% trans 'Ficha técnica' %}" style="padding-top:0;">
+        <h3>{% trans 'Ficha técnica' %}</h3>
+        <div class="mal-row"><span class="k">Id:</span>
+            <span class="v">{{ object.pk }}</span>
+        </div>
+        <div class="mal-row">
+            <span class="k">Slug:</span>
+            <span class="v">{{ object.slug }}</span>
+        </div>
+
+        <div class="mal-row">
+            <span class="k">{% trans 'Activo' %}:</span>
+            <span class="v">{{ object.display_is_active }}</span>
+        </div>
+
+        <div class="mal-row">
+            <span class="k">{% trans 'Creado' %}:</span>
+            <span class="v">{{ object.display_created }}</span>
+        </div>
+        <div class="mal-row">
+            <span class="k">{% trans 'Actualizado' %}:</span>
+            <span class="v">{{ object.display_updated }}</span>
+        </div>
+    </section>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,16 @@
+{% load i18n %}
+{% comment %}Lanzamientos de un juego como lista (fecha · título · idiomas / plataformas; a la derecha las editoras y las
+marcas: no oficial, parche, gratis, edad). `filas` las da Game.lanzamientos() (con idiomas, plataformas y editoras
+precargados).{% endcomment %}
+<ol class="tracklist">
+  {% for r in filas %}
+    <li><span class="tk-n">{% if r.released %}{{ r.released|date:"Y" }}{% else %}TBA{% endif %}</span>
+      <div>
+        <div>{{ r.title }}{% if r.alttitle %} <span class="tk-sub">· {{ r.alttitle }}</span>{% endif %}</div>
+        <div class="tk-sub">{% if r.released %}{{ r.released|date:"d M Y" }}{% endif %}{% for l in r.languages.all %}{% if forloop.first %} · {% endif %}{{ l }}{% if not forloop.last %}, {% endif %}{% endfor %}{% for p in r.platforms.all %}{% if forloop.first %} · {% endif %}{{ p }}{% if not forloop.last %}, {% endif %}{% endfor %}</div>
+      </div>
+      <div class="tk-sub" style="margin-left:auto;text-align:right">{% for e in r.publishers.all %}{{ e }}{% if not forloop.last %}, {% endif %}{% endfor %}
+        {% if not r.official %} · {% trans 'no oficial' %}{% endif %}{% if r.patch %} · {% trans 'parche' %}{% endif %}{% if r.freeware %} · {% trans 'gratis' %}{% endif %}{% if r.minage %} · {{ r.minage }}+{% endif %}</div>
+    </li>
+  {% endfor %}
+</ol>

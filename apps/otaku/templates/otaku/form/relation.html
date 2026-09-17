@@ -1,0 +1,37 @@
+{% comment %} Campos de relación — patrón Hades/Poseidon.
+   PARCIAL que INCLUYE admin_panel/form.html (el cuadro: card, botones, csrf) porque la
+   vista Create/Update lo declara: form_template = "…/form/<modelo>.html".
+   Edita libremente el orden/HTML de cada campo aquí. Los booleanos se
+   auto-agrupan abajo, no van en este bloque.
+   Sincroniza:  python manage.py sync_forms  {% endcomment %}
+
+    <div class="field">
+      <label for="{{ form.relation_type.id_for_label }}">{{ form.relation_type.label }}{% if form.relation_type.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.relation_type }}
+      {% for e in form.relation_type.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.relation_type.help_text %}<span class="field__hint">{{ form.relation_type.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.from_type.id_for_label }}">{{ form.from_type.label }}{% if form.from_type.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.from_type }}
+      {% for e in form.from_type.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.from_type.help_text %}<span class="field__hint">{{ form.from_type.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.from_mal_id.id_for_label }}">{{ form.from_mal_id.label }}{% if form.from_mal_id.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.from_mal_id }}
+      {% for e in form.from_mal_id.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.from_mal_id.help_text %}<span class="field__hint">{{ form.from_mal_id.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.to_type.id_for_label }}">{{ form.to_type.label }}{% if form.to_type.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.to_type }}
+      {% for e in form.to_type.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.to_type.help_text %}<span class="field__hint">{{ form.to_type.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.to_mal_id.id_for_label }}">{{ form.to_mal_id.label }}{% if form.to_mal_id.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.to_mal_id }}
+      {% for e in form.to_mal_id.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.to_mal_id.help_text %}<span class="field__hint">{{ form.to_mal_id.help_text }}</span>{% endif %}
+    </div>

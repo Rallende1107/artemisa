@@ -1,0 +1,100 @@
+{% extends 'detail/base_detail.html' %}
+{% load static i18n ficha %}
+{% comment %}FICHA de película (gestión y público), estilo MAL: títulos alternativos, información y estadísticas en
+el side. Cuerpo en PESTAÑAS de la página: Detalles (sinopsis en su cuadro + mini recuentos de relaciones, reparto
+y equipo con «Más … →» que abren la pestaña), Relaciones, Reparto, Equipo e Imágenes completos («Ver en lista →»
+solo si son muchos).{% endcomment %}
+
+{% block subtitulo %}{% if object.title_secundary %}<div class="orig">{{ object.title_secundary }}</div>{% endif %}{% endblock %}
+
+{% block titulos %}{% include 'detail/_titulos.html' with titulos=object.titulos original=object.title_secundary pk=object.pk %}{% endblock %}
+
+{% block side %}
+  {% if object.movie_type %}<div class="mal-row"><span class="k">{% trans 'Tipo' %}:</span><span class="v"><a href="{% by by_url 'tipo' object.movie_type %}">{{ object.movie_type }}</a></span></div>{% endif %}
+  {% if object.release_year %}<div class="mal-row"><span class="k">{% trans 'Año' %}:</span><span class="v">{{ object.release_year }}</span></div>{% endif %}
+  {% if object.duration_minutes %}<div class="mal-row"><span class="k">{% trans 'Duración' %}:</span><span class="v">{{ object.duration_minutes }} min</span></div>{% endif %}
+  {% with productoras=object.producers.all %}{% if productoras %}
+    <div class="mal-row"><span class="k">{% trans 'Productoras' %}:</span><span class="v">{% for c in productoras %}<a href="{% by by_url 'productora' c %}">{{ c }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>
+  {% endif %}{% endwith %}
+  {% with distribuidoras=object.distributors.all %}{% if distribuidoras %}
+    <div class="mal-row"><span class="k">{% trans 'Distribuidoras' %}:</span><span class="v">{% for c in distribuidoras %}<a href="{% by by_url 'distribuidora' c %}">{{ c }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>
+  {% endif %}{% endwith %}
+  {% with generos=object.genres.all %}{% if generos %}
+    <div class="mal-row"><span class="k">{% trans 'Géneros' %}:</span><span class="v">{% for g in generos %}<a href="{% by by_url 'genero' g %}">{{ g }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>
+  {% endif %}{% endwith %}
+  {% if object.movie_rating %}<div class="mal-row"><span class="k">{% trans 'Clasificación' %}:</span><span class="v"><a href="{% by by_url 'clasificacion' object.movie_rating %}">{{ object.movie_rating }}</a></span></div>{% endif %}
+{% endblock %}
+
+{% block cuerpo %}
+  {% with reparto=object.reparto equipo=object.equipo fotos=object|fotos relaciones=object.relaciones %}
+
+  {# ---- Detalles: sinopsis en su cuadro + mini recuentos (relaciones, reparto, equipo) ---- #}
+  <section class="dsection" data-tab="detalles" data-label="{% trans 'Detalles' %}" style="padding-top:0;">
+    <h3>{% trans 'Sinopsis' %}</h3>
+    <div class="synopsis-area">
+      {% if object.synopsis %}<p class="synopsis">{{ object.synopsis|linebreaksbr }}</p>{% endif %}
+    </div>
+
+    {% if relaciones %}
+      <h3 style="margin-top:24px;">{% trans 'Relaciones' %}<a class="page-sub mas" href="#relaciones">{% trans 'Más relaciones' %} ({{ relaciones|length }}) →</a></h3>
+      {% include 'detail/_relaciones.html' with filas=relaciones|slice:":6" columnas="2" %}
+    {% endif %}
+    {% if reparto %}
+      <h3 style="margin-top:24px;">{% trans 'Reparto' %}<a class="page-sub mas" href="#reparto">{% trans 'Más reparto' %} ({{ reparto|length }}) →</a></h3>
+      {% include 'detail/_personas.html' with filas=reparto|slice:":10" columnas="2" %}
+    {% endif %}
+    {% if equipo %}
+      <h3 style="margin-top:24px;">{% trans 'Equipo' %}<a class="page-sub mas" href="#equipo">{% trans 'Más equipo' %} ({{ equipo|length }}) →</a></h3>
+      {% include 'detail/_personas.html' with filas=equipo|slice:":6" columnas="2" %}
+    {% endif %}
+  </section>
+
+  {# ---- Relaciones completas ---- #}
+  {% if relaciones %}
+    <section class="dsection" data-tab="relaciones" data-label="{% trans 'Relaciones' %}" style="padding-top:0;">
+      <h3>{% trans 'Relaciones' %} <span class="page-sub" style="font-size:12px">({{ relaciones|length }})</span>
+        {% if tab_url.relaciones and relaciones|length > 30 %}<a class="page-sub mas" href="{{ tab_url.relaciones }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      {% include 'detail/_relaciones.html' with filas=relaciones columnas="2" %}
+    </section>
+  {% endif %}
+
+  {# ---- Reparto completo ---- #}
+  {% if reparto %}
+    <section class="dsection" data-tab="reparto" data-label="{% trans 'Reparto' %}" style="padding-top:0;">
+      <h3>{% trans 'Reparto' %} <span class="page-sub" style="font-size:12px">({{ reparto|length }})</span>
+        {% if tab_url.reparto and reparto|length > 30 %}<a class="page-sub mas" href="{{ tab_url.reparto }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      {% include 'detail/_personas.html' with filas=reparto columnas="2" %}
+    </section>
+  {% endif %}
+
+  {# ---- Equipo completo ---- #}
+  {% if equipo %}
+    <section class="dsection" data-tab="equipo" data-label="{% trans 'Equipo' %}" style="padding-top:0;">
+      <h3>{% trans 'Equipo' %} <span class="page-sub" style="font-size:12px">({{ equipo|length }})</span>
+        {% if tab_url.equipo and equipo|length > 30 %}<a class="page-sub mas" href="{{ tab_url.equipo }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      {% include 'detail/_personas.html' with filas=equipo columnas="2" %}
+    </section>
+  {% endif %}
+
+  {# ---- Galería completa (con lightbox) ---- #}
+  {% if fotos %}
+    <section class="dsection" data-tab="imagenes" data-label="{% trans 'Imágenes' %}" style="padding-top:0;">
+      <h3>{% trans 'Imágenes' %} <span class="page-sub" style="font-size:12px">({{ fotos|length }})</span>
+        {% if tab_url.imagenes and fotos|length > 40 %}<a class="page-sub mas" href="{{ tab_url.imagenes }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      <div class="gallery">{% for f in fotos %}{% if f|imagen %}<img class="shot" src="{{ f|imagen }}" alt="{{ object }}" loading="lazy">{% endif %}{% endfor %}</div>
+    </section>
+  {% endif %}
+
+  {% endwith %}
+  {% if es_gestion %}
+  {# Ficha técnica (solo gestión): lo que el registro ES — id, slug, activo, fechas. Muévela o amplíala aquí. #}
+  <section class="dsection" data-tab="tecnica" data-label="{% trans 'Ficha técnica' %}" style="padding-top:0;">
+    <h3>{% trans 'Ficha técnica' %}</h3>
+    <div class="mal-row"><span class="k">Id:</span><span class="v">{{ object.pk }}</span></div>
+    {% if object.slug %}<div class="mal-row"><span class="k">Slug:</span><span class="v">{{ object.slug }}</span></div>{% endif %}
+    {% if object.is_active is not None %}<div class="mal-row"><span class="k">{% trans 'Activo' %}:</span><span class="v">{{ object.display_is_active }}</span></div>{% endif %}
+    {% if object.created_at %}<div class="mal-row"><span class="k">{% trans 'Creado' %}:</span><span class="v">{{ object.display_created }}</span></div>{% endif %}
+    {% if object.updated_at %}<div class="mal-row"><span class="k">{% trans 'Actualizado' %}:</span><span class="v">{{ object.display_updated }}</span></div>{% endif %}
+  </section>
+  {% endif %}
+{% endblock %}

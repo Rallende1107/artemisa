@@ -1,0 +1,43 @@
+{% comment %} Campos de artista — patrón Hades/Poseidon.
+   PARCIAL que INCLUYE admin_panel/form.html (el cuadro: card, botones, csrf) porque la
+   vista Create/Update lo declara: form_template = "…/form/<modelo>.html".
+   Edita libremente el orden/HTML de cada campo aquí. Los booleanos se
+   auto-agrupan abajo, no van en este bloque.
+   Sincroniza:  python manage.py sync_forms  {% endcomment %}
+
+    <div class="field">
+      <label for="{{ form.name.id_for_label }}">{{ form.name.label }}{% if form.name.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.name }}
+      {% for e in form.name.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.name.help_text %}<span class="field__hint">{{ form.name.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.biography.id_for_label }}">{{ form.biography.label }}{% if form.biography.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.biography }}
+      {% for e in form.biography.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.biography.help_text %}<span class="field__hint">{{ form.biography.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.start_year.id_for_label }}">{{ form.start_year.label }}{% if form.start_year.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.start_year }}
+      {% for e in form.start_year.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.start_year.help_text %}<span class="field__hint">{{ form.start_year.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.year_end.id_for_label }}">{{ form.year_end.label }}{% if form.year_end.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.year_end }}
+      {% for e in form.year_end.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.year_end.help_text %}<span class="field__hint">{{ form.year_end.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.artist_type.id_for_label }}">{{ form.artist_type.label }}{% if form.artist_type.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.artist_type }}
+      {% for e in form.artist_type.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.artist_type.help_text %}<span class="field__hint">{{ form.artist_type.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.genres.id_for_label }}">{{ form.genres.label }}{% if form.genres.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.genres }}
+      {% for e in form.genres.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.genres.help_text %}<span class="field__hint">{{ form.genres.help_text }}</span>{% endif %}
+    </div>

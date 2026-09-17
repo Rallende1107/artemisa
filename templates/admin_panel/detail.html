@@ -1,0 +1,60 @@
+{% extends page_template|default:'admin_panel/base_admin.html' %}
+{% load i18n %}
+
+{% block title %}{{ object }} · {{ SITE_NAME }}{% endblock %}
+
+{% comment %}
+  CUADRO GENÉRICO del detalle de gestión (entidades triviales: categorías, logs, datos crudos…): la imagen si la
+  hay (`poster`), las filas de `detail_fields` (`facts`), la descripción del objeto si la tiene, y las acciones
+  arriba y abajo. Una entidad con ficha propia NO pasa por aquí: su HTML hereda de detail/base_detail.html.
+{% endcomment %}
+{% block content %}
+  <div class="page-head">
+    <div class="breadcrumbs">
+      <a href="{% url 'panel:home' %}">{% trans "panel" %}</a><span class="sep">/</span>
+      {% if section_url %}<a href="{% url section_url %}">{{ section_label|lower }}</a><span class="sep">/</span>{% endif %}
+      <a href="{% url list_url %}">{{ label_plural }}</a><span class="sep">/</span>
+      <span>{{ object }}</span>
+    </div>
+    <h1 class="page-title">{{ object }}</h1>
+    <p class="page-sub">{{ label|capfirst }} · {% trans "id" %} {{ object.pk }}</p>
+    <div class="detail-toolbar chip-row">
+      {% block detail_actions_top %}{% include 'admin_panel/_detail_actions.html' %}{% endblock %}
+    </div>
+  </div>
+
+  {% block detalle %}
+    <div class="detail-shell{% if not poster and not facts %} detail-shell--solo{% endif %}">
+      {% if poster or facts %}
+        <aside class="detail-side">
+          {% if poster %}
+            <div class="detail-media detail-media--wide"><img src="{{ poster }}" alt="{{ object }}" style="width:100%;height:100%;object-fit:cover;border-radius:12px"></div>
+          {% endif %}
+          {% if facts %}
+            <div class="info-list glass">
+              {% for f in facts %}<div class="info-list__row"><span class="k">{{ f.label }}</span><span class="v">{{ f.value|default:"—"|linebreaksbr }}</span></div>{% endfor %}
+            </div>
+          {% endif %}
+        </aside>
+      {% endif %}
+
+      <div class="detail-main">
+        {% if object.description %}
+          <div class="detail-longtext">
+            <div class="k">{% trans "Descripción" %}</div>
+            <div class="v glass">{{ object.description|linebreaksbr }}</div>
+          </div>
+        {% endif %}
+
+        <div class="detail-block">
+          <h3>{% trans "Acciones" %}</h3>
+          <div class="chip-row">
+            {% block detail_actions %}{% include 'admin_panel/_detail_actions.html' %}{% endblock %}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endblock detalle %}
+{% endblock %}
+
+{% block foot_meta %}detail{% endblock %}

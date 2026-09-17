@@ -1,0 +1,109 @@
+{% extends 'public/list.html' %}
+{% load static i18n %}
+{% comment %}
+  MI colección (una lista por medio): la página pública de lista (tabla, tarjetas, panel de filtros) más
+  la edición EN LÍNEA de estado y nota (guarda al vuelo) y «Quitar» con confirmación.
+  Las filas las trae la Data del medio (collections/views/public/v1_data.py): solo las del usuario.
+{% endcomment %}
+
+{% block head %}
+  {{ block.super }}
+  <style>
+    .st { font-size: 12px; padding: 2px 9px; border-radius: 20px; border: 1px solid transparent; }
+    .st.s-pending { color: var(--faint); border-color: var(--border-soft); }
+    .pr-num { width: 64px; text-align: center; }
+    /* selects en línea compactos: el estado no necesita media pantalla */
+    .st-inline { max-width: 170px; text-overflow: ellipsis; }
+    /* columna «Dónde»: líneas apiladas, de solo lectura (se edita en Editar) */
+    .dt-linea { display: block; font-size: 12.5px; white-space: nowrap; }
+    .dt-k { color: var(--muted, #9aa); margin-right: 4px; }
+    /* Estado editable en línea (cambia y guarda al vuelo) */
+    .st-inline { height: 30px; padding: 0 8px; background: var(--glass-2); color: var(--text-2);
+      border: 1px solid var(--border-soft); border-radius: 20px; font-size: 12.5px; cursor: pointer; }
+    .st-inline:focus { outline: none; border-color: var(--accent); }
+    .st-inline.ok { border-color: var(--ok); color: var(--ok); transition: border-color .2s, color .2s; }
+    /* la DataTable convive con la columna de filtros del catálogo */
+    .cat-main .dt-wrap, .cat-main #cards-grid { min-width: 0; }
+    /* pie de la TARJETA (estado + editar): estilos en catalogo.css, en dos líneas */
+    .card-btn { display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 9px; border-radius: 20px;
+      background: var(--glass-2); color: var(--text-2); border: 1px solid var(--border-soft); font-size: 12.5px;
+      cursor: pointer; white-space: nowrap; text-decoration: none; }
+    .card-btn:hover { color: var(--accent); border-color: var(--accent); }
+  </style>
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script>
+    // ESTADO / NOTA / PROGRESO editables en línea: cambiar guarda al vuelo (AJAX parcial).
+    function guardarCampo(url, campo, valor, el) {
+      var datos = new FormData();
+      datos.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+      datos.append(campo, valor);
+      datos.append("ajax", "1");
+      var sel = el;
+      fetch(url, { method: "POST", body: datos, credentials: "same-origin" })
+        .then(function (r) {
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          return r.json();
+        })
+        .then(function (d) {
+          if (!d.ok) throw new Error("respuesta sin ok");
+          sel.classList.add("ok");
+          if (window.artNotify) window.artNotify.toast("{% trans 'Guardado' %}" + (d.status ? ": " + d.status : ""));
+          // tabla y tarjetas se pintan con las MISMAS filas: se vuelven a pedir (misma página)
+          // para que el cambio hecho en una vista se vea en la otra sin F5.
+          setTimeout(function () { if (window.DT_TABLE) window.DT_TABLE.ajax.reload(null, false); }, 600);
+        })
+        .catch(function (err) {
+          var msg = "{% trans 'No se pudo guardar' %} (" + err.message + ")";
+          if (window.artNotify) window.artNotify.toast(msg, "error"); else alert(msg);
+        });
+    }
+    document.addEventListener("change", function (e) {
+      var sel = e.target.closest && e.target.closest(".st-inline");
+      if (!sel) return;
+      guardarCampo(sel.dataset.url, sel.dataset.campo || "status", sel.value, sel);
+    });
+    // «Marcar / Quitar favorito» desde el menú de Acciones: guarda al vuelo y repinta la fila
+    document.addEventListener("click", function (e) {
+      var a = e.target.closest && e.target.closest(".js-fav");
+      if (!a) return;
+      e.preventDefault(); e.stopPropagation();
+      var menu = a.closest(".row-menu"); if (menu) menu.classList.remove("open");
+      guardarCampo(a.dataset.url, "is_favorite", a.dataset.value, a);
+    });
+    // estado desde el menú desplegable de la TARJETA
+    document.addEventListener("click", function (e) {
+      var a = e.target.closest && e.target.closest(".js-set-status");
+      if (!a) return;
+      e.preventDefault(); e.stopPropagation();
+      var menu = a.closest(".row-menu"); if (menu) menu.classList.remove("open");
+      guardarCampo(a.dataset.url, "status", a.dataset.status, a);
+    });
+    // «Quitar» desde el menú de acciones: POST con confirmación.
+    document.addEventListener("click", function (e) {
+      var a = e.target.closest && e.target.closest(".js-quitar");
+      if (!a) return;
+      e.preventDefault();
+      function quitar() {
+        var f = document.createElement("form");
+        f.method = "post"; f.action = a.getAttribute("href");
+        f.innerHTML = '<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">' +
+                      '<input type="hidden" name="next" value="{{ request.get_full_path }}">';
+        document.body.appendChild(f);
+        f.submit();
+      }
+      if (window.artNotify) {
+        window.artNotify.confirm({
+          title: "{% trans '¿Quitar de tu colección?' %}",
+          html: "<b>«" + (a.dataset.name || "") + "»</b>",
+          confirmButtonText: "{% trans 'Sí, quitar' %}",
+          customClass: { confirmButton: "swal2-danger" },
+        }).then(function (r) { if (r.isConfirmed) quitar(); });
+      } else if (confirm("¿Quitar «" + (a.dataset.name || "") + "» de tu colección?")) {
+        quitar();
+      }
+    });
+  </script>
+{% endblock %}

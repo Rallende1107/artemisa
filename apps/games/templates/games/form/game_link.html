@@ -1,0 +1,31 @@
+{% comment %} Campos de enlace de juego — patrón Hades/Poseidon.
+   PARCIAL que INCLUYE admin_panel/form.html (el cuadro: card, botones, csrf) porque la
+   vista Create/Update lo declara: form_template = "…/form/<modelo>.html".
+   Edita libremente el orden/HTML de cada campo aquí. Los booleanos se
+   auto-agrupan abajo, no van en este bloque.
+   Sincroniza:  python manage.py sync_forms  {% endcomment %}
+
+    <div class="field">
+      <label for="{{ form.game.id_for_label }}">{{ form.game.label }}{% if form.game.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.game }}
+      {% for e in form.game.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.game.help_text %}<span class="field__hint">{{ form.game.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.source.id_for_label }}">{{ form.source.label }}{% if form.source.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.source }}
+      {% for e in form.source.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.source.help_text %}<span class="field__hint">{{ form.source.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.external_id.id_for_label }}">{{ form.external_id.label }}{% if form.external_id.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.external_id }}
+      {% for e in form.external_id.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.external_id.help_text %}<span class="field__hint">{{ form.external_id.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.url.id_for_label }}">{{ form.url.label }}{% if form.url.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.url }}
+      {% for e in form.url.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.url.help_text %}<span class="field__hint">{{ form.url.help_text }}</span>{% endif %}
+    </div>

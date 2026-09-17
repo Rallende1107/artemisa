@@ -1,0 +1,169 @@
+{# LIGHTBOX de galerías (estilo F95): foto grande + tira de miniaturas abajo, #}
+{# presentación con BARRA DE TIEMPO, pantalla completa y descarga. #}
+<div class="lightbox" id="lightbox" hidden>
+  <div class="lb-progreso"></div>
+  <button type="button" class="lb-btn lb-cerrar" title="Cerrar">✕</button>
+  <a class="lb-btn lb-desc" href="" download title="Descargar"><i class="bi bi-download"></i></a>
+  <button type="button" class="lb-btn lb-play" title="Presentación"><i class="bi bi-play-fill"></i></button>
+  <button type="button" class="lb-btn lb-full" title="Pantalla completa"><i class="bi bi-fullscreen"></i></button>
+  <button type="button" class="lb-btn lb-grid" title="Mostrar u ocultar miniaturas"><i class="bi bi-grid-3x3-gap-fill"></i></button>
+  <button type="button" class="lb-prev" title="Anterior">‹</button>
+  <button type="button" class="lb-next" title="Siguiente">›</button>
+  <div class="lb-zona"><img class="lb-img" src="" alt="Foto ampliada"></div>
+  <div class="lb-contador"></div>
+  <button type="button" class="lb-tira-btn lb-tira-prev" title="Miniaturas anteriores">‹</button>
+  <button type="button" class="lb-tira-btn lb-tira-next" title="Más miniaturas">›</button>
+  <div class="lb-tiras"></div>
+</div>
+<script>
+  // Carrusel F95: miniaturas con arrastre, presentación con barra de tiempo,
+  // pantalla completa y descarga de la foto actual.
+  (function () {
+    var caja = document.getElementById("lightbox");
+    if (!caja || caja.dataset.listo) return;
+    caja.dataset.listo = "1";
+    // FUERA del contenido: dentro de main queda bajo el header (su contexto
+    // de apilamiento es menor); colgado del body, el z-index del modal manda.
+    document.body.appendChild(caja);
+    var visor = caja.querySelector(".lb-img");
+    var contador = caja.querySelector(".lb-contador");
+    var tira = caja.querySelector(".lb-tiras");
+    var barra = caja.querySelector(".lb-progreso");
+    var descarga = caja.querySelector(".lb-desc");
+    var botonPlay = caja.querySelector(".lb-play");
+    var botonFull = caja.querySelector(".lb-full");
+    var fotos = [], idx = 0, reloj = null, animacion = null;
+    var PASO_MS = 3000;
+
+    var llegada = null;
+    function desliza(destino) {
+      // Deslizado propio (rAF): el scroll suave nativo se cancela con las
+      // cargas de miniaturas; este no. Un temporizador GARANTIZA la llegada
+      // aunque el navegador congele la animación (pestaña de fondo).
+      if (animacion) cancelAnimationFrame(animacion);
+      if (llegada) clearTimeout(llegada);
+      var tope = Math.max(0, tira.scrollWidth - tira.clientWidth);
+      destino = Math.max(0, Math.min(destino, tope));
+      var inicio = tira.scrollLeft, delta = destino - inicio, t0 = null;
+      var DURA = 260;
+      function paso(t) {
+        if (t0 === null) t0 = t;
+        var p = Math.min(1, (t - t0) / DURA);
+        tira.scrollLeft = inicio + delta * (1 - Math.pow(1 - p, 3));   // ease-out
+        animacion = p < 1 ? requestAnimationFrame(paso) : null;
+      }
+      animacion = requestAnimationFrame(paso);
+      llegada = setTimeout(function () {
+        if (animacion) cancelAnimationFrame(animacion);
+        animacion = null; tira.scrollLeft = destino;
+      }, DURA + 80);
+    }
+    visor.addEventListener("load", function () { caja.classList.remove("cargando"); });
+    visor.addEventListener("error", function () { caja.classList.remove("cargando"); });
+
+    function corre_barra() {
+      barra.style.transition = "none";
+      barra.style.width = "0";
+      void barra.offsetWidth;   // reflow: reinicia la animación
+      barra.style.transition = "width " + PASO_MS + "ms linear";
+      barra.style.width = "100%";
+    }
+    function pinta() {
+      caja.classList.add("cargando");   // spinner hasta que llegue la foto
+      visor.src = fotos[idx];
+      descarga.href = fotos[idx];
+      contador.textContent = (idx + 1) + " / " + fotos.length;
+      [].forEach.call(tira.children, function (t, j) { t.classList.toggle("on", j === idx); });
+      var actual = tira.children[idx];
+      if (actual) {
+        desliza(actual.offsetLeft - tira.clientWidth / 2 + actual.clientWidth / 2);
+      }
+      if (reloj) corre_barra();
+    }
+    function abre(lista, i) {
+      fotos = lista; idx = i;
+      tira.innerHTML = "";
+      lista.forEach(function (src, j) {
+        var t = document.createElement("img");
+        t.src = src;   // sin lazy: que la tira no se mueva mientras cargan
+        t.addEventListener("click", function () { idx = j; pinta(); });
+        tira.appendChild(t);
+      });
+      caja.hidden = false; pinta();
+    }
+    function cierra() {
+      para();
+      if (document.fullscreenElement) document.exitFullscreen();
+      caja.hidden = true; visor.src = "";
+    }
+    function mueve(paso) { idx = (idx + paso + fotos.length) % fotos.length; pinta(); }
+    function para() {
+      if (reloj) { clearInterval(reloj); reloj = null; }
+      botonPlay.innerHTML = '<i class="bi bi-play-fill"></i>';
+      barra.style.transition = "none";
+      barra.style.width = "0";
+    }
+    function presenta() {
+      if (reloj) { para(); return; }
+      reloj = setInterval(function () { mueve(1); }, PASO_MS);
+      botonPlay.innerHTML = '<i class="bi bi-pause-fill"></i>';
+      corre_barra();
+    }
+
+    document.addEventListener("click", function (e) {
+      var img = e.target.closest(".gallery img.shot");
+      if (!img) return;
+      var todas = [].slice.call(img.closest(".gallery").querySelectorAll("img.shot"));
+      abre(todas.map(function (i) { return i.src; }), todas.indexOf(img));
+    });
+    caja.querySelector(".lb-cerrar").addEventListener("click", cierra);
+    caja.querySelector(".lb-prev").addEventListener("click", function () { mueve(-1); });
+    caja.querySelector(".lb-next").addEventListener("click", function () { mueve(1); });
+    botonPlay.addEventListener("click", presenta);
+    botonFull.addEventListener("click", function () {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else caja.requestFullscreen();
+    });
+    document.addEventListener("fullscreenchange", function () {
+      botonFull.innerHTML = document.fullscreenElement
+        ? '<i class="bi bi-fullscreen-exit"></i>' : '<i class="bi bi-fullscreen"></i>';
+    });
+    caja.querySelector(".lb-grid").addEventListener("click", function () {
+      caja.classList.toggle("sin-tiras");
+    });
+    // Flechas de la TIRA (como Steam): pasan las miniaturas por páginas
+    // deslizando, con VUELTA circular (del final al inicio y al revés).
+    caja.querySelector(".lb-tira-prev").addEventListener("click", function () {
+      if (tira.scrollLeft <= 2) desliza(tira.scrollWidth);
+      else desliza(tira.scrollLeft - tira.clientWidth * 0.8);
+    });
+    caja.querySelector(".lb-tira-next").addEventListener("click", function () {
+      if (tira.scrollLeft + tira.clientWidth >= tira.scrollWidth - 2) desliza(0);
+      else desliza(tira.scrollLeft + tira.clientWidth * 0.8);
+    });
+    caja.querySelector(".lb-zona").addEventListener("click", function (e) {
+      if (e.target === e.currentTarget) cierra();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (caja.hidden) return;
+      if (e.key === "Escape") cierra();
+      if (e.key === "ArrowLeft") mueve(-1);
+      if (e.key === "ArrowRight") mueve(1);
+      if (e.key === " ") { e.preventDefault(); presenta(); }
+    });
+
+    // Arrastre horizontal de la tira (cuando son muchas miniaturas).
+    var arrastre = null;
+    tira.addEventListener("pointerdown", function (e) {
+      arrastre = { x: e.clientX, scroll: tira.scrollLeft }; tira.classList.add("agarrada");
+    });
+    window.addEventListener("pointermove", function (e) {
+      if (arrastre) tira.scrollLeft = arrastre.scroll - (e.clientX - arrastre.x);
+    });
+    window.addEventListener("pointerup", function () {
+      arrastre = null; tira.classList.remove("agarrada");
+    });
+
+    window.addEventListener("pageshow", cierra);   // bfcache: nunca revive abierto
+  })();
+</script>

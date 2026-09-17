@@ -1,0 +1,27 @@
+{% load static i18n ficha %}
+{% comment %}
+Filas estilo MAL de PERSONAJES de una obra (anime, manga, juego).
+Izquierda: el personaje (foto, nombre → su ficha) y su rol debajo.
+Derecha: su voz principal (persona e idioma) si el modelo la colgó en `.voz`.
+Se incluye con `filas` (puentes con .character y .role) y `columnas` (
+    "2" para el mini recuento).{% endcomment %}
+{% static 'image/default/sin-imagen.webp' as sin_img %}
+<div class="mal-rows{% if columnas == "2" %} mal-rows--2{% endif %}">
+  {% for c in filas %}
+    <div class="mr">
+      <div class="mr-ent">
+        <a class="mr-thumb" href="{% ficha c.character %}"><img src="{{ c.character|imagen|default:sin_img }}" alt="{{ c.character }}" loading="lazy"></a>
+        <div>
+          <div class="mr-name"><a href="{% ficha c.character %}">{{ c.character }}</a></div>
+          {% if c.role %}<div class="mr-sub">{{ c.role }}</div>{% endif %}
+        </div>
+      </div>
+      {% if c.voz %}
+        <div class="mr-vas"><div class="mr-va">
+          <div><div class="mr-name"><a href="{% ficha c.voz.person %}">{{ c.voz.person }}</a></div><div class="mr-sub">{{ c.voz.language }}</div></div>
+          <a class="mr-thumb" href="{% ficha c.voz.person %}"><img src="{{ c.voz.person|imagen|default:sin_img }}" alt="{{ c.voz.person }}" loading="lazy"></a>
+        </div></div>
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>

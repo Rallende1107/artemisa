@@ -1,0 +1,104 @@
+{
+  "mal_id" : 1,
+  "url" : "https://myanimelist.net/anime/1/Cowboy_Bebop",
+  "title" : "Cowboy Bebop",
+  "english_title" : null,
+  "titles" : [ {
+    "lang" : "english",
+    "titles" : [ "Cowboy Bebop" ]
+  }, {
+    "lang" : "japanese",
+    "titles" : [ "カウボーイビバップ" ]
+  } ],
+  "type" : "TV",
+  "status" : "Finished Airing",
+  "source" : "Original",
+  "rating" : "R - 17+ (violence & profanity)",
+  "episodes" : "26",
+  "duration" : "24 min. per ep.",
+  "aired" : {
+    "from" : "1998-04-03",
+    "to" : "1999-04-24",
+    "raw" : "Apr 3, 1998 to Apr 24, 1999"
+  },
+  "synopsis" : "Crime is timeless. By the year 2071, humanity has expanded across the galaxy, filling the surface of other planets with settlements like those on Earth. These new societies are plagued by murder, drug use, and theft, and intergalactic outlaws are hunted by a growing number of tough bounty hunters. Spike Spiegel and Jet Black pursue criminals throughout space to make a humble living. Beneath his goofy and aloof demeanor, Spike is haunted by the weight of his violent past. Meanwhile, Jet manages his own troubled memories while taking care of Spike and the Bebop, their ship. The duo is joined by the beautiful con artist Faye Valentine, odd child Edward Wong Hau Pepelu Tivrusky IV, and Ein, a bioengineered Welsh corgi. While developing bonds and working to catch a colorful cast of criminals, the Bebop crew's lives are disrupted by a menace from Spike's past. As a rival's maniacal plot continues to unravel, Spike must choose between life with his newfound family or revenge for his old wounds. [Written by MAL Rewrite]",
+  "background" : "When Cowboy Bebop first aired in spring of 1998 on TV Tokyo, only episodes 2-3, 7-15, and 18 were broadcast, it was concluded with a recap special known as Yose Atsume Blues. This was due to anime censorship having increased following the big controversies over Evangelion, as a result most of the series was pulled from the air due to violent content. Satellite channel WOWOW picked up the series in the fall of that year and aired it in its entirety uncensored. Cowboy Bebop was not a ratings hit in Japan, but sold over 19,000 DVD units in the initial release run, and 81,000 overall. Protagonist Spike Spiegel won Best Male Character, and Megumi Hayashibara won Best Voice Actor for her role as Faye Valentine in the 1999 and 2000 Anime Grand Prix, respectively.\n\n Cowboy Bebop's biggest influence has been in the United States, where it premiered on Adult Swim in 2001 with many reruns since. The show's heavy Western influence struck a chord with American viewers, where it became a \"gateway drug\" to anime aimed at adult audiences.",
+  "image_url" : "https://cdn.myanimelist.net/images/anime/4/19644.jpg",
+  "images_extra" : [ "https://cdn.myanimelist.net/images/anime/11/53939.jpg", "https://cdn.myanimelist.net/images/anime/12/19609.jpg", "https://cdn.myanimelist.net/images/anime/12/22883.jpg", "https://cdn.myanimelist.net/images/anime/12/81920.jpg", "https://cdn.myanimelist.net/images/anime/1519/91488.jpg", "https://cdn.myanimelist.net/images/anime/1608/139122.jpg", "https://cdn.myanimelist.net/images/anime/1623/122582.jpg", "https://cdn.myanimelist.net/images/anime/1764/109632.jpg", "https://cdn.myanimelist.net/images/anime/1952/121242.jpg", "https://cdn.myanimelist.net/images/anime/2/78836.jpg", "https://cdn.myanimelist.net/images/anime/4/19644.jpg", "https://cdn.myanimelist.net/images/anime/4/22882.jpg", "https://cdn.myanimelist.net/images/anime/6/22885.jpg", "https://cdn.myanimelist.net/images/anime/7/3791.jpg" ],
+  "genres" : [ "Action", "Award Winning", "Sci-Fi" ],
+  "themes" : [ "Adult Cast", "Space" ],
+  "demographics" : [ ],
+  "producers" : [ {
+    "company_id" : 23,
+    "name" : "Bandai Visual"
+  }, {
+    "company_id" : 123,
+    "name" : "Victor Entertainment"
+  }, {
+    "company_id" : 1506,
+    "name" : "Audio Planning U"
+  } ],
+  "licensors" : [ {
+    "company_id" : 102,
+    "name" : "Funimation"
+  } ],
+  "studios" : [ {
+    "company_id" : 14,
+    "name" : "Sunrise"
+  } ],
+  "relations" : [ {
+    "relation" : "Adaptation",
+    "entry" : [ {
+      "mal_id" : 173,
+      "type" : "manga",
+      "name" : "Cowboy Bebop",
+      "url" : "https://myanimelist.net/manga/173"
+    }, {
+      "mal_id" : 174,
+      "type" : "manga",
+      "name" : "Shooting Star Bebop: Cowboy Bebop",
+      "url" : "https://myanimelist.net/manga/174"
+    } ]
+  }, {
+    "relation" : "Side Story",
+    "entry" : [ {
+      "mal_id" : 5,
+      "type" : "anime",
+      "name" : "Cowboy Bebop: Tengoku no Tobira",
+      "url" : "https://myanimelist.net/anime/5"
+    }, {
+      "mal_id" : 17205,
+      "type" : "anime",
+      "name" : "Cowboy Bebop: Ein no Natsuyasumi",
+      "url" : "https://myanimelist.net/anime/17205"
+    } ]
+  }, {
+    "relation" : "Summary",
+    "entry" : [ {
+      "mal_id" : 4037,
+      "type" : "anime",
+      "name" : "Cowboy Bebop: Yose Atsume Blues",
+      "url" : "https://myanimelist.net/anime/4037"
+    } ]
+  } ],
+  "ost" : {
+    "openings" : [ {
+      "number" : 1,
+      "title" : "Tank!",
+      "artist" : "The Seatbelts"
+    } ],
+    "endings" : [ {
+      "number" : 1,
+      "title" : "The Real Folk Blues",
+      "artist" : "The Seatbelts feat. Mai Yamane"
+    }, {
+      "number" : 2,
+      "title" : "Space Lion",
+      "artist" : "The Seatbelts"
+    }, {
+      "number" : 3,
+      "title" : "Blue",
+      "artist" : "The Seatbelts feat. Mai Yamane"
+    } ]
+  }
+}

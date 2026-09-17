@@ -1,0 +1,25 @@
+{% comment %} Campos de título de juego — patrón Hades/Poseidon.
+   PARCIAL que INCLUYE admin_panel/form.html (el cuadro: card, botones, csrf) porque la
+   vista Create/Update lo declara: form_template = "…/form/<modelo>.html".
+   Edita libremente el orden/HTML de cada campo aquí. Los booleanos se
+   auto-agrupan abajo, no van en este bloque.
+   Sincroniza:  python manage.py sync_forms  {% endcomment %}
+
+    <div class="field">
+      <label for="{{ form.game.id_for_label }}">{{ form.game.label }}{% if form.game.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.game }}
+      {% for e in form.game.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.game.help_text %}<span class="field__hint">{{ form.game.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.title_lang.id_for_label }}">{{ form.title_lang.label }}{% if form.title_lang.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.title_lang }}
+      {% for e in form.title_lang.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.title_lang.help_text %}<span class="field__hint">{{ form.title_lang.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.title.id_for_label }}">{{ form.title.label }}{% if form.title.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.title }}
+      {% for e in form.title.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.title.help_text %}<span class="field__hint">{{ form.title.help_text }}</span>{% endif %}
+    </div>

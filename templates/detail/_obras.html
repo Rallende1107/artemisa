@@ -1,0 +1,19 @@
+{% load static i18n ficha %}
+{% comment %}Filas estilo MAL de OBRAS (películas, series, animes, mangas, juegos…) de una persona, personaje, creador o
+compañía. Izquierda: la obra (portada, título → su ficha del lado, año). Derecha: `rol` y `rol_sub` si la fila los
+trae (los cuelga el modelo con filas_obra). Se incluye con `filas` y `columnas` ("2").{% endcomment %}
+{% static 'image/default/sin-imagen.webp' as sin_img %}
+<div class="mal-rows{% if columnas == "2" %} mal-rows--2{% endif %}">
+  {% for f in filas %}{% with obra=f.obra %}
+    <div class="mr">
+      <div class="mr-ent">
+        <a class="mr-thumb" href="{% ficha obra %}"><img src="{{ obra|imagen|default:sin_img }}" alt="{{ obra }}" loading="lazy"></a>
+        <div>
+          <div class="mr-name"><a href="{% ficha obra %}">{{ obra }}</a></div>
+          {% firstof obra.release_year obra.year obra.release_date.year as anio %}{% if anio %}<div class="mr-sub">{{ anio }}</div>{% endif %}
+        </div>
+      </div>
+      {% if f.rol %}<div class="mr-vas"><div class="mr-va"><div><div class="mr-name">{{ f.rol }}</div>{% if f.rol_sub %}<div class="mr-sub">{{ f.rol_sub }}</div>{% endif %}</div></div></div>{% endif %}
+    </div>
+  {% endwith %}{% endfor %}
+</div>

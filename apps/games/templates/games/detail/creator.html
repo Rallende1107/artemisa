@@ -1,0 +1,61 @@
+{% extends 'detail/base_detail.html' %}
+{% load i18n ficha %}
+{% comment %}FICHA de creador de juegos (gestión y público): tipo, idiomas, VNDB y enlaces en el lateral; descripción y
+los juegos que desarrolla y los que edita. Métodos del modelo: juegos, editados, enlaces, apodos.{% endcomment %}
+
+{% block side %}
+  {% if object.type %}<div class="mal-row"><span class="k">{% trans 'Tipo' %}:</span><span class="v"><a href="{% url 'panel:creator_by' 'type' object.type %}">{{ object.get_type_display }}</a></span></div>{% endif %}
+  {% with lista=object.languages.all %}{% if lista %}<div class="mal-row"><span class="k">{% trans 'Idiomas' %}:</span><span class="v">{% for g in lista %}<a href="{% by by_url 'idioma' g %}">{{ g }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>{% endif %}{% endwith %}
+  {% with apodos=object.apodos %}{% if apodos %}<div class="mal-row"><span class="k">{% trans 'Apodos' %}:</span><span class="v">{{ apodos|join:" · " }}</span></div>{% endif %}{% endwith %}
+  {% if object.p_vndb_id %}<div class="mal-row"><span class="k">VNDB:</span><span class="v"><a href="https://vndb.org/{{ object.p_vndb_id }}" target="_blank" rel="noopener">{{ object.p_vndb_id }}</a></span></div>{% endif %}
+  {% with enlaces=object.enlaces %}{% if enlaces %}<div class="mal-row"><span class="k">{% trans 'Enlaces' %}:</span><span class="v">{% for e in enlaces %}<a href="{{ e.url }}" target="_blank" rel="noopener">{{ e.source|default:e.url }}</a>{% if not forloop.last %} · {% endif %}{% endfor %}</span></div>{% endif %}{% endwith %}
+{% endblock %}
+
+{% block cuerpo %}
+  {% with juegos=object.juegos editados=object.editados %}
+
+  <section class="dsection" data-tab="detalles" data-label="{% trans 'Detalles' %}" style="padding-top:0;">
+    <h3>{% trans 'Descripción' %}</h3>
+    <div class="synopsis-area">
+      {% if object.description %}<p class="synopsis">{{ object.description|linebreaksbr }}</p>{% endif %}
+    </div>
+
+    {% if juegos %}
+      <h3 style="margin-top:24px;">{% trans 'Desarrolla' %}<a class="page-sub mas" href="#juegos">{% trans 'Más juegos' %} ({{ juegos|length }}) →</a></h3>
+      {% include 'detail/_obras.html' with filas=juegos|slice:":6" columnas="2" %}
+    {% endif %}
+    {% if editados %}
+      <h3 style="margin-top:24px;">{% trans 'Edita' %}<a class="page-sub mas" href="#editados">{% trans 'Más juegos' %} ({{ editados|length }}) →</a></h3>
+      {% include 'detail/_obras.html' with filas=editados|slice:":6" columnas="2" %}
+    {% endif %}
+  </section>
+
+  {% if juegos %}
+    <section class="dsection" data-tab="juegos" data-label="{% trans 'Desarrolla' %}" style="padding-top:0;">
+      <h3>{% trans 'Desarrolla' %} <span class="page-sub" style="font-size:12px">({{ juegos|length }})</span>
+        {% if tab_url.juegos and juegos|length > 30 %}<a class="page-sub mas" href="{{ tab_url.juegos }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      {% include 'detail/_obras.html' with filas=juegos columnas="2" %}
+    </section>
+  {% endif %}
+
+  {% if editados %}
+    <section class="dsection" data-tab="editados" data-label="{% trans 'Edita' %}" style="padding-top:0;">
+      <h3>{% trans 'Edita' %} <span class="page-sub" style="font-size:12px">({{ editados|length }})</span>
+        {% if tab_url.editados and editados|length > 30 %}<a class="page-sub mas" href="{{ tab_url.editados }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      {% include 'detail/_obras.html' with filas=editados columnas="2" %}
+    </section>
+  {% endif %}
+
+  {% endwith %}
+  {% if es_gestion %}
+  {# Ficha técnica (solo gestión): lo que el registro ES — id, slug, activo, fechas. Muévela o amplíala aquí. #}
+  <section class="dsection" data-tab="tecnica" data-label="{% trans 'Ficha técnica' %}" style="padding-top:0;">
+    <h3>{% trans 'Ficha técnica' %}</h3>
+    <div class="mal-row"><span class="k">Id:</span><span class="v">{{ object.pk }}</span></div>
+    {% if object.slug %}<div class="mal-row"><span class="k">Slug:</span><span class="v">{{ object.slug }}</span></div>{% endif %}
+    {% if object.is_active is not None %}<div class="mal-row"><span class="k">{% trans 'Activo' %}:</span><span class="v">{{ object.display_is_active }}</span></div>{% endif %}
+    {% if object.created_at %}<div class="mal-row"><span class="k">{% trans 'Creado' %}:</span><span class="v">{{ object.display_created }}</span></div>{% endif %}
+    {% if object.updated_at %}<div class="mal-row"><span class="k">{% trans 'Actualizado' %}:</span><span class="v">{{ object.display_updated }}</span></div>{% endif %}
+  </section>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,142 @@
+{% extends page_template|default:'panel/base.html' %}
+{% comment %}
+  CUADRO de importación (BaseImport): el HTML es UNO y recorre con un `for` el arreglo de formularios que
+  declara la vista (`forms`), uno debajo de otro. Cada formulario trae su título, su botón y a dónde lleva;
+  aquí solo se pintan sus campos. El que tiene campo `q` es el buscador: solo la caja, que manda por GET a su
+  vista de resultados (`resultados_url`), donde se marcan los candidatos y se importan de una vez.
+{% endcomment %}
+
+{% block head %}
+  <style>
+    .section { margin-bottom: 26px; }
+    .section__head { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+    .section__rule { flex: 1; height: 1px; background: var(--border-soft); }
+    .import-aviso { font-size: 18px; font-weight: 600; color: var(--ink); margin: 0 0 14px; }
+    .import-aviso b { color: var(--accent); }
+    /* Acciones: botones CENTRADOS y a dónde lleva, a la derecha (tres columnas: el centro no se mueve). */
+    .form-actions { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; }
+    .form-actions .botones { grid-column: 2; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    /* Los dos botones, del MISMO tamaño (el «Cancelar» es un <a> y el de acción un <button>) */
+    .form-actions .botones > .btn-primary, .form-actions .botones > .btn-cancel {
+      min-width: 132px; height: 38px; padding: 0 18px; display: inline-flex; align-items: center; justify-content: center;
+      box-sizing: border-box; font-size: 14px; line-height: 1; }
+    .destino { grid-column: 3; justify-self: end; font: 12px var(--mono); color: var(--ink-dim); text-align: right; }
+    .destino b { color: var(--ink-soft); font-weight: 500; }
+    @media (max-width: 820px) {
+      .form-actions { grid-template-columns: 1fr; }
+      .form-actions .botones, .destino { grid-column: 1; justify-self: center; text-align: center; }
+    }
+    /* El cuadro de un lanzador es angosto: uno o dos campos, sus casillas y el botón. */
+    .section .form-card { max-width: 760px; }
+    .section .form-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+    .section .form-actions { margin-top: 14px; }
+    /* Casillas: DEBAJO de los campos, en UNA fila, cada una con su ayuda; centradas. */
+    .checks { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin: 12px 0 2px; }
+    .check { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; max-width: 40ch; }
+    .check label { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+    /* Campo que otra casilla desactiva (data-bloquea). */
+    .field--off { opacity: .45; }
+    .field--off input { cursor: not-allowed; }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div class="breadcrumbs">
+      <a href="{% url 'panel:home' %}">panel</a><span class="sep">/</span>
+      {% if section_url %}<a href="{% url section_url %}">{{ section_label|lower }}</a><span class="sep">/</span>{% endif %}
+      <span>importar · {{ source_key }} · {{ label|lower }}</span>
+    </div>
+    <h1 class="page-title">{{ page_title }}</h1>
+    <p class="page-sub">{{ ayuda }}{% if not celery_enabled %} Modo síncrono; el background se activa con Celery (Docker).{% endif %}</p>
+  </div>
+
+  {% for f in forms %}
+  <div class="section">
+    <div class="section__head"><span class="eyebrow">{{ f.titulo }}</span><span class="section__rule"></span></div>
+    {# aviso opcional del formulario (p. ej. «Hay 1.205 por procesar»): una línea destacada antes de sus campos #}
+    {% if f.aviso %}<p class="import-aviso">{{ f.aviso }}</p>{% endif %}
+
+    {% if f.es_buscador %}
+      {# --- buscador: solo la caja; manda por GET a su vista de resultados, donde se eligen los que importar --- #}
+      <form class="form-card" method="get" action="{{ f.resultados_href }}"
+            data-espera="Buscando en {{ source_label }}…" data-espera-texto="Puede tardar unos segundos.">
+        <div class="form-grid">
+          <div class="field">
+            <label for="{{ f.q.id_for_label }}">{{ f.q.label }}</label>
+            <input type="search" name="q" id="{{ f.q.id_for_label }}" maxlength="{{ f.q.field.max_length }}"
+                   minlength="{{ f.q.field.min_length }}" placeholder="{{ f.q.field.widget.attrs.placeholder }}" autocomplete="off" required>
+            <span class="field__hint">{{ f.q.help_text }}</span>
+          </div>
+        </div>
+        <div class="form-actions">
+          <div class="botones">
+            <button type="submit" class="btn-primary">{{ f.boton }}</button>
+            {% if cancel_href %}<a class="btn-cancel" href="{{ cancel_href }}">Cancelar</a>{% endif %}
+          </div>
+          {% if f.success_label %}<span class="destino">al importar → <b>{{ f.success_label }}</b></span>{% endif %}
+        </div>
+      </form>
+
+    {% else %}
+      {# --- formulario normal: sus campos en la rejilla, las casillas centradas debajo, su botón --- #}
+      <form class="form-card" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="{{ f.slug }}">
+        {% for h in f.hidden_fields %}{{ h }}{% endfor %}
+        {% for e in f.non_field_errors %}<div class="field__err">{{ e }}</div>{% endfor %}
+        <div class="form-grid">
+          {% for campo in f.visible_fields %}{% if campo.field.widget.input_type != 'checkbox' %}
+            <div class="field" data-campo="{{ campo.name }}">
+              <label for="{{ campo.id_for_label }}">{{ campo.label }}{% if campo.field.required %} <span class="req">*</span>{% endif %}</label>
+              {{ campo }}
+              {% for e in campo.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+              {% if campo.help_text %}<span class="field__hint">{{ campo.help_text }}</span>{% endif %}
+            </div>
+          {% endif %}{% endfor %}
+        </div>
+        {% if f.checks %}
+        <div class="checks">
+          {% for campo in f.checks %}
+            <div class="check">
+              <label for="{{ campo.id_for_label }}">{{ campo }} <b>{{ campo.label }}</b></label>
+              {% if campo.help_text %}<span class="field__hint">{{ campo.help_text }}</span>{% endif %}
+              {% for e in campo.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        <div class="form-actions">
+          <div class="botones">
+            <button type="submit" class="btn-primary">{{ f.boton }}</button>
+            {% if cancel_href %}<a class="btn-cancel" href="{{ cancel_href }}">Cancelar</a>{% endif %}
+          </div>
+          {% if f.success_label %}<span class="destino">al terminar → <b>{{ f.success_label }}</b></span>{% endif %}
+        </div>
+      </form>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+  <script>
+    /* En un rango, «hasta» no puede quedar por debajo de «desde»: el navegador lo frena antes de enviar
+       (el formulario lo vuelve a comprobar en el servidor). */
+    document.querySelectorAll('form').forEach(function (form) {
+      var desde = form.querySelector('.field[data-campo="inicio"] input');
+      var hasta = form.querySelector('.field[data-campo="fin"] input');
+      if (!desde || !hasta) { return; }
+      function acotar() { hasta.min = desde.value || 1; if (hasta.value && +hasta.value < +desde.value) { hasta.setCustomValidity('El id final no puede ser menor que el inicial.'); } else { hasta.setCustomValidity(''); } }
+      desde.addEventListener('input', acotar); hasta.addEventListener('input', acotar); acotar();
+    });
+    /* Una casilla con data-bloquea="<campo>" desactiva ese campo de SU formulario mientras esté marcada
+       (p. ej. «Traerlas todas» manda sobre «Cuántas páginas»). El formulario ya lo ignora al validar. */
+    document.querySelectorAll('input[type=checkbox][data-bloquea]').forEach(function (casilla) {
+      var campo = casilla.closest('form').querySelector('.field[data-campo="' + casilla.dataset.bloquea + '"]');
+      if (!campo) { return; }
+      var input = campo.querySelector('input, select, textarea');
+      function sincronizar() { if (input) { input.disabled = casilla.checked; } campo.classList.toggle('field--off', casilla.checked); }
+      casilla.addEventListener('change', sincronizar);
+      sincronizar();
+    });
+  </script>
+{% endblock %}

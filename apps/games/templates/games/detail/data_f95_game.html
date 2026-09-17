@@ -1,0 +1,7 @@
+{% extends 'detail/base_data.html' %}
+{% load i18n ficha %}
+{% comment %}FICHA de datos de juego (F95) (gestión): cuadro compartido detail/base_data.html; aquí solo el id externo.{% endcomment %}
+
+{% block id_externo %}
+  {% if object.f95_id %}<div class="mal-row"><span class="k">{% trans 'f95_id' %}:</span><span class="v">{{ object.f95_id }}</span></div>{% endif %}
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'detail/base_detail.html' %}
+{% load i18n ficha %}
+{% comment %}FICHA de juego (gestión y público): datos enlazados a sus «por» y a las fichas de creadores en el lateral;
+sinopsis, trasfondo, personajes (principales primero) y lanzamientos. Métodos del modelo: titulos, personajes,
+lanzamientos, enlaces.{% endcomment %}
+
+{% block titulos %}{% include 'detail/_titulos.html' with titulos=object.titulos pk=object.pk %}{% endblock %}
+
+{% block side %}
+  {% if object.release_date %}<div class="mal-row"><span class="k">{% trans 'Fecha' %}:</span><span class="v">{{ object.display_release_date }}</span></div>{% endif %}
+  {% if object.version %}<div class="mal-row"><span class="k">{% trans 'Versión' %}:</span><span class="v">{{ object.version }}</span></div>{% endif %}
+  <div class="mal-row"><span class="k">{% trans 'Estado' %}:</span><span class="v"><a href="{% url 'panel:game_by' 'status' object.status %}">{{ object.get_status_display }}</a></span></div>
+  <div class="mal-row"><span class="k">{% trans 'Tipo' %}:</span><span class="v"><a href="{% url 'panel:game_by' 'type' object.type %}">{{ object.get_type_display }}</a></span></div>
+  {% with lista=object.developers.all %}{% if lista %}<div class="mal-row"><span class="k">{% trans 'Desarrolla' %}:</span><span class="v">{% for c in lista %}<a href="{% ficha c %}">{{ c }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>{% endif %}{% endwith %}
+  {% with lista=object.publishers.all %}{% if lista %}<div class="mal-row"><span class="k">{% trans 'Edita' %}:</span><span class="v">{% for c in lista %}<a href="{% ficha c %}">{{ c }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>{% endif %}{% endwith %}
+  {% with lista=object.engine.all %}{% if lista %}<div class="mal-row"><span class="k">{% trans 'Motor' %}:</span><span class="v">{% for g in lista %}<a href="{% by by_url 'motor' g %}">{{ g }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>{% endif %}{% endwith %}
+  {% with lista=object.platforms.all %}{% if lista %}<div class="mal-row"><span class="k">{% trans 'Plataformas' %}:</span><span class="v">{% for g in lista %}<a href="{% by by_url 'plataforma' g %}">{{ g }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>{% endif %}{% endwith %}
+  {% with lista=object.mediums.all %}{% if lista %}<div class="mal-row"><span class="k">{% trans 'Medios' %}:</span><span class="v">{% for g in lista %}<a href="{% by by_url 'medio' g %}">{{ g }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>{% endif %}{% endwith %}
+  {% with lista=object.languages.all %}{% if lista %}<div class="mal-row"><span class="k">{% trans 'Idiomas' %}:</span><span class="v">{% for g in lista %}<a href="{% by by_url 'idioma' g %}">{{ g }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>{% endif %}{% endwith %}
+  {% with lista=object.genres.all %}{% if lista %}<div class="mal-row"><span class="k">{% trans 'Géneros' %}:</span><span class="v">{% for g in lista %}<a href="{% by by_url 'genero' g %}">{{ g }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>{% endif %}{% endwith %}
+  {% if object.p_vndb_id %}<div class="mal-row"><span class="k">VNDB:</span><span class="v"><a href="https://vndb.org/{{ object.p_vndb_id }}" target="_blank" rel="noopener">{{ object.p_vndb_id }}</a></span></div>{% endif %}
+  {% with enlaces=object.enlaces %}{% if enlaces %}<div class="mal-row"><span class="k">{% trans 'Enlaces' %}:</span><span class="v">{% for e in enlaces %}<a href="{{ e.url }}" target="_blank" rel="noopener">{{ e.source|default:e.url }}</a>{% if not forloop.last %} · {% endif %}{% endfor %}</span></div>{% endif %}{% endwith %}
+{% endblock %}
+
+{% block cuerpo %}
+  {% with personajes=object.personajes lanzamientos=object.lanzamientos fotos=object|fotos %}
+
+  <section class="dsection" data-tab="detalles" data-label="{% trans 'Detalles' %}" style="padding-top:0;">
+    <h3>{% trans 'Sinopsis' %}</h3>
+    <div class="synopsis-area">
+      {% if object.synopsis %}<p class="synopsis">{{ object.synopsis|linebreaksbr }}</p>{% endif %}
+      {% if object.background %}<h3 style="margin-top:18px;">{% trans 'Trasfondo' %}</h3><p class="synopsis">{{ object.background|linebreaksbr }}</p>{% endif %}
+    </div>
+
+    {% if personajes %}
+      <h3 style="margin-top:24px;">{% trans 'Personajes' %}<a class="page-sub mas" href="#personajes">{% trans 'Más personajes' %} ({{ personajes|length }}) →</a></h3>
+      {% include 'detail/_personajes.html' with filas=personajes|slice:":10" columnas="2" %}
+    {% endif %}
+    {% if lanzamientos %}
+      <h3 style="margin-top:24px;">{% trans 'Lanzamientos' %}<a class="page-sub mas" href="#lanzamientos">{% trans 'Más lanzamientos' %} ({{ lanzamientos|length }}) →</a></h3>
+      {% include 'games/detail/_lanzamientos.html' with filas=lanzamientos|slice:":5" %}
+    {% endif %}
+  </section>
+
+  {% if personajes %}
+    <section class="dsection" data-tab="personajes" data-label="{% trans 'Personajes' %}" style="padding-top:0;">
+      <h3>{% trans 'Personajes' %} <span class="page-sub" style="font-size:12px">({{ personajes|length }})</span>
+        {% if tab_url.personajes and personajes|length > 30 %}<a class="page-sub mas" href="{{ tab_url.personajes }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      {% include 'detail/_personajes.html' with filas=personajes columnas="2" %}
+    </section>
+  {% endif %}
+
+  {% if lanzamientos %}
+    <section class="dsection" data-tab="lanzamientos" data-label="{% trans 'Lanzamientos' %}" style="padding-top:0;">
+      <h3>{% trans 'Lanzamientos' %} <span class="page-sub" style="font-size:12px">({{ lanzamientos|length }})</span>
+        {% if tab_url.lanzamientos and lanzamientos|length > 30 %}<a class="page-sub mas" href="{{ tab_url.lanzamientos }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      {% include 'games/detail/_lanzamientos.html' with filas=lanzamientos %}
+    </section>
+  {% endif %}
+
+  {% if fotos %}
+    <section class="dsection" data-tab="imagenes" data-label="{% trans 'Imágenes' %}" style="padding-top:0;">
+      <h3>{% trans 'Imágenes' %} <span class="page-sub" style="font-size:12px">({{ fotos|length }})</span>
+        {% if tab_url.imagenes and fotos|length > 40 %}<a class="page-sub mas" href="{{ tab_url.imagenes }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      <div class="gallery">{% for f in fotos %}{% if f|imagen %}<img class="shot" src="{{ f|imagen }}" alt="{{ object }}" loading="lazy">{% endif %}{% endfor %}</div>
+    </section>
+  {% endif %}
+
+  {% endwith %}
+  {% if es_gestion %}
+  {# Ficha técnica (solo gestión): lo que el registro ES — id, slug, activo, fechas. Muévela o amplíala aquí. #}
+  <section class="dsection" data-tab="tecnica" data-label="{% trans 'Ficha técnica' %}" style="padding-top:0;">
+    <h3>{% trans 'Ficha técnica' %}</h3>
+    <div class="mal-row"><span class="k">Id:</span><span class="v">{{ object.pk }}</span></div>
+    {% if object.slug %}<div class="mal-row"><span class="k">Slug:</span><span class="v">{{ object.slug }}</span></div>{% endif %}
+    {% if object.is_active is not None %}<div class="mal-row"><span class="k">{% trans 'Activo' %}:</span><span class="v">{{ object.display_is_active }}</span></div>{% endif %}
+    {% if object.created_at %}<div class="mal-row"><span class="k">{% trans 'Creado' %}:</span><span class="v">{{ object.display_created }}</span></div>{% endif %}
+    {% if object.updated_at %}<div class="mal-row"><span class="k">{% trans 'Actualizado' %}:</span><span class="v">{{ object.display_updated }}</span></div>{% endif %}
+  </section>
+  {% endif %}
+{% endblock %}

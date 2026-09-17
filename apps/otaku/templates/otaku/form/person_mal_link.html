@@ -1,0 +1,44 @@
+{% load i18n %}
+{% comment %} Ficha MAL para una persona EXISTENTE (PersonMALExistentForm): se elige la persona y se
+   rellenan sus datos MAL; los datos de la persona no se tocan. Para una persona NUEVA está person_mal.html.
+   El CUADRO (card, botones, csrf) vive en admin_panel/form.html. {% endcomment %}
+
+    <h3>{% trans "Persona existente" %}</h3>
+    <div class="field">
+      <label for="{{ form.person.id_for_label }}">{{ form.person.label }} <span class="req">*</span></label>
+      {{ form.person }}
+      {% for e in form.person.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.person.help_text %}<span class="field__hint">{{ form.person.help_text }}</span>{% endif %}
+    </div>
+
+    <h3>{% trans "MyAnimeList" %}</h3>
+    <div class="field">
+      <label for="{{ form.mal_id.id_for_label }}">{{ form.mal_id.label }} <span class="req">*</span></label>
+      {{ form.mal_id }}
+      {% for e in form.mal_id.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.mal_id.help_text %}<span class="field__hint">{{ form.mal_id.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.url.id_for_label }}">{{ form.url.label }}{% if form.url.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.url }}
+      {% for e in form.url.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.url.help_text %}<span class="field__hint">{{ form.url.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.family_name.id_for_label }}">{{ form.family_name.label }}{% if form.family_name.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.family_name }}
+      {% for e in form.family_name.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.family_name.help_text %}<span class="field__hint">{{ form.family_name.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.given_name.id_for_label }}">{{ form.given_name.label }}{% if form.given_name.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.given_name }}
+      {% for e in form.given_name.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.given_name.help_text %}<span class="field__hint">{{ form.given_name.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.about.id_for_label }}">{{ form.about.label }}{% if form.about.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.about }}
+      {% for e in form.about.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.about.help_text %}<span class="field__hint">{{ form.about.help_text }}</span>{% endif %}
+    </div>

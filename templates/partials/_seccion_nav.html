@@ -1,0 +1,4 @@
+{% comment %}Nav SECUNDARIO (de sección): páginas hijas del contenido de la app, persistente en todas sus
+vistas. El sidebar es el nav global entre apps. Es el mismo COMPONENTE de pestañas, alimentado por el
+context processor `core.context_processors.seccion_nav` en vez de por la vista.{% endcomment %}
+{% include 'components/tabs.html' with nav_tabs=SECCION_NAV nav_tabs_label=_("Navegación de la sección") %}

@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% comment %}
+  EDICIÓN de una fila de Mi colección con UN formulario (CollectionItemForm, el de la tabla del medio):
+  portada + seguimiento (estado, nota, favorito) + dónde la VEO / de dónde la DESCARGUÉ
+  (sitio; en la descarga formato y calidad). Los campos que la tabla no tiene no vienen en el form
+  (personajes y personas: sin estado; sin FORMATO: sin enlaces).
+  Contexto: form · fila · titulo · portada · ficha_url · volver · medio_label.
+{% endcomment %}
+
+{% block title %}{{ page_title }} · {{ block.super }}{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/components/auth.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/enlaces.css' %}?v={{ ASSET_VERSION }}">
+  <style>
+    .page-head { text-align: center; }
+    .edit-wrap { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: 240px 1fr; gap: 26px; align-items: start; }
+    .edit-poster img { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 12px; border: 1px solid var(--border-soft); background: var(--surface-1); }
+    .edit-poster .ficha { display: block; text-align: center; margin-top: 10px; font-size: 13px; }
+    .edit-main { display: grid; gap: 22px; min-width: 0; }
+    .edit-sec h2 { font-size: 15px; margin: 0 0 10px; color: var(--text-2); display: flex; align-items: center; gap: 8px; }
+    .form-grid .field--check { display: flex; align-items: center; align-self: end; color: var(--text-2); font-size: 13px; }
+    .form-grid .field--check label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .form-grid .field--check input { accent-color: var(--accent); width: 16px; height: 16px; margin: 0; }
+    @media (max-width: 720px) { .edit-wrap { grid-template-columns: 1fr; } .edit-poster { max-width: 200px; margin: 0 auto; } }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div class="breadcrumbs" style="justify-content:center;">
+      <a href="{% url 'collections:mine' %}">mi colección</a>
+      <span class="sep">/</span><a href="{{ volver }}">{{ medio_label|lower }}</a>
+      <span class="sep">/</span><span>{{ titulo|lower }}</span>
+    </div>
+    <h1 class="page-title">{{ titulo }}</h1>
+  </div>
+
+  <div class="edit-wrap">
+    <aside class="edit-poster">
+      {% if portada %}<img src="{{ portada }}" alt="{{ titulo }}">{% else %}<img src="{% static 'image/default/sin-imagen.webp' %}" alt="{% trans 'Sin imagen' %}">{% endif %}
+      {% if ficha_url %}<a class="ficha" href="{{ ficha_url }}"><i class="bi bi-eye"></i> {% trans 'Ver ficha' %}</a>{% endif %}
+    </aside>
+
+    <form method="post" class="edit-main">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.path }}">
+      {% for e in form.non_field_errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+
+      <section class="edit-sec">
+        <h2><i class="bi bi-bookmark-star"></i> {% trans 'Seguimiento' %}</h2>
+        <div class="form-grid">
+          {% if form.status %}<div class="field"><label for="{{ form.status.id_for_label }}">{{ form.status.label }}</label>{{ form.status }}{% for e in form.status.errors %}<span class="field__err">{{ e }}</span>{% endfor %}</div>{% endif %}
+          <div class="field"><label for="{{ form.score.id_for_label }}">{{ form.score.label }}</label>{{ form.score }}{% for e in form.score.errors %}<span class="field__err">{{ e }}</span>{% endfor %}</div>
+          <div class="field field--check">
+            <label for="{{ form.is_favorite.id_for_label }}">{{ form.is_favorite }} {{ form.is_favorite.label }}</label>
+          </div>
+        </div>
+      </section>
+
+      {% if form.watch_site %}
+      <section class="edit-sec">
+        <h2><i class="bi bi-link-45deg"></i> {% trans 'Dónde la veo / de dónde la descargué' %}</h2>
+        <div class="form-grid">
+          {% for f in form %}{% if f.name == "watch_site" or f.name == "download_site" or f.name == "download_format" or f.name == "download_quality" %}
+            <div class="field"><label for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{% for e in f.errors %}<span class="field__err">{{ e }}</span>{% endfor %}</div>
+          {% endif %}{% endfor %}
+        </div>
+      </section>
+      {% endif %}
+
+      <div class="actions">
+        <a class="btn-line" href="{{ volver }}">{% trans 'Volver' %}</a>
+        <button class="auth__submit" type="submit"><i class="bi bi-check-lg"></i> {% trans 'Guardar' %}</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Formato y calidad solo tienen sentido con un sitio de descarga elegido.
+    (function () {
+      var sitio = document.getElementById("id_download_site"), fmt = document.getElementById("id_download_format"), q = document.getElementById("id_download_quality");
+      if (!sitio || !fmt || !q) return;
+      function sync() { var off = !sitio.value; fmt.disabled = off; q.disabled = off; }
+      sitio.addEventListener("change", sync); sync();
+    })();
+  </script>
+{% endblock %}

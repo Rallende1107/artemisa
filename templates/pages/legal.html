@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% comment %}
+  Página informativa MODULAR (Nosotros / Términos / Privacidad): el contenido
+  llega como DATOS (secciones = [{clave, titulo, parrafos, lista?}]) desde la
+  vista — nada de HTML a mano por página. El TOC muestra SOLO la sección
+  elegida (con memoria local); «Mostrar todo» pinta el documento completo.
+{% endcomment %}
+
+{% block title %}{{ page_title }} · {{ block.super }}{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'css/components/legal.css' %}?v={{ ASSET_VERSION }}">{% endblock %}
+
+{% block content %}
+  <div class="legal-wrap">
+    <div class="legal">
+      <aside class="legal__toc">
+        <span class="eyebrow" style="color:var(--accent)">{% trans "Contenido" %}</span>
+        {% for s in secciones %}
+          <a href="#" data-sec="{{ s.clave }}" {% if forloop.first %}class="active"{% endif %}>{{ forloop.counter }} · {{ s.titulo }}</a>
+        {% endfor %}
+        <button type="button" class="legal__todo" id="legal-todo">
+          <i class="bi bi-list-ul"></i> {% trans "Mostrar todo" %}</button>
+      </aside>
+
+      <div class="legal__body">
+        <h1>{{ page_title }}</h1>
+        <div class="legal__updated">{{ subtitulo }}</div>
+        {% for s in secciones %}
+          <section class="legal-sec" data-sec="{{ s.clave }}" {% if not forloop.first %}hidden{% endif %}>
+            <h2><span class="num">{{ forloop.counter|stringformat:"02d" }}</span>{{ s.titulo }}</h2>
+            {% for p in s.parrafos %}<p>{{ p }}</p>{% endfor %}
+            {% if s.lista %}
+              <ul>{% for li in s.lista %}<li>{{ li }}</li>{% endfor %}</ul>
+            {% endif %}
+          </section>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // TOC selector: muestra SOLO la sección elegida (memoria por página);
+  // «Mostrar todo» pinta el documento completo.
+  (function () {
+    var toc = document.querySelector(".legal__toc");
+    var todo = document.getElementById("legal-todo");
+    if (!toc || !todo) return;
+    var KEY = "legal:" + location.pathname;
+    function activa(clave) {
+      document.querySelectorAll(".legal-sec").forEach(function (s) {
+        s.hidden = clave !== "*" && s.dataset.sec !== clave;
+      });
+      toc.querySelectorAll("a").forEach(function (a) {
+        a.classList.toggle("active", a.dataset.sec === clave);
+      });
+      todo.classList.toggle("on", clave === "*");
+      try { localStorage.setItem(KEY, clave); } catch (e) {}
+    }
+    toc.addEventListener("click", function (e) {
+      var a = e.target.closest("a[data-sec]");
+      if (!a) return;
+      e.preventDefault();
+      activa(a.dataset.sec);
+    });
+    todo.addEventListener("click", function () { activa("*"); });
+    var quiere = null;
+    try { quiere = localStorage.getItem(KEY); } catch (e) {}
+    if (quiere === "*") activa("*");
+    else if (quiere && document.querySelector('.legal-sec[data-sec="' + quiere + '"]')) activa(quiere);
+  })();
+</script>
+{% endblock %}

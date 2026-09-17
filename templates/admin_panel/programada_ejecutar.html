@@ -1,0 +1,33 @@
+{% extends 'panel/base.html' %}
+{% load i18n %}
+{% comment %}Confirmación de «Ejecutar ahora» sobre una tarea programada: la encola en este momento con su
+cantidad, esté activa o no (modo manual mientras no se programe).{% endcomment %}
+
+{% block title %}{% trans "Ejecutar ahora" %} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div class="breadcrumbs">
+      <a href="{% url 'panel:home' %}">{% trans "panel" %}</a><span class="sep">/</span>
+      <a href="{% url 'panel:scheduled-task_list' %}">{{ label_plural }}</a><span class="sep">/</span>
+      <a href="{% url 'panel:scheduled-task_detail' programada.pk %}">{{ programada }}</a><span class="sep">/</span>
+      <span>{% trans "ejecutar ahora" %}</span>
+    </div>
+    <h1 class="page-title">{% trans "Ejecutar ahora" %}</h1>
+    <p class="page-sub">{{ programada.task }}{% if programada.args %} · {{ programada.args }}{% endif %}{% if kwargs_efectivos %} · {{ kwargs_efectivos }}{% endif %}
+      · {% if programada.is_active %}{% trans "activa" %}{% else %}{% trans "apagada (solo manual)" %}{% endif %}</p>
+  </div>
+
+  <div class="form-card" style="max-width:640px">
+    <p style="color:var(--text);font-size:15px;line-height:1.6">
+      {% trans "Se encola la tarea en este momento con sus argumentos. Los lotes de datos toman el próximo id y la cantidad de su cursor de lote (Tareas → Cursores de lote)." %}
+    </p>
+    <form method="post" style="margin-top:20px">
+      {% csrf_token %}
+      <div class="form-actions" style="border:0;padding:0;margin:0">
+        <button class="btn-save" type="submit">{% trans "Sí, ejecutar ahora" %}</button>
+        <a class="btn-cancel" href="{% url 'panel:scheduled-task_list' %}">{% trans "Volver" %}</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

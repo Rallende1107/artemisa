@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/components/table.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'vendor/datatables/dataTables.dataTables.min.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'vendor/datatables/responsive.dataTables.min.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/datatables-theme.css' %}?v={{ ASSET_VERSION }}">
+{% endblock %}
+
+{% block content %}
+  <div class="wrap wrap--wide" style="padding-top:22px;">
+    <div class="page-head">
+      <div class="breadcrumbs"><a href="{% url 'users:profile' %}">mi cuenta</a><span class="sep">/</span><span>mi actividad</span></div>
+      <h1 class="page-title">Mi actividad</h1>
+      <p class="page-sub">Cambios reales de tu cuenta: contraseña, correo, teléfono, perfil, activaciones y permisos.</p>
+    </div>
+
+    <div class="dt-wrap">
+      <table id="dt" data-url="{% url 'users:profile-activity-data' %}" class="display" style="width:100%">
+        <thead><tr>
+          <th>Actividad</th><th style="width:18%">Realizado por</th><th style="width:190px; white-space:nowrap">Cuándo</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'vendor/jquery/jquery.min.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script src="{% static 'vendor/datatables/dataTables.min.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script src="{% static 'vendor/datatables/dataTables.responsive.min.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script>
+    window.DT_NCOLS = 3;
+    window.DT_ENTITY = "mi-actividad";
+    window.CARDS_ENABLED = false;
+    window.DT_NO_ACTIONS = true;            // sin columna de acciones: nada que hacer por fila
+    window.DT_BUTTONS = false;              // el usuario no exporta su actividad
+    window.DT_ORDER = [[2, "desc"]];        // lo más reciente primero
+  </script>
+  <script src="{% static 'js/datatable.js' %}?v={{ ASSET_VERSION }}"></script>
+{% endblock %}

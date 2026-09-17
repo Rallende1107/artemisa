@@ -1,0 +1,36 @@
+/* Enlaces de un ítem de Mi colección: página collections/item_links.html y modal de la lista. */
+.links-wrap { max-width: 860px; margin: 0 auto; display: grid; gap: 22px; }
+.links-list { display: grid; gap: 10px; }
+.link-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 12px 16px;
+  border: 1px solid var(--border-soft); border-radius: 12px; background: var(--surface-1); }
+.link-row .kind { font-size: 12px; padding: 2px 9px; border-radius: 20px; border: 1px solid var(--accent); color: var(--accent); }
+.link-row .kind.descarga { border-color: var(--ok); color: var(--ok); }
+.link-row .site { font-weight: 700; }
+.link-row .meta { color: var(--text-2); font-size: 13px; }
+.link-row .url { color: var(--text-2); font-size: 13px; overflow-wrap: anywhere; }
+.link-row form { margin-left: auto; }
+.link-row .cp-quitar { cursor: pointer; }
+.links-empty { color: var(--faint); text-align: center; padding: 18px; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px 18px; padding: 18px 20px;
+  border: 1px solid var(--border-soft); border-radius: 12px; background: var(--surface-1); }
+.form-grid .field--wide { grid-column: 1 / -1; }
+.form-grid .field label { display: block; font-size: 12.5px; font-weight: 700; color: var(--text-2); margin-bottom: 6px; }
+.form-grid .field input, .form-grid .field select { width: 100%; height: 38px; padding: 0 10px; background: var(--elevated);
+  border: 1px solid var(--border-soft); border-radius: 8px; color: var(--text); font-size: 13.5px; }
+.form-grid .field__hint { display: block; font-size: 12px; color: var(--faint); margin-top: 4px; }
+.form-grid .field__err { display: block; font-size: 12px; color: var(--danger, #ff5c7a); margin-top: 4px; }
+.form-grid .actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 10px; }
+.link-row a.site { color: var(--accent); text-decoration: none; }
+.link-row a.site:hover { text-decoration: underline; }
+
+/* Quitar (texto rojo, como en la ficha) y botones de la página de edición */
+.cp-quitar { background: none; border: none; padding: 0; color: var(--danger); font-size: 12.5px; cursor: pointer; }
+.cp-quitar:hover { text-decoration: underline; }
+.actions .btn-line { display: inline-flex; align-items: center; height: 40px; padding: 0 16px; border-radius: 9px;
+  border: 1px solid var(--border-soft); color: var(--text-2); text-decoration: none; font-size: 13.5px; }
+.actions .btn-line:hover { color: var(--accent); border-color: var(--accent); }
+/* favorito: estrella como la de la ficha (.cp-fav) */
+.fav-toggle { display: inline-grid; place-items: center; width: 38px; height: 38px; border-radius: 9px; font-size: 16px; cursor: pointer;
+  background: var(--elevated); border: 1px solid var(--border-soft); color: var(--muted); user-select: none; }
+.fav-toggle.on { color: var(--warning); border-color: var(--warning-25); box-shadow: 0 0 12px rgba(255,176,32,.25); }
+.fav-toggle input { display: none; }

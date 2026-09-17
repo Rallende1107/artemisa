@@ -1,0 +1,166 @@
+/* COMPONENTE: sidebar  ↔  partials/_sidebar.html */
+.sidebar {
+  position: fixed; top: var(--header-h); bottom: 0; left: 0;
+  width: var(--side-w); z-index: var(--z-sidebar);
+  display: flex; flex-direction: column; padding: 16px 12px;
+  /* Fondo: el cromo + un velo oscuro extra (--sidebar-veil) y un desenfoque fuerte para
+     que la imagen de fondo no compita con el texto. Perillas: el velo y los px del blur. */
+  background: linear-gradient(var(--sidebar-veil), var(--sidebar-veil)), var(--sidebar-bg);
+  backdrop-filter: blur(24px) saturate(.85); -webkit-backdrop-filter: blur(24px) saturate(.85);
+  border-right: 1px solid var(--border-soft);
+  overflow-y: auto; overflow-x: hidden;
+  transition: width .18s ease, transform .22s ease;
+  /* Scrollbar sutil (Firefox) */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-soft) transparent;
+}
+/* Scrollbar sutil (Chromium/WebKit) */
+.sidebar::-webkit-scrollbar { width: 8px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border-soft); border-radius: 8px; }
+.sidebar::-webkit-scrollbar-thumb:hover { background: var(--border); }
+/* Sin labels de grupo, las secciones se espacian UNIFORME (igual que dentro del
+   grupo de contenido). Antes 18px entre grupos vs 2px dentro → se veía disparejo. */
+.nav-group + .nav-group { margin-top: 2px; }
+.nav-group__label { padding: 0 10px 8px; }
+/* Grupo Legal: empujado al fondo del sidebar. El foot va JUSTO debajo (sin su
+   propio margin-top:auto, para que no se reparta el hueco y quede todo abajo). */
+.sidebar .nav-group.nav-group--legal { margin-top: auto; }
+.nav-group--legal + .sidebar__foot { margin-top: 0; }
+.nav-group--legal .nav-item { font-size: 13px; padding: 7px 10px; }
+.nav-group--legal .nav-item .ico { font-size: 14px; }
+
+.nav-item {
+  position: relative;
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 10px; border-radius: 8px;
+  color: var(--text-2); font-size: 14px;   /* texto CLARO: los items se leen sobre cualquier fondo */
+  transition: color .14s, background .14s;
+}
+.nav-item .ico { width: 18px; text-align: center; flex: none; font-size: 15px; }
+.nav-item:hover { color: var(--text); background: var(--hover-soft); }
+.nav-item.active { color: var(--accent); background: var(--accent-06); }
+.nav-item.active::before {
+  content: ""; position: absolute; left: 0; top: 8px; bottom: 8px;
+  width: 3px; border-radius: 3px; background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+.nav-item .count { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--faint); }
+
+.sidebar__foot {
+  margin-top: auto; padding: 12px 10px 4px;
+  font-family: var(--mono); font-size: 11px; color: var(--faint);
+  border-top: 1px solid var(--border-soft);
+}
+.status-dot { color: var(--ok); }
+
+/* ---- Árbol colapsable (grupos con submenú, para el panel de gestión) ---- */
+.nav-tree { margin-bottom: 2px; }
+.nav-tree > summary {
+  list-style: none; cursor: pointer;
+  display: flex; align-items: center; gap: 11px;
+  padding: 9px 10px; border-radius: 8px;
+  color: var(--text-2); font-size: 13.5px;
+  transition: color .14s, background .14s;
+}
+.nav-tree > summary::-webkit-details-marker { display: none; }
+.nav-tree > summary .ico { width: 18px; text-align: center; flex: none; font-size: 15px; }
+.nav-tree > summary::after {
+  content: "❯"; margin-left: auto; margin-right: 4px; font-size: 12px;
+  color: var(--muted); transition: transform .16s, color .16s;
+}
+.nav-tree > summary:hover::after { color: var(--accent); }
+.nav-tree[open] > summary::after { transform: rotate(90deg); color: var(--accent); }
+.nav-tree > summary:hover { color: var(--text); background: var(--hover-soft); }
+/* Cabecera-enlace (la cabecera del acordeón navega directo a su home) */
+.nav-tree > summary > .nav-tree__home {
+  display: flex; align-items: center; gap: 11px; flex: 1 1 auto;
+  color: inherit; margin: -9px -10px; padding: 9px 10px; border-radius: 8px;
+}
+.nav-tree > summary > .nav-tree__home.active { color: var(--accent); }
+.nav-tree > summary > .nav-tree__home:hover { color: var(--accent); }
+/* Sub-items indentados dentro del árbol */
+.nav-tree .nav-item { padding-left: 40px; font-size: 13.5px; }
+/* Sub-acordeón "Satélite" (tablas hijas: apodos, títulos, imágenes, enlaces) */
+.nav-tree--sub { margin: 2px 0 2px 22px; border-left: 1px solid var(--border-soft, rgba(255,255,255,.06)); }
+.nav-tree--sub > summary {
+  padding: 6px 10px; font-size: 12px; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--text-2); opacity: .8;   /* subgrupos: claros, un punto menos que los items */
+}
+.nav-tree--sub > summary::after { font-size: 9px; }
+.nav-tree--sub > summary:hover { opacity: 1; }
+.nav-tree--sub .nav-item { padding-left: 26px; font-size: 13px; }
+/* Item pendiente (aún sin vista real) */
+.nav-item--todo { color: var(--faint); }
+.nav-item--todo:hover { color: var(--muted); background: transparent; }
+.nav-item--todo .tag { margin-left: auto; font-family: var(--mono); font-size: 9px; letter-spacing: .1em; color: var(--faint); border: 1px solid var(--border-soft); border-radius: 10px; padding: 1px 6px; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SIDEBAR RAIL (solo-iconos) · desktop
+   - Por DEFECTO el sidebar está colapsado a un rail de iconos (NO se ensancha
+     con hover: como BootstrapMade). El HOVER muestra un FLYOUT (sidebar-rail.js)
+     para navegar sin expandir. Solo el TOGGLE de arriba lo FIJA abierto
+     (body.nav-expanded) y ahí sí empuja el contenido.
+   El estado "full" es el CSS base de arriba; el rail son overrides bajo
+   body:not(.nav-expanded). Aplica a los 3 sidebars (comparten .sidebar).
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (min-width: 901px) {
+  body:not(.nav-expanded) .sidebar { width: var(--rail-w); padding: 16px 8px; }
+  body.nav-expanded .sidebar       { width: var(--side-w); }   /* explícito (transición) */
+
+  /* Solo iconos: el texto (nodo suelto junto a .ico) se oculta con font-size:0;
+     el icono conserva su tamaño propio. Ítems y cabeceras centrados. */
+  body:not(.nav-expanded) .sidebar .nav-item,
+  body:not(.nav-expanded) .sidebar .nav-tree > summary,
+  body:not(.nav-expanded) .sidebar .nav-tree__home {
+    font-size: 0; gap: 0; justify-content: center; padding-left: 0; padding-right: 0;
+  }
+  body:not(.nav-expanded) .sidebar .nav-tree__home { margin: -9px 0; padding: 9px 0; }
+  body:not(.nav-expanded) .sidebar .ico { font-size: 17px; width: auto; }
+
+  /* Ocultar lo que no tiene icono en modo rail */
+  body:not(.nav-expanded) .sidebar .nav-group__label,
+  body:not(.nav-expanded) .sidebar .sidebar__foot,
+  body:not(.nav-expanded) .sidebar .nav-tree > summary::after,
+  body:not(.nav-expanded) .sidebar .nav-item .count,
+  body:not(.nav-expanded) .sidebar .nav-item .tag { display: none; }
+
+  /* En el acordeón (gestión), los hijos/subárboles no tienen icono → ocultos en
+     rail (se navegan expandiendo con el toggle; el tooltip nativo identifica). */
+  body:not(.nav-expanded) .sidebar .nav-tree .nav-item,
+  body:not(.nav-expanded) .sidebar .nav-tree--sub { display: none; }
+
+  /* SECCIÓN ACTIVA en rail: el árbol de la entidad actual queda [open] (lo pone
+     el servidor), así que pintamos su icono con acento para señalar dónde estás
+     (p. ej. en Usuarios se marca el icono de Sistema). */
+  body:not(.nav-expanded) .sidebar .nav-tree[open] > summary > .nav-tree__home,
+  body:not(.nav-expanded) .sidebar .nav-tree[open] > summary .ico { color: var(--accent); }
+}
+
+/* ---- FLYOUT del rail (lo construye sidebar-rail.js, va en <body>) ----------
+   Aparece al pasar el mouse por una SECCIÓN con hijos (acordeón): muestra sus
+   opciones navegables, para llegar sin expandir. Estilo BootstrapMade. */
+.rail-flyout {
+  position: fixed; z-index: 200; min-width: 200px; max-width: 280px;
+  max-height: 76vh; overflow-y: auto;
+  padding: 7px; border-radius: 12px;
+  background: var(--elevated); border: 1px solid var(--border);
+  box-shadow: 12px 14px 44px rgba(0, 0, 0, .6);
+  display: flex; flex-direction: column; gap: 1px;
+  animation: railfly .12s ease;
+  scrollbar-width: thin; scrollbar-color: var(--border-soft) transparent;
+}
+@keyframes railfly { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
+.rail-flyout__head {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--muted); padding: 7px 12px 9px; margin-bottom: 5px;
+  border-bottom: 1px solid var(--border-soft); cursor: pointer;
+}
+.rail-flyout__head:hover { color: var(--accent); }
+.rail-flyout__item {
+  display: block; padding: 8px 12px; border-radius: 7px; font-size: 13.5px; color: var(--text-2);
+  transition: color .12s, background .12s;
+}
+.rail-flyout__item:hover { background: var(--hover-soft); color: var(--text); }
+.rail-flyout__item.active { color: var(--accent); background: var(--accent-06); }
+

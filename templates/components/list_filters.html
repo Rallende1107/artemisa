@@ -1,0 +1,98 @@
+{% load i18n %}
+{# Panel de filtros de una lista (como el FILTRO del admin de Django). Pieza INDEPENDIENTE: #}
+{# la genera la clase de filtros del modelo (apps/<app>/views/admin/v5_filters.py, base en #}
+{# core/shared/views/filters.py) y list.html la incluye solo si la vista trae `filtros`.          #}
+{# Es un formulario GET: un <select> por filtro, «Todo» + opciones, sin recuentos. Sin JS se #}
+{# envía y la página vuelve filtrada; con JS (datatable.js) solo se recarga la tabla y los    #}
+{# valores quedan en la URL de la lista para poder compartirla.                              #}
+<aside class="list-filters" id="panel-filtros">
+  <h2 class="list-filters__title">{% trans "Filtro" %}</h2>
+  <form id="dt-filtros" method="get" action="{{ request.path }}">
+    {% if filtros_extra_template %}{% include filtros_extra_template %}{% endif %}   {# pieza propia de la página (p. ej. «Mi estado») #}
+    {# TIPO (choices del mapa «por»): casillas. UNO marcado → navega a la lista de ese valor (su URL, su fondo);   #}
+    {# dos o más → se queda en la lista general con el filtro combinado (fondo genérico); ninguno → todos.           #}
+    {% for g in type_tabs %}
+    <details class="list-filters__item fl-item fl-nav" data-nav="{{ g.tipo }}" data-campo="{{ g.campo }}" data-lista="{{ g.lista }}" open>
+      <summary><span class="fl-nombre">{{ g.label }}</span><span class="fl-resumen"></span></summary>
+      <div class="fl-dd fl-dd--nav">
+        <button type="button" class="fl-dd__btn" aria-haspopup="listbox" aria-expanded="false"><span class="fl-dd__texto">{% trans "Todos" %}</span><i class="bi bi-caret-down-fill"></i></button>
+        <div class="fl-dd__menu" hidden>
+          <input type="search" class="fl-dd__buscar" placeholder="{% trans "Buscar…" %}" autocomplete="off">
+          <div class="fl-dd__opciones">
+            {% for t in g.tabs %}<label class="fl-dd__op"><input type="checkbox" value="{{ t.valor }}" data-href="{{ t.href }}"{% if t.on %} checked{% endif %}> <span>{{ t.label }}</span></label>{% endfor %}
+          </div>
+        </div>
+        <input type="hidden" name="{{ g.campo }}" value="">
+      </div>
+    </details>
+    {% endfor %}
+    {# Dos bloques COLAPSABLES: «Incluir» (lo que debe tener) y «Excluir» (lo que NO debe tener). Cada filtro, a su #}
+    {# vez, colapsable. Excluir llega abierto solo si ya trae algo. #}
+    {% if filtros %}
+    <details class="fl-grupo" open>
+      <summary>{% trans "Incluir" %}</summary>
+    {% for param, etiqueta, opciones, actual, modo, grupo in filtros %}
+    {# Cada filtro es COLAPSABLE: cerrado muestra solo su nombre y un resumen de lo elegido; abierto, el control. #}
+    {# Llega abierto si ya trae valores (la página puede venir filtrada). #}
+    <details class="list-filters__item fl-item"{% if actual %} open{% endif %}>
+      <summary><span class="fl-nombre">{{ etiqueta }}</span><span class="fl-resumen"></span></summary>
+      {% if modo == "lista" %}
+      {# Desplegable multi (países, géneros, años…): cerrado muestra lo elegido; abierto, buscador + casillas #}
+      <div class="fl-dd" data-param="{{ param }}">
+        <button type="button" class="fl-dd__btn" aria-haspopup="listbox" aria-expanded="false"><span class="fl-dd__texto">{% trans "Seleccionar" %}</span><i class="bi bi-caret-down-fill"></i></button>
+        <div class="fl-dd__menu" hidden>
+          <input type="search" class="fl-dd__buscar" placeholder="{% trans "Buscar…" %}" autocomplete="off">
+          <div class="fl-dd__opciones">
+            {% for valor, texto in opciones %}<label class="fl-dd__op"><input type="checkbox" value="{{ valor }}"{% if valor in actual %} checked{% endif %}> <span>{{ texto }}</span></label>{% endfor %}
+          </div>
+        </div>
+        <input type="hidden" name="{{ param }}" value="{{ actual|join:"," }}">
+      </div>
+      {% else %}
+      <select name="{{ param }}">
+        <option value="">{% trans "Todo" %}</option>
+        {% for valor, texto in opciones %}<option value="{{ valor }}"{% if valor in actual %} selected{% endif %}>{{ texto }}</option>{% endfor %}
+      </select>
+      {% endif %}
+    </details>
+    {% endfor %}
+    </details>
+    {% endif %}
+    {% if filtros_excluir %}
+    <details class="fl-grupo fl-grupo--excluir"{% if excluir_activo %} open{% endif %}>
+      <summary>{% trans "Excluir" %}</summary>
+    {% for param, etiqueta, opciones, actual, modo, grupo in filtros_excluir %}
+    {# Cada filtro es COLAPSABLE: cerrado muestra solo su nombre y un resumen de lo elegido; abierto, el control. #}
+    {# Llega abierto si ya trae valores (la página puede venir filtrada). #}
+    <details class="list-filters__item fl-item"{% if actual %} open{% endif %}>
+      <summary><span class="fl-nombre">{{ etiqueta }}</span><span class="fl-resumen"></span></summary>
+      {% if modo == "lista" %}
+      {# Desplegable multi (países, géneros, años…): cerrado muestra lo elegido; abierto, buscador + casillas #}
+      <div class="fl-dd" data-param="{{ param }}">
+        <button type="button" class="fl-dd__btn" aria-haspopup="listbox" aria-expanded="false"><span class="fl-dd__texto">{% trans "Seleccionar" %}</span><i class="bi bi-caret-down-fill"></i></button>
+        <div class="fl-dd__menu" hidden>
+          <input type="search" class="fl-dd__buscar" placeholder="{% trans "Buscar…" %}" autocomplete="off">
+          <div class="fl-dd__opciones">
+            {% for valor, texto in opciones %}<label class="fl-dd__op"><input type="checkbox" value="{{ valor }}"{% if valor in actual %} checked{% endif %}> <span>{{ texto }}</span></label>{% endfor %}
+          </div>
+        </div>
+        <input type="hidden" name="{{ param }}" value="{{ actual|join:"," }}">
+      </div>
+      {% else %}
+      <select name="{{ param }}">
+        <option value="">{% trans "Todo" %}</option>
+        {% for valor, texto in opciones %}<option value="{{ valor }}"{% if valor in actual %} selected{% endif %}>{{ texto }}</option>{% endfor %}
+      </select>
+      {% endif %}
+    </details>
+    {% endfor %}
+    </details>
+    {% endif %}
+    {# El filtrado es INMEDIATO: al marcar o elegir algo se recarga la tabla. Abajo, cuántas filas quedaron y, si hay #}
+    {# algún filtro puesto, «Quitar filtros». #}
+    <div class="list-filters__acciones">
+      <span id="fl-resultados" class="list-filters__cuenta"></span>
+      <button type="button" id="btn-quitar-filtros" class="list-filters__clear" hidden>{% trans "Quitar filtros" %}</button>
+    </div>
+  </form>
+</aside>

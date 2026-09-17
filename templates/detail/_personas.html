@@ -1,0 +1,28 @@
+{% load static i18n ficha %}
+{% comment %}Filas estilo MAL de PERSONAS (reparto, equipo, staff, autores, voces de un personaje). Izquierda: la persona
+(foto y nombre → su ficha del lado). Derecha: en el reparto el PERSONAJE y debajo su rol; en una voz el IDIOMA; si
+no, el CARGO (rol). Se incluye con `filas` (puentes con .person y .role; opcional .character_name / .language) y
+`columnas` ("2" para el mini recuento a dos columnas).{% endcomment %}
+{% static 'image/default/sin-imagen.webp' as sin_img %}
+<div class="mal-rows{% if columnas == "2" %} mal-rows--2{% endif %}">
+  {% for c in filas %}
+    <div class="mr">
+      <div class="mr-ent">
+        <a class="mr-thumb" href="{% ficha c.person %}"><img src="{{ c.person|imagen|default:sin_img }}" alt="{{ c.person }}" loading="lazy"></a>
+        <div class="mr-name"><a href="{% ficha c.person %}">{{ c.person }}</a></div>
+      </div>
+      <div class="mr-vas"><div class="mr-va"><div>
+        {% if c.character_name %}
+          <div class="mr-name">{{ c.character_name }}</div>
+          <div class="mr-sub">{{ c.role|default:_("Personaje") }}</div>
+        {% elif c.language %}
+          <div class="mr-name">{{ c.language }}</div>
+          <div class="mr-sub">{% trans 'Voz' %}</div>
+        {% else %}
+          <div class="mr-name">{{ c.role|default:"—" }}</div>
+          <div class="mr-sub">{% trans 'Cargo' %}</div>
+        {% endif %}
+      </div></div></div>
+    </div>
+  {% endfor %}
+</div>

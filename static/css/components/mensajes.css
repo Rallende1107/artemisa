@@ -1,0 +1,40 @@
+/* MIS MENSAJES: hilos del usuario con el sitio (mensaje + respuestas) */
+.hilos { display: flex; flex-direction: column; gap: 18px; max-width: 860px; }
+.hilo { background: var(--glass-2); border: 1px solid var(--border-soft);
+    border-radius: 14px; padding: 18px 20px; }
+.hilo__cab { display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 14px; margin-bottom: 10px; }
+.hilo__asunto { font-size: 15px; font-weight: 700; }
+.hilo__meta { font-family: var(--mono); font-size: 11.5px; color: var(--muted);
+    margin-top: 2px; }
+.hilo__cuerpo { color: var(--text-2); font-size: 14px; line-height: 1.7; }
+.hilo__estado { flex: none; font-size: 11px; font-family: var(--mono);
+    padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border-soft);
+    color: var(--muted); }
+.hilo__estado--respondido { color: var(--accent); border-color: var(--accent); }
+.hilo__estado--nuevo { color: #ffd166; border-color: rgba(255, 209, 102, .5); }
+
+/* Respuesta del sitio: bloque con borde de acento, como cita */
+.hilo__respuesta { margin-top: 14px; padding: 12px 16px;
+    border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0;
+    background: var(--glass); }
+.hilo__espera { margin-top: 12px; }
+
+/* TABLA de mensajes: DataTable de la casa, ancho completo como Mi colección
+ * (el hilo se abre en modal) */
+.msj-fila { cursor: pointer; }
+.msj-asunto { font-weight: 700; color: var(--text); }
+.msj-fecha { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.msj-ver { color: var(--accent); text-align: right; }
+
+/* MODAL del hilo — margin auto: el reset global mata el centrado nativo */
+dialog.msj-modal { width: min(680px, 92vw); max-height: 84vh; margin: auto;
+    border: 1px solid var(--border-soft);
+    border-radius: 14px; background: var(--surface); color: var(--text);
+    padding: 0; box-shadow: 0 24px 70px rgba(0, 0, 0, .6); }
+dialog.msj-modal::backdrop { background: rgba(0, 0, 0, .62); backdrop-filter: blur(2px); }
+.msj-modal__head { display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border-soft); }
+.msj-modal__x { background: none; border: 0; color: var(--faint); font-size: 17px; cursor: pointer; }
+.msj-modal__x:hover { color: var(--warn); }
+.msj-modal__body { padding: 16px 20px 20px; max-height: 62vh; overflow-y: auto; }

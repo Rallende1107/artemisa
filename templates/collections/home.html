@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+{% comment %}DASHBOARD de Mi colección (estilo panel de gestión): una tarjeta por
+colección, con el fondo HOME de su app, hacia /collection/<tipo>/.{% endcomment %}
+
+{% block title %}Mi colección · {{ block.super }}{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/components/card.css' %}?v={{ ASSET_VERSION }}">
+{% endblock %}
+
+{% block content %}
+    <div class="page-head">
+      <div class="breadcrumbs"><span>colección</span></div>
+      <h1 class="page-title">Mi colección</h1>
+      <p class="page-sub">{{ total }} título{{ total|pluralize }} en tu biblioteca. Elige una colección.</p>
+    </div>
+
+    <div class="card-grid">
+      {% for it in cards %}
+        <a class="card{% if it.bg %} card--bg{% endif %}" href="{{ it.url }}"{% if it.bg %} style="--card-bg:url('{{ it.bg }}')"{% endif %}>
+          <div class="card__top"><div class="card__icon">{{ it.icon|safe }}</div><span class="card__count">{{ it.count }}</span></div>
+          <div class="card__name">{{ it.label }}</div>
+        </a>
+      {% endfor %}
+    </div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% comment %} RESPALDO del song.html ORIGINAL (generado por sync_forms, sin filas).
+   Este archivo NO se usa solo: la vista siempre carga `song.html`. Está aquí
+   como referencia por si querés volver al layout plano. Para restaurarlo,
+   copia su contenido a song.html (o borra song.html y corre `sync_forms`). {% endcomment %}
+
+    <div class="field">
+      <label for="{{ form.title.id_for_label }}">{{ form.title.label }}{% if form.title.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.title }}
+      {% for e in form.title.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.title.help_text %}<span class="field__hint">{{ form.title.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.title_short.id_for_label }}">{{ form.title_short.label }}{% if form.title_short.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.title_short }}
+      {% for e in form.title_short.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.title_short.help_text %}<span class="field__hint">{{ form.title_short.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.title_version.id_for_label }}">{{ form.title_version.label }}{% if form.title_version.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.title_version }}
+      {% for e in form.title_version.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.title_version.help_text %}<span class="field__hint">{{ form.title_version.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.album.id_for_label }}">{{ form.album.label }}{% if form.album.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.album }}
+      {% for e in form.album.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.album.help_text %}<span class="field__hint">{{ form.album.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.album_song_id.id_for_label }}">{{ form.album_song_id.label }}{% if form.album_song_id.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.album_song_id }}
+      {% for e in form.album_song_id.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.album_song_id.help_text %}<span class="field__hint">{{ form.album_song_id.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      {% include 'admin_panel/_campo_imagen.html' with field=form.audio_file %}
+    </div>
+    <div class="field">
+      <label for="{{ form.lyrics.id_for_label }}">{{ form.lyrics.label }}{% if form.lyrics.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.lyrics }}
+      {% for e in form.lyrics.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.lyrics.help_text %}<span class="field__hint">{{ form.lyrics.help_text }}</span>{% endif %}
+    </div>

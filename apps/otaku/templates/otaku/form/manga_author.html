@@ -1,0 +1,25 @@
+{% comment %} Campos de autor de manga — patrón Hades/Poseidon.
+   PARCIAL que INCLUYE admin_panel/form.html (el cuadro: card, botones, csrf) porque la
+   vista Create/Update lo declara: form_template = "…/form/<modelo>.html".
+   Edita libremente el orden/HTML de cada campo aquí. Los booleanos se
+   auto-agrupan abajo, no van en este bloque.
+   Sincroniza:  python manage.py sync_forms  {% endcomment %}
+
+    <div class="field">
+      <label for="{{ form.manga.id_for_label }}">{{ form.manga.label }}{% if form.manga.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.manga }}
+      {% for e in form.manga.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.manga.help_text %}<span class="field__hint">{{ form.manga.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.person.id_for_label }}">{{ form.person.label }}{% if form.person.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.person }}
+      {% for e in form.person.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.person.help_text %}<span class="field__hint">{{ form.person.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.role.id_for_label }}">{{ form.role.label }}{% if form.role.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.role }}
+      {% for e in form.role.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.role.help_text %}<span class="field__hint">{{ form.role.help_text }}</span>{% endif %}
+    </div>

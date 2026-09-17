@@ -1,0 +1,70 @@
+/* =====================================================================
+   01-base.css  ·  reset + elementos base + capas de fondo por categoría
+   ===================================================================== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+    font-family: var(--sans);
+    background: var(--ground);
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flow-root;   /* contiene el margin-top de .main (evita 56px de overflow) */
+}
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+
+/* ---- Capa de fondo: imagen de categoría + overlay oscuro ------------- */
+/* {% fondo %} fija 4 orientaciones (--bg-wide/landscape/portrait/tall).   */
+/* Se elige por aspect-ratio → el navegador SOLO descarga la que aplica.   */
+/* Fallback a --bg-cat (una sola imagen) para los mockups estáticos.       */
+.bg-layer { position: fixed; inset: 0; z-index: var(--z-bg); background-color: var(--ground); }
+
+.bg-layer::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: var(--bg-wide, var(--bg-cat));   /* desktop ancho */
+    background-size: cover; background-position: center;
+    opacity: var(--bg-opacity);
+    transition: opacity .35s ease;
+}
+/* aspecto < 1.6 : landscape normal / tablet horizontal */
+@media (max-aspect-ratio: 16/10) {
+    .bg-layer::before { background-image: var(--bg-landscape, var(--bg-cat)); }
+}
+/* aspecto < 1.0 : vertical (móvil/tablet retrato) */
+@media (max-aspect-ratio: 1/1) {
+    .bg-layer::before { background-image: var(--bg-portrait, var(--bg-cat)); }
+}
+/* aspecto < 0.6 : muy alto y angosto (móviles largos) */
+@media (max-aspect-ratio: 3/5) {
+    .bg-layer::before { background-image: var(--bg-tall, var(--bg-cat)); }
+}
+.bg-layer::after {
+    content: ""; position: absolute; inset: 0;
+    background:
+        linear-gradient(180deg, var(--overlay-top), var(--overlay-bottom)),
+        radial-gradient(900px 500px at 82% -12%, rgba(8, 8, 13, 0.35), transparent 60%);   /* antes brillo cian (accent-06) */
+    backdrop-filter: blur(1px);
+}
+
+/* Etiqueta mono reutilizable (eyebrow) */
+.eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+/* Scrollbars sutiles en todo el sitio (oscuras, no blancas del navegador) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-soft) transparent;
+}
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: var(--border-soft); border-radius: 8px; }
+*::-webkit-scrollbar-thumb:hover { background: var(--border); }

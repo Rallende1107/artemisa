@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% comment %}
+  Lista PÚBLICA (catálogo) sobre las MISMAS piezas del panel: list_table.html (tabla),
+  list_cards.html (tarjetas) y filters.html (panel de filtros), alimentada por su PublicDataView
+  (`data_url`). Sin exportar, sin Id, sin masivo; 30 por página; tarjetas por defecto.
+{% endcomment %}
+
+{% block title %}{{ page_title }} · {{ block.super }}{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'vendor/datatables/dataTables.dataTables.min.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'vendor/datatables/responsive.dataTables.min.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/datatables-theme.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/catalogo.css' %}?v={{ ASSET_VERSION }}">
+{% endblock %}
+
+{% block content %}
+  <div class="cat-wrap">
+    <div class="breadcrumbs">
+      {% if home_href %}<a href="{{ home_href }}">{{ home_label|default:active_section }}</a><span class="sep">/</span>
+      {% elif home_url %}<a href="{% url home_url %}">{{ home_label|default:active_section }}</a><span class="sep">/</span>{% endif %}
+      <span>{{ page_title|lower }}</span>
+    </div>
+    <div class="page-head">
+      <h1 class="page-title">{% if icon %}<i class="bi {{ icon }}"></i> {% endif %}{{ page_title }}</h1>
+      {% if subtitle %}<p class="page-sub">{{ subtitle }}</p>{% endif %}
+    </div>
+
+    {# la base pública no carga toolbar.css: la fila se arma aquí, botones a la esquina derecha como en gestión #}
+    <div class="toolbar" style="display:flex;justify-content:flex-end;align-items:center;gap:10px;margin:0 0 14px;">
+      <div style="display:flex;gap:10px;align-items:center">
+        {% if enable_cards %}
+        <button id="view-cards" class="btn-icon view-toggle-btn" type="button" title="{% trans "Ver como tarjetas" %}"><i class="bi bi-grid-3x3-gap"></i></button>
+        <button id="view-table" class="btn-icon view-toggle-btn" type="button" title="{% trans "Ver como lista" %}"><i class="bi bi-list-ul"></i></button>
+        {% endif %}
+        {% if filtros %}<button type="button" id="btn-panel-filtros" class="btn-filtros" aria-controls="panel-filtros" title="{% trans "Filtros" %}" aria-label="{% trans "Mostrar u ocultar el panel de filtros" %}"><i class="bi bi-funnel"></i></button>{% endif %}
+      </div>
+    </div>
+
+    <div class="list-layout{% if not filtros %} list-layout--solo{% endif %}">
+    <div class="list-main">
+      {% include "components/list_table.html" %}
+      {% if enable_cards %}{% include "components/list_cards.html" %}{% endif %}
+    </div>
+    {% if filtros %}{% include filters_template %}{% endif %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'vendor/jquery/jquery.min.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script src="{% static 'vendor/datatables/dataTables.min.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script src="{% static 'vendor/datatables/dataTables.responsive.min.js' %}?v={{ ASSET_VERSION }}"></script>
+  {% trans "Procesando…" as dt_processing %}{% trans "Buscar:" as dt_search %}{% trans "Mostrando _START_–_END_ de _TOTAL_" as dt_info %}{% trans "Sin registros" as dt_empty %}{% trans "(filtrado de _MAX_)" as dt_filtered %}{% trans "Sin coincidencias" as dt_zero %}{% trans "Sin registros todavía" as dt_emptytable %}
+  <script>
+    window.DT_LANG = { processing: "{{ dt_processing|escapejs }}", search: "{{ dt_search|escapejs }}", info: "{{ dt_info|escapejs }}",
+      infoEmpty: "{{ dt_empty|escapejs }}", infoFiltered: "{{ dt_filtered|escapejs }}", zeroRecords: "{{ dt_zero|escapejs }}", emptyTable: "{{ dt_emptytable|escapejs }}" };
+    window.DT_NCOLS = {{ headers|length }};
+    window.DT_ENTITY = "catalogo-{{ entity }}";
+    window.CARDS_ENABLED = {% if enable_cards %}true{% else %}false{% endif %};
+    window.DT_VIEW_DEFAULT = "{% if cards_default %}cards{% else %}table{% endif %}";
+    window.DT_BULK = false;
+    window.DT_ID = false;
+    window.DT_NO_ACTIONS = {% if actions %}false{% else %}true{% endif %};
+    window.DT_BUTTONS = false;            // sin exportación en lo público
+    window.DT_LENGTH_CHANGE = false;      // 30 por página, fijo
+    window.DT_PAGE_LENGTH = 30;
+    window.DT_PAGING_TOP_BOTTOM = true;   // info + paginación arriba y abajo
+    window.DT_CARDS_INSIDE = true;        // tarjetas entre la tabla y los controles de abajo
+    window.DT_CARD_DEFAULT_IMG = "{% static 'image/default/sin-imagen.webp' %}";
+    window.DT_FILTROS_ABIERTO = false;
+  </script>
+  <script src="{% static 'js/datatable.js' %}?v={{ ASSET_VERSION }}"></script>
+  {% include "public/_coleccion_js.html" %}
+{% endblock %}

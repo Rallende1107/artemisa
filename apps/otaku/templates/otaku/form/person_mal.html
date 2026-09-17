@@ -1,0 +1,40 @@
+{% load i18n %}
+
+<!-- <div class="form-row"> -->
+    <h3>{% trans "Persona" %}</h3>
+<!-- </div> -->
+{% include 'otaku/form/_candidatas_mal.html' %}
+{# Los campos de la persona son los del PersonForm (este formulario hereda de él): su mismo parcial. #}
+{% include 'people/form/person.html' %}
+
+    <h3>{% trans "MyAnimeList" %}</h3>
+    <div class="field">
+      <label for="{{ form.mal_id.id_for_label }}">{{ form.mal_id.label }} <span class="req">*</span></label>
+      {{ form.mal_id }}
+      {% for e in form.mal_id.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.mal_id.help_text %}<span class="field__hint">{{ form.mal_id.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.url.id_for_label }}">{{ form.url.label }}{% if form.url.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.url }}
+      {% for e in form.url.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.url.help_text %}<span class="field__hint">{{ form.url.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.family_name.id_for_label }}">{{ form.family_name.label }}{% if form.family_name.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.family_name }}
+      {% for e in form.family_name.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.family_name.help_text %}<span class="field__hint">{{ form.family_name.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.given_name.id_for_label }}">{{ form.given_name.label }}{% if form.given_name.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.given_name }}
+      {% for e in form.given_name.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.given_name.help_text %}<span class="field__hint">{{ form.given_name.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.about.id_for_label }}">{{ form.about.label }}{% if form.about.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.about }}
+      {% for e in form.about.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.about.help_text %}<span class="field__hint">{{ form.about.help_text }}</span>{% endif %}
+    </div>

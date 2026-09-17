@@ -1,0 +1,10 @@
+{% load i18n %}
+{# Pieza TABLA de una lista del panel: la incluye admin_panel/list.html. Cabeceras de la Data #}
+{# (`columns`), filas por AJAX (data-url = endpoint de la Data). Sin barra ni paginación: eso #}
+{# es de list.html y no cambia al pasar a tarjetas.                                           #}
+<div class="dt-wrap">
+  <table id="dt" data-url="{{ data_url }}" class="display" style="width:100%">
+    <thead><tr>{% if bulk_actions %}<th class="th-sel"><input type="checkbox" id="dt-sel-all" title="{% trans "Seleccionar la página" %}" aria-label="{% trans "Seleccionar la página" %}"></th>{% endif %}{% if con_id %}<th class="th-id">Id</th>{% endif %}{% for h, es_bool, prio, ordenable in headers %}<th{% if es_bool %} class="col-stat"{% endif %}{% if prio %} data-priority="{{ prio }}"{% endif %}{% if not ordenable %} data-orderable="false"{% endif %}>{{ h }}</th>{% endfor %}{% if actions %}<th class="th-actions"></th>{% endif %}</tr></thead>
+    <tbody></tbody>
+  </table>
+</div>

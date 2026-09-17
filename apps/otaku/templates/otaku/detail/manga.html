@@ -1,0 +1,94 @@
+{% extends 'detail/base_detail.html' %}
+{% load i18n ficha %}
+{% comment %}FICHA de manga (gestión y público) sobre detail/base_detail.html, calcada de MAL. Lo que se pinta lo dan
+los métodos del modelo: titulos, personajes, autores, relaciones. Pestañas: Detalles, Relaciones, Personajes,
+Autores e Imágenes.{% endcomment %}
+
+{% block subtitulo %}{% if object.title_jap %}<div class="orig">{{ object.title_jap }}</div>{% endif %}{% endblock %}
+
+{% block titulos %}{% include 'detail/_titulos.html' with titulos=object.titulos pk=object.pk %}{% endblock %}
+
+{% block side %}
+  {% if object.manga_type %}<div class="mal-row"><span class="k">{% trans 'Tipo' %}:</span><span class="v"><a href="{% by by_url 'tipo' object.manga_type %}">{{ object.manga_type }}</a></span></div>{% endif %}
+  {% if object.volumes %}<div class="mal-row"><span class="k">{% trans 'Volúmenes' %}:</span><span class="v">{{ object.volumes }}</span></div>{% endif %}
+  {% if object.chapters %}<div class="mal-row"><span class="k">{% trans 'Capítulos' %}:</span><span class="v">{{ object.chapters }}</span></div>{% endif %}
+  {% if object.status %}<div class="mal-row"><span class="k">{% trans 'Estado' %}:</span><span class="v"><a href="{% by by_url 'estado' object.status %}">{{ object.status }}</a></span></div>{% endif %}
+  {% if object.from_date %}<div class="mal-row"><span class="k">{% trans 'Publicación' %}:</span><span class="v">{{ object.from_date|date:"d M Y" }}{% if object.to_date %} – {{ object.to_date|date:"d M Y" }}{% endif %}</span></div>
+  {% elif object.year %}<div class="mal-row"><span class="k">{% trans 'Año' %}:</span><span class="v">{{ object.year }}</span></div>{% endif %}
+  {% with lista=object.serializations.all %}{% if lista %}<div class="mal-row"><span class="k">{% trans 'Revistas' %}:</span><span class="v">{% for c in lista %}<a href="{% ficha c %}">{{ c }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>{% endif %}{% endwith %}
+  {% if object.source %}<div class="mal-row"><span class="k">{% trans 'Fuente' %}:</span><span class="v"><a href="{% by by_url 'fuente' object.source %}">{{ object.source }}</a></span></div>{% endif %}
+  {% with lista=object.genres.all %}{% if lista %}<div class="mal-row"><span class="k">{% trans 'Géneros' %}:</span><span class="v">{% for g in lista %}<a href="{% by by_url 'genero' g %}">{{ g }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>{% endif %}{% endwith %}
+  {% with lista=object.themes.all %}{% if lista %}<div class="mal-row"><span class="k">{% trans 'Temas' %}:</span><span class="v">{% for g in lista %}<a href="{% by by_url 'tema' g %}">{{ g }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>{% endif %}{% endwith %}
+  {% with lista=object.demographics.all %}{% if lista %}<div class="mal-row"><span class="k">{% trans 'Demografía' %}:</span><span class="v">{% for g in lista %}<a href="{% by by_url 'demografia' g %}">{{ g }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>{% endif %}{% endwith %}
+  {% if object.rating %}<div class="mal-row"><span class="k">{% trans 'Clasificación' %}:</span><span class="v"><a href="{% url 'panel:manga_by' 'rating' object.rating %}">{{ object.get_rating_display }}</a></span></div>{% endif %}
+  {% if object.season %}<div class="mal-row"><span class="k">{% trans 'Temporada' %}:</span><span class="v"><a href="{% url 'panel:manga_by' 'season' object.season %}">{{ object.get_season_display }}</a>{% if object.from_date %} · {{ object.from_date }}{% endif %}</span></div>{% endif %}
+  {% if object.mal_id > 0 %}<div class="mal-row"><span class="k">MAL:</span><span class="v"><a href="https://myanimelist.net/manga/{{ object.mal_id }}" target="_blank" rel="noopener">{{ object.mal_id }}</a></span></div>{% endif %}
+{% endblock %}
+
+{% block cuerpo %}
+  {% with personajes=object.personajes autores=object.autores relaciones=object.relaciones fotos=object|fotos %}
+
+  <section class="dsection" data-tab="detalles" data-label="{% trans 'Detalles' %}" style="padding-top:0;">
+    <h3>{% trans 'Sinopsis' %}</h3>
+    <div class="synopsis-area">
+      {% if object.synopsis %}<p class="synopsis">{{ object.synopsis|linebreaksbr }}</p>{% endif %}
+    </div>
+
+    {% if relaciones %}
+      <h3 style="margin-top:24px;">{% trans 'Relaciones' %}<a class="page-sub mas" href="#relaciones">{% trans 'Más relaciones' %} ({{ relaciones|length }}) →</a></h3>
+      {% include 'detail/_relaciones.html' with filas=relaciones|slice:":6" columnas="2" %}
+    {% endif %}
+    {% if personajes %}
+      <h3 style="margin-top:24px;">{% trans 'Personajes' %}<a class="page-sub mas" href="#personajes">{% trans 'Más personajes' %} ({{ personajes|length }}) →</a></h3>
+      {% include 'detail/_personajes.html' with filas=personajes|slice:":10" columnas="2" %}
+    {% endif %}
+    {% if autores %}
+      <h3 style="margin-top:24px;">{% trans 'Autores' %}<a class="page-sub mas" href="#autores">{% trans 'Más autores' %} ({{ autores|length }}) →</a></h3>
+      {% include 'detail/_personas.html' with filas=autores|slice:":6" columnas="2" %}
+    {% endif %}
+  </section>
+
+  {% if relaciones %}
+    <section class="dsection" data-tab="relaciones" data-label="{% trans 'Relaciones' %}" style="padding-top:0;">
+      <h3>{% trans 'Relaciones' %} <span class="page-sub" style="font-size:12px">({{ relaciones|length }})</span></h3>
+      {% include 'detail/_relaciones.html' with filas=relaciones columnas="2" %}
+    </section>
+  {% endif %}
+
+  {% if personajes %}
+    <section class="dsection" data-tab="personajes" data-label="{% trans 'Personajes' %}" style="padding-top:0;">
+      <h3>{% trans 'Personajes' %} <span class="page-sub" style="font-size:12px">({{ personajes|length }})</span>
+        {% if tab_url.personajes and personajes|length > 30 %}<a class="page-sub mas" href="{{ tab_url.personajes }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      {% include 'detail/_personajes.html' with filas=personajes columnas="2" %}
+    </section>
+  {% endif %}
+
+  {% if autores %}
+    <section class="dsection" data-tab="autores" data-label="{% trans 'Autores' %}" style="padding-top:0;">
+      <h3>{% trans 'Autores' %} <span class="page-sub" style="font-size:12px">({{ autores|length }})</span>
+        {% if tab_url.autores and autores|length > 30 %}<a class="page-sub mas" href="{{ tab_url.autores }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      {% include 'detail/_personas.html' with filas=autores columnas="2" %}
+    </section>
+  {% endif %}
+
+  {% if fotos %}
+    <section class="dsection" data-tab="imagenes" data-label="{% trans 'Imágenes' %}" style="padding-top:0;">
+      <h3>{% trans 'Imágenes' %} <span class="page-sub" style="font-size:12px">({{ fotos|length }})</span>
+        {% if tab_url.imagenes and fotos|length > 40 %}<a class="page-sub mas" href="{{ tab_url.imagenes }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      <div class="gallery">{% for f in fotos %}{% if f|imagen %}<img class="shot" src="{{ f|imagen }}" alt="{{ object }}" loading="lazy">{% endif %}{% endfor %}</div>
+    </section>
+  {% endif %}
+
+  {% endwith %}
+  {% if es_gestion %}
+  {# Ficha técnica (solo gestión): lo que el registro ES — id, slug, activo, fechas. Muévela o amplíala aquí. #}
+  <section class="dsection" data-tab="tecnica" data-label="{% trans 'Ficha técnica' %}" style="padding-top:0;">
+    <h3>{% trans 'Ficha técnica' %}</h3>
+    <div class="mal-row"><span class="k">Id:</span><span class="v">{{ object.pk }}</span></div>
+    {% if object.slug %}<div class="mal-row"><span class="k">Slug:</span><span class="v">{{ object.slug }}</span></div>{% endif %}
+    {% if object.is_active is not None %}<div class="mal-row"><span class="k">{% trans 'Activo' %}:</span><span class="v">{{ object.display_is_active }}</span></div>{% endif %}
+    {% if object.created_at %}<div class="mal-row"><span class="k">{% trans 'Creado' %}:</span><span class="v">{{ object.display_created }}</span></div>{% endif %}
+    {% if object.updated_at %}<div class="mal-row"><span class="k">{% trans 'Actualizado' %}:</span><span class="v">{{ object.display_updated }}</span></div>{% endif %}
+  </section>
+  {% endif %}
+{% endblock %}

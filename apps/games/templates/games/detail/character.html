@@ -1,0 +1,59 @@
+{% extends 'detail/base_detail.html' %}
+{% load i18n ficha %}
+{% comment %}FICHA de personaje de juego (gestión y público): nombre original, sexo, edad, cumpleaños y VNDB en el lateral;
+descripción y los juegos en los que aparece con su rol. Métodos del modelo: juegos, sexo.{% endcomment %}
+
+{% block subtitulo %}{% if object.original %}<div class="orig">{{ object.original }}</div>{% endif %}{% endblock %}
+
+{% block side %}
+  {% if object.original %}<div class="mal-row"><span class="k">{% trans 'Nombre original' %}:</span><span class="v">{{ object.original }}</span></div>{% endif %}
+  {% with sexo=object.sexo %}{% if sexo %}<div class="mal-row"><span class="k">{% trans 'Sexo' %}:</span><span class="v">{{ sexo }}</span></div>{% endif %}{% endwith %}
+  {% if object.age %}<div class="mal-row"><span class="k">{% trans 'Edad' %}:</span><span class="v">{{ object.age }}</span></div>{% endif %}
+  {% if object.birthday %}<div class="mal-row"><span class="k">{% trans 'Cumpleaños' %}:</span><span class="v">{{ object.birthday }}</span></div>{% endif %}
+  {% if object.p_vndb_id %}<div class="mal-row"><span class="k">VNDB:</span><span class="v"><a href="https://vndb.org/{{ object.p_vndb_id }}" target="_blank" rel="noopener">{{ object.p_vndb_id }}</a></span></div>{% endif %}
+{% endblock %}
+
+{% block cuerpo %}
+  {% with juegos=object.juegos fotos=object|fotos %}
+
+  <section class="dsection" data-tab="detalles" data-label="{% trans 'Detalles' %}" style="padding-top:0;">
+    <h3>{% trans 'Descripción' %}</h3>
+    <div class="synopsis-area">
+      {% if object.description %}<p class="synopsis">{{ object.description|linebreaksbr }}</p>{% endif %}
+    </div>
+
+    {% if juegos %}
+      <h3 style="margin-top:24px;">{% trans 'Juegos' %}<a class="page-sub mas" href="#juegos">{% trans 'Más juegos' %} ({{ juegos|length }}) →</a></h3>
+      {% include 'detail/_obras.html' with filas=juegos|slice:":6" columnas="2" %}
+    {% endif %}
+  </section>
+
+  {% if juegos %}
+    <section class="dsection" data-tab="juegos" data-label="{% trans 'Juegos' %}" style="padding-top:0;">
+      <h3>{% trans 'Juegos' %} <span class="page-sub" style="font-size:12px">({{ juegos|length }})</span>
+        {% if tab_url.juegos and juegos|length > 30 %}<a class="page-sub mas" href="{{ tab_url.juegos }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      {% include 'detail/_obras.html' with filas=juegos columnas="2" %}
+    </section>
+  {% endif %}
+
+  {% if fotos %}
+    <section class="dsection" data-tab="imagenes" data-label="{% trans 'Imágenes' %}" style="padding-top:0;">
+      <h3>{% trans 'Imágenes' %} <span class="page-sub" style="font-size:12px">({{ fotos|length }})</span>
+        {% if tab_url.imagenes and fotos|length > 40 %}<a class="page-sub mas" href="{{ tab_url.imagenes }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      <div class="gallery">{% for f in fotos %}{% if f|imagen %}<img class="shot" src="{{ f|imagen }}" alt="{{ object }}" loading="lazy">{% endif %}{% endfor %}</div>
+    </section>
+  {% endif %}
+
+  {% endwith %}
+  {% if es_gestion %}
+  {# Ficha técnica (solo gestión): lo que el registro ES — id, slug, activo, fechas. Muévela o amplíala aquí. #}
+  <section class="dsection" data-tab="tecnica" data-label="{% trans 'Ficha técnica' %}" style="padding-top:0;">
+    <h3>{% trans 'Ficha técnica' %}</h3>
+    <div class="mal-row"><span class="k">Id:</span><span class="v">{{ object.pk }}</span></div>
+    {% if object.slug %}<div class="mal-row"><span class="k">Slug:</span><span class="v">{{ object.slug }}</span></div>{% endif %}
+    {% if object.is_active is not None %}<div class="mal-row"><span class="k">{% trans 'Activo' %}:</span><span class="v">{{ object.display_is_active }}</span></div>{% endif %}
+    {% if object.created_at %}<div class="mal-row"><span class="k">{% trans 'Creado' %}:</span><span class="v">{{ object.display_created }}</span></div>{% endif %}
+    {% if object.updated_at %}<div class="mal-row"><span class="k">{% trans 'Actualizado' %}:</span><span class="v">{{ object.display_updated }}</span></div>{% endif %}
+  </section>
+  {% endif %}
+{% endblock %}

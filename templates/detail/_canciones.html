@@ -1,0 +1,18 @@
+{% load i18n ficha %}
+{% comment %}BANDA SONORA de un anime como la tabla de MAL (Opening Theme / Ending Theme / Insert): nº, título (kanji e
+inglés debajo) y artistas (→ su ficha de música del lado). `grupos` = [(etiqueta, canciones)] lo arma
+Anime.banda_sonora().{% endcomment %}
+{% for etiqueta, canciones in grupos %}{% if canciones %}
+  <h3 {% if not forloop.first %}style="margin-top:22px;"{% endif %}>{{ etiqueta }} <span class="page-sub" style="font-size:12px">({{ canciones|length }})</span></h3>
+  <ol class="tracklist">
+    {% for c in canciones %}
+      <li><span class="tk-n">{% if c.song_id %}{{ c.song_id }}{% else %}–{% endif %}</span>
+        <div>
+          <div>{{ c.title }}</div>
+          {% if c.title_kanji or c.title_eng %}<div class="tk-sub">{% if c.title_kanji %}{{ c.title_kanji }}{% endif %}{% if c.title_kanji and c.title_eng %} · {% endif %}{% if c.title_eng %}{{ c.title_eng }}{% endif %}</div>{% endif %}
+        </div>
+        <div class="tk-sub" style="margin-left:auto;text-align:right">{% for texto, a in c.credito %}{% if a %}{% ficha a as href %}{% if href %}<a href="{{ href }}">{{ texto }}</a>{% else %}{{ texto }}{% endif %}{% else %}{{ texto }}{% endif %}{% empty %}—{% endfor %}</div>
+      </li>
+    {% endfor %}
+  </ol>
+{% endif %}{% endfor %}

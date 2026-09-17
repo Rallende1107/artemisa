@@ -1,0 +1,64 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{# Home de la sección Correo: estado del envío + cola + accesos. #}
+{% block content %}
+  <div class="page-head">
+    <div class="breadcrumbs"><a href="{% url 'panel:home' %}">panel</a><span class="sep">/</span><span>{{ page_title }}</span></div>
+    <h1 class="page-title">{{ page_title }}</h1>
+    <p class="page-sub">Plantillas, registro de envíos, cola y configuración de salida.</p>
+  </div>
+
+  {# ---- Estado del envío (master switch) ---- #}
+  <div class="mail-switch glass">
+    <div class="mail-switch__state">
+      <span class="dot {% if cfg.send_email %}on{% else %}off{% endif %}"></span>
+      <div>
+        <div class="mail-switch__title">Envío de correos: <strong>{% if cfg.send_email %}ACTIVADO{% else %}DESACTIVADO{% endif %}</strong></div>
+        <div class="mail-switch__sub">{% if cfg.send_email %}Los correos se envían por SMTP.{% else %}Los correos quedan EN COLA (se reenvían al activar).{% endif %}</div>
+      </div>
+    </div>
+    <div class="chip-row">
+      <form method="post" action="{% url 'panel:mail-config_toggle' %}">{% csrf_token %}
+        <input type="hidden" name="next" value="{% url 'panel:mailing-home' %}">
+        <button class="chip {% if cfg.send_email %}chip--danger{% else %}chip--accent{% endif %}" type="submit">
+          <span class="ico"><i class="bi bi-power"></i></span> {% if cfg.send_email %}Desactivar{% else %}Activar{% endif %} envío
+        </button>
+      </form>
+      <a class="chip" href="{% url 'panel:mail-config' %}"><span class="ico"><i class="bi bi-gear"></i></span> Configuración</a>
+    </div>
+  </div>
+
+  {% if pending %}
+    <form method="post" action="{% url 'panel:email-message_resend_pending' %}" style="margin:0 0 22px" data-confirm="¿Reenviar {{ pending }} correo(s) pendiente(s)?">{% csrf_token %}
+      <input type="hidden" name="next" value="{% url 'panel:mailing-home' %}">
+      <button class="chip chip--accent" type="submit"><span class="ico"><i class="bi bi-send-check"></i></span> Reenviar pendientes ({{ pending }})</button>
+    </form>
+  {% endif %}
+
+  {# ---- Accesos (título simple por grupo, mismo estilo que admin_panel/section_home.html) ---- #}
+  {% for g in groups %}
+    <section class="section">
+      <div class="section__head"><h2>{{ g.title }}</h2><span class="section__rule"></span></div>
+      <div class="card-grid">
+        {% for it in g.items %}
+          <a class="card{% if it.bg %} card--bg{% endif %}" href="{{ it.href }}"{% if it.bg %} style="--card-bg:url('{{ it.bg }}')"{% endif %}>
+            <div class="card__top"><div class="card__icon">{{ it.icon|safe }}</div></div>
+            <div class="card__name">{{ it.label }}</div>
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+  {% endfor %}
+
+  <style>
+    .mail-switch { display:flex; align-items:center; justify-content:space-between; gap:18px; flex-wrap:wrap;
+      padding:16px 18px; border-radius:14px; margin-bottom:20px; }
+    .mail-switch__state { display:flex; align-items:center; gap:14px; }
+    .mail-switch__title { font-size:15px; }
+    .mail-switch__sub { font-size:12.5px; color:var(--faint); }
+    .dot { width:12px; height:12px; border-radius:50%; flex:none; }
+    .dot.on { background:#38d39f; box-shadow:0 0 10px #38d39f88; }
+    .dot.off { background:#6b7d90; }
+    .section { margin-top: 22px; }
+  </style>
+{% endblock %}

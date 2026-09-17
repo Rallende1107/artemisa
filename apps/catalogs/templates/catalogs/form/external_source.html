@@ -1,0 +1,34 @@
+
+    <div class="field">
+      <label for="{{ form.name.id_for_label }}">{{ form.name.label }}{% if form.name.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.name }}
+      {% for e in form.name.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.name.help_text %}<span class="field__hint">{{ form.name.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.acronym.id_for_label }}">{{ form.acronym.label }}{% if form.acronym.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.acronym }}
+      {% for e in form.acronym.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.acronym.help_text %}<span class="field__hint">{{ form.acronym.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.url.id_for_label }}">{{ form.url.label }}{% if form.url.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.url }}
+      {% for e in form.url.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.url.help_text %}<span class="field__hint">{{ form.url.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.type.id_for_label }}">{{ form.type.label }}{% if form.type.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.type }}
+      {% for e in form.type.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.type.help_text %}<span class="field__hint">{{ form.type.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.description.id_for_label }}">{{ form.description.label }}{% if form.description.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.description }}
+      {% for e in form.description.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.description.help_text %}<span class="field__hint">{{ form.description.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      {% include 'admin_panel/_campo_imagen.html' with field=form.image %}
+    </div>

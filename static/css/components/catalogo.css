@@ -1,0 +1,229 @@
+/* COMPONENTE: catalogo  ↔  templates/catalog/list.html (catálogo PÚBLICO)
+   Tarjetas de portada con proporción fija: la imagen nunca rompe la grilla. */
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 18px; }
+
+.cards-grid .card {
+    position: relative; display: flex; flex-direction: column;
+    padding: 0; overflow: hidden; text-decoration: none; color: inherit;
+    background: linear-gradient(180deg, var(--glass-2), var(--glass));
+    border: 1px solid var(--border-soft); border-radius: 12px;
+    transition: border-color .16s, transform .16s, box-shadow .16s;
+}
+.cards-grid .card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 12px 34px rgba(0,0,0,.5); }
+.cards-grid .card:hover .card-title { color: var(--accent); }
+
+.card-image-container {
+    aspect-ratio: 2/3; background: var(--glass-2);
+    display: grid; place-items: center; overflow: hidden;
+}
+.card-image-container img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .16s; }
+.cards-grid .card:hover .card-image-container img { transform: scale(1.04); }
+.card-initial-badge { font-size: 42px; font-family: var(--mono); color: var(--faint); }
+
+.cards-grid .card-title { font-size: 13.5px; font-weight: 600; line-height: 1.25; padding: 10px 12px 2px; }
+.cards-grid .card-sub { font-family: var(--mono); font-size: 11px; color: var(--muted); padding: 0 12px 12px; }
+
+/* Variante COMPACTA (estilo F95) para las secciones de una ficha:
+   cover APAISADA (no retrato), título y año debajo */
+.cards-grid--wide { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+.cards-grid--wide .card-image-container { aspect-ratio: 16/9; }
+.cards-grid--wide .card-initial-badge { font-size: 28px; }
+
+/* ---- Catálogo a ancho completo + barra de filtros + modo lista ---- */
+.cat-wrap { width: 100%; padding: 0 36px; }
+@media (max-width: 860px) { .cat-wrap { padding: 0 16px; } }
+
+.filtros { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 0 0 22px; }
+.filtros input[type=search] { background: var(--glass-2); color: var(--text); font-size: 13px;
+  border: 1px solid var(--border-soft); border-radius: 8px; padding: 8px 14px; min-width: 220px; }
+.filtros input[type=search]:focus { outline: none; border-color: var(--accent); }
+.filtros__spacer { margin-left: auto; }
+
+.fdrop { position: relative; }
+.fdrop > summary { list-style: none; cursor: pointer; user-select: none; display: flex; gap: 8px;
+  align-items: center; padding: 8px 14px; border: 1px solid var(--border-soft); border-radius: 8px;
+  background: var(--elevated); font-size: 13px; color: var(--text-2); }
+.fdrop > summary::-webkit-details-marker { display: none; }
+.fdrop > summary::after { content: "▾"; font-size: 10px; color: var(--muted); }
+.fdrop[open] > summary { border-color: var(--accent); color: var(--accent); }
+.fdrop__panel { position: absolute; z-index: 40; top: calc(100% + 6px); left: 0; min-width: 340px;
+  max-width: min(560px, 80vw); max-height: 320px; overflow: auto; background: var(--elevated);
+  border: 1px solid var(--border); border-radius: 12px; padding: 14px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 6px 14px;
+  box-shadow: 0 18px 40px rgba(0,0,0,.55); }
+.fdrop__panel--anios { grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); min-width: 300px; }
+.fdrop__panel label { display: flex; gap: 8px; align-items: center; font-size: 12.5px;
+  color: var(--text-2); cursor: pointer; white-space: nowrap; }
+.fdrop__panel label:hover { color: var(--accent); }
+
+.f-sel { height: 36px; padding: 0 10px; background: var(--elevated); border: 1px solid var(--border-soft);
+  border-radius: 8px; color: var(--text-2); font-size: 13px; }
+/* Filtrar y Limpiar son HOMÓLOGOS: misma píldora contorneada, colores
+   distintos (Filtrar = acento cian, Limpiar = warning fucsia) */
+.btn-filtrar { font-size: 13px; color: var(--accent); padding: 8px 12px;
+  border: 1px solid rgba(0, 174, 239, .55); border-radius: 8px; text-align: center;
+  background: rgba(0, 174, 239, .08); font-weight: 600; cursor: pointer; }
+.btn-filtrar:hover { color: #d9fbff; border-color: var(--accent); background: rgba(0, 174, 239, .18);
+  box-shadow: 0 0 14px var(--accent-glow); }
+/* Píldora neutra (también la usa la paginación) */
+.f-limpiar { font-size: 13px; color: var(--muted); padding: 8px 12px; border: 1px solid var(--border-soft);
+  border-radius: 8px; text-decoration: none; }
+.f-limpiar:hover { color: var(--accent); border-color: var(--accent); }
+
+/* «Limpiar» de los filtros en WARNING neón (tríada: --warn) */
+.f-warn { font-size: 13px; color: var(--warn); padding: 8px 12px; border: 1px solid var(--warn);
+  border-radius: 8px; text-decoration: none; text-align: center; background: rgba(236, 0, 140, .08);
+  font-weight: 600; }
+.f-warn:hover { color: #ffd7f0; border-color: var(--warn); background: rgba(236, 0, 140, .18);
+  box-shadow: 0 0 14px var(--warn-glow); }
+
+.cat-toggle { display: flex; gap: 4px; }
+.cat-toggle button { width: 34px; height: 34px; border-radius: 8px; background: var(--glass-2);
+  border: 1px solid var(--border-soft); color: var(--muted); cursor: pointer; font-size: 15px; }
+.cat-toggle button.on { color: var(--accent); border-color: var(--accent); }
+
+.cat-list { display: grid; gap: 8px; }
+.cat-row { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center;
+  padding: 8px 14px 8px 8px; border: 1px solid var(--border-soft); border-radius: 10px;
+  background: linear-gradient(180deg, var(--glass-2), var(--glass)); text-decoration: none;
+  color: inherit; transition: border-color .14s; }
+.cat-row:hover { border-color: var(--accent); }
+.cat-row__thumb { width: 40px; height: 56px; border-radius: 6px; overflow: hidden; flex: none;
+  background: var(--glass); display: grid; place-items: center; font-family: var(--mono);
+  color: var(--faint); border: 1px solid var(--border-soft); }
+.cat-row__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cat-row__title { font-size: 13.5px; font-weight: 600; }
+.cat-row__sub { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+
+/* `hidden` debe ganar al display de las clases (toggle tarjetas/lista) */
+.cards-grid[hidden], .cat-list[hidden] { display: none; }
+
+/* ---- Panel lateral de FILTROS (estilo F95) ---- */
+.fpanel { position: absolute; right: 36px; z-index: 50; width: 340px; max-width: 90vw;
+  background: var(--glass-2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border); border-radius: 14px;
+  box-shadow: 0 22px 50px rgba(0,0,0,.6); padding: 0 0 0; overflow: hidden; }
+.fpanel[hidden] { display: none; }
+.fpanel__head { display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; border-bottom: 1px solid var(--border-soft);
+  font-size: 13px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .05em; }
+.fpanel__reset { background: none; border: none; cursor: pointer; color: var(--muted);
+  font-size: 14px; text-decoration: none; padding: 2px 6px; }
+.fpanel__reset:hover { color: var(--accent); }
+.fpanel__sec { padding: 12px 16px; border-bottom: 1px solid var(--border-soft); }
+.fpanel__sec h5 { font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 9px; }
+.fpanel__grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 12px; }
+.fpanel__grid--anios { grid-template-columns: repeat(4, 1fr); }
+.fpanel__grid--scroll { max-height: 180px; overflow: auto; }
+.fpanel__grid label { display: flex; gap: 7px; align-items: center; font-size: 12.5px;
+  color: var(--text-2); cursor: pointer; }
+.fpanel__grid label:hover { color: var(--accent); }
+.fpanel__buscar { width: 100%; margin-bottom: 8px; background: var(--glass); color: var(--text);
+  border: 1px solid var(--border-soft); border-radius: 7px; padding: 6px 10px; font-size: 12.5px; }
+/* Filtrar y Limpiar APILADOS (uno sobre el otro), sin llegar a los bordes */
+.fpanel__acciones { display: flex; flex-direction: column; gap: 8px;
+  align-items: stretch; padding: 12px 16px; }
+.fpanel__foot { padding: 11px 16px; font-size: 12.5px; color: var(--muted);
+  background: var(--glass); display: flex; gap: 8px; align-items: center; }
+.f-activos { color: var(--accent); border-color: var(--accent); }
+
+/* Paginación en línea (junto al buscador) */
+.pager--inline { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.pager--inline .f-limpiar { padding: 6px 10px; }
+.pager__on { color: var(--bg-0) !important; background: var(--accent); border-color: var(--accent) !important; }
+
+/* ---- Panel de filtros como COLUMNA del layout (no flota) ---- */
+.cat-cuerpo { display: flex; gap: 22px; align-items: flex-start; }
+.cat-main { flex: 1; min-width: 0; }
+.fpanel { position: sticky; top: 68px; right: auto; width: 300px; flex: none;
+  max-height: calc(100vh - 90px); overflow: auto; }
+@media (max-width: 900px) { .cat-cuerpo { flex-direction: column-reverse; } .fpanel { position: static; width: 100%; max-height: none; } }
+
+/* Secciones CONTRAÍBLES del panel */
+.fpanel__sec > summary { list-style: none; cursor: pointer; user-select: none;
+  display: flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--muted); }
+.fpanel__sec > summary::-webkit-details-marker { display: none; }
+.fpanel__sec > summary::after { content: "▾"; margin-left: auto; font-size: 10px; }
+.fpanel__sec:not([open]) > summary::after { content: "▸"; }
+.fpanel__sec[open] > summary { color: var(--accent); }
+.fpanel__sec h5 { display: none; }
+.fpanel__body { padding-top: 10px; }
+.fsec-n { color: var(--accent); font-family: var(--mono); }
+.fpanel__grid--una { grid-template-columns: 1fr; }
+
+/* OR / AND del género */
+.fmodo { margin-left: auto; display: inline-flex; gap: 4px; font-size: 10px; letter-spacing: 0; text-transform: none; }
+.fmodo label { cursor: pointer; color: var(--faint); padding: 1px 5px; border-radius: 5px; }
+.fmodo label.on, .fmodo label:has(input:checked) { color: var(--accent); background: var(--surface); }
+.fmodo input { display: none; }
+.fpanel__sec > summary .fmodo { margin-right: 10px; }
+
+/* Selector de tags (buscar → lista con conteos → chips ×) */
+.tsel__lista { display: grid; gap: 2px; max-height: 210px; overflow: auto; margin-bottom: 8px;
+  border: 1px solid var(--border-soft); border-radius: 8px; padding: 6px; background: var(--surface); }
+.tsel__lista button { display: flex; justify-content: space-between; gap: 10px; text-align: left;
+  background: none; border: none; color: var(--text-2); font-size: 12.5px; padding: 5px 8px;
+  border-radius: 6px; cursor: pointer; }
+.tsel__lista button:hover { background: var(--elevated); color: var(--accent); }
+.tsel__lista button span { color: var(--faint); font-family: var(--mono); font-size: 11px; }
+.tsel__chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.tchip { font-size: 12px; padding: 4px 9px; border-radius: 7px; cursor: pointer; user-select: none;
+  background: var(--surface); border: 1px solid var(--accent); color: var(--accent); }
+.tchip:hover { filter: brightness(1.2); }
+.tsel__chips--x .tchip { border-color: var(--danger); color: var(--danger); }
+
+/* hidden gana también en la lista de tags */
+.tsel__lista[hidden] { display: none; }
+
+/* conteo junto al checkbox de genero */
+.fpanel__grid .fnum { color: var(--faint); font-family: var(--mono); font-size: 10.5px; margin-left: auto; }
+
+/* Boton Filtros: misma familia que los toggles de vista */
+.btn-filtros { height: 34px; padding: 0 13px; border-radius: 8px; background: var(--glass-2);
+  border: 1px solid var(--border-soft); color: var(--muted); cursor: pointer; font-size: 13px; }
+.btn-filtros:hover, .btn-filtros.f-activos { color: var(--accent); border-color: var(--accent); }
+
+/* ---- DataTable PÚBLICA (catálogo y Mi colección): barra propia, tabla y tarjetas del catálogo ---- */
+.filtros__buscar .dt-search { display: flex; align-items: center; gap: 0; }
+.filtros__buscar .dt-search label { display: none; }
+.filtros__buscar .dt-search input { width: 260px; max-width: 60vw; height: 36px; padding: 0 10px 0 34px; border-radius: 8px;
+  background-color: var(--elevated); background-repeat: no-repeat; background-position: 10px center; background-size: 15px 15px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%2300e5ff'><path d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398l3.85 3.85a1 1 0 0 0 1.415-1.414zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0'/></svg>");
+  border: 1px solid var(--border-soft); color: var(--text); font-size: 13.5px; }
+.filtros__buscar .dt-search input:focus { outline: none; border-color: var(--accent); }
+/* filas de la lista: miniatura + título */
+.cat-main .dt-thumb { width: 34px; height: 48px; object-fit: cover; border-radius: 5px; vertical-align: middle; margin-right: 10px;
+  border: 1px solid var(--border-soft); background: var(--surface-1); }
+.cat-main td a.dt-title { color: var(--text); font-weight: 600; text-decoration: none; }
+.cat-main td a.dt-title:hover { color: var(--accent); }
+.cat-toggle .view-toggle-btn { width: 34px; height: 34px; border-radius: 8px; background: var(--glass-2); color: var(--text-2);
+  border: 1px solid var(--border-soft); cursor: pointer; font-size: 15px; }
+.cat-toggle .view-toggle-btn.active { color: var(--accent); border-color: var(--accent); }
+.cat-main .dt-wrap { min-width: 0; }
+.cat-main .dt-info { color: var(--muted); font-family: var(--mono); font-size: 12px; }
+.cat-main .cards-grid .card-sub { color: var(--muted); font-size: 12px; padding: 0 10px 10px; font-family: var(--mono); }
+.cat-btn { display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 11px; border-radius: 20px; font-size: 12.5px;
+  background: transparent; color: var(--accent); border: 1px solid var(--accent); cursor: pointer; text-decoration: none; white-space: nowrap; }
+.cat-btn:hover { background: var(--accent); color: #001014; }
+.cat-btn--ok { background: var(--accent); color: #001014; border-color: var(--accent); }
+.cat-btn--ok:hover { background: transparent; color: var(--danger); border-color: var(--danger); }
+/* paginación e info de la DataTable pública: visibles sobre el fondo (también los botones inactivos) */
+.cat-main .dt-paging .dt-paging-button { min-width: 34px; height: 34px; margin: 0 2px; border-radius: 8px; background: var(--glass-2);
+  border: 1px solid var(--border-soft); color: var(--text-2); font-family: var(--mono); font-size: 12.5px; cursor: pointer; }
+.cat-main .dt-paging .dt-paging-button:hover:not(.disabled) { color: var(--accent); border-color: var(--accent); }
+.cat-main .dt-paging .dt-paging-button.current { color: var(--accent); border-color: var(--accent); background: var(--elevated); }
+.cat-main .dt-paging .dt-paging-button.disabled { opacity: .45; cursor: default; }
+.cat-main .dt-layout-row { margin: 8px 0; }
+/* el pie de la tarjeta (estado, Añadir/Quitar, Editar) es SUYO: al pasar por él la tarjeta no se ilumina */
+.cat-main .cards-grid .card:has(.card-actions:hover) { border-color: var(--border-soft) !important; transform: none !important; box-shadow: none !important; }
+.cat-main .cards-grid .card:has(.card-actions:hover) .card-title { color: var(--text) !important; }
+.cat-main .cards-grid .card:has(.card-actions:hover) .card-image-container img { transform: none !important; }
+/* pie de la tarjeta: una línea (estado + editar), centrado y con aire, sin tocar los bordes */
+.cat-main .cards-grid .card .card-actions { display: flex; justify-content: center; align-items: center; gap: 6px; padding: 6px 12px 12px; }
+.cat-main .cards-grid .card .card-actions .st-inline { flex: 1; min-width: 0; height: 28px; font-size: 12px; }
+.cat-main .cards-grid .card .card-actions .cat-btn { max-width: 100%; }
+/* botones de acción de la tabla: mismo ancho para que «Añadir» y «En mi colección» queden alineados */
+.cat-main td.td-actions { text-align: right; }
+.cat-main td .cat-btn { min-width: 150px; justify-content: center; }

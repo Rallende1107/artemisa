@@ -1,0 +1,33 @@
+{% extends 'detail/base_detail.html' %}
+{% load i18n ficha %}
+{% comment %}FICHA de colección de personas (gestión): sus datos en el lateral (una fila por campo) y los textos largos en el cuerpo.
+Lo propio de esta entidad se escribe AQUÍ; la Ficha técnica (id, slug, activo, fechas) la pone el cuadro.{% endcomment %}
+
+{% block side %}
+  {% if object.user %}<div class="mal-row"><span class="k">{% trans 'Usuario' %}:</span><span class="v">{% ficha object.user as href %}{% if href %}<a href="{{ href }}">{{ object.user }}</a>{% else %}{{ object.user }}{% endif %}</span></div>{% endif %}
+  {% if object.content %}<div class="mal-row"><span class="k">{% trans 'Contenido' %}:</span><span class="v">{% ficha object.content as href %}{% if href %}<a href="{{ href }}">{{ object.content }}</a>{% else %}{{ object.content }}{% endif %}</span></div>{% endif %}
+  {% if object.status %}<div class="mal-row"><span class="k">{% trans 'Estado' %}:</span><span class="v">{{ object.get_status_display }}</span></div>{% endif %}
+  {% if object.score %}<div class="mal-row"><span class="k">{% trans 'Puntuación' %}:</span><span class="v">{{ object.score }}</span></div>{% endif %}
+  <div class="mal-row"><span class="k">{% trans 'Favorito' %}:</span><span class="v">{{ object.is_favorite|yesno:_("Sí,No") }}</span></div>
+  {% if object.watch_site %}<div class="mal-row"><span class="k">{% trans 'Lo ve en' %}:</span><span class="v">{% ficha object.watch_site as href %}{% if href %}<a href="{{ href }}">{{ object.watch_site }}</a>{% else %}{{ object.watch_site }}{% endif %}</span></div>{% endif %}
+  {% if object.download_site %}<div class="mal-row"><span class="k">{% trans 'Lo descargó de' %}:</span><span class="v">{% ficha object.download_site as href %}{% if href %}<a href="{{ href }}">{{ object.download_site }}</a>{% else %}{{ object.download_site }}{% endif %}</span></div>{% endif %}
+  {% if object.download_format %}<div class="mal-row"><span class="k">{% trans 'Formato' %}:</span><span class="v">{% ficha object.download_format as href %}{% if href %}<a href="{{ href }}">{{ object.download_format }}</a>{% else %}{{ object.download_format }}{% endif %}</span></div>{% endif %}
+  {% if object.download_quality %}<div class="mal-row"><span class="k">{% trans 'Calidad' %}:</span><span class="v">{% ficha object.download_quality as href %}{% if href %}<a href="{{ href }}">{{ object.download_quality }}</a>{% else %}{{ object.download_quality }}{% endif %}</span></div>{% endif %}
+{% endblock %}
+
+{% block cuerpo %}
+  <section class="dsection" data-tab="detalles" data-label="{% trans 'Detalles' %}" style="padding-top:0;">
+    <p class="page-sub">{% trans 'Sin textos largos: todo está en el lateral y en la ficha técnica.' %}</p>
+  </section>
+  {% if es_gestion %}
+  {# Ficha técnica (solo gestión): lo que el registro ES — id, slug, activo, fechas. Muévela o amplíala aquí. #}
+  <section class="dsection" data-tab="tecnica" data-label="{% trans 'Ficha técnica' %}" style="padding-top:0;">
+    <h3>{% trans 'Ficha técnica' %}</h3>
+    <div class="mal-row"><span class="k">Id:</span><span class="v">{{ object.pk }}</span></div>
+    {% if object.slug %}<div class="mal-row"><span class="k">Slug:</span><span class="v">{{ object.slug }}</span></div>{% endif %}
+    {% if object.is_active is not None %}<div class="mal-row"><span class="k">{% trans 'Activo' %}:</span><span class="v">{{ object.display_is_active }}</span></div>{% endif %}
+    {% if object.created_at %}<div class="mal-row"><span class="k">{% trans 'Creado' %}:</span><span class="v">{{ object.display_created }}</span></div>{% endif %}
+    {% if object.updated_at %}<div class="mal-row"><span class="k">{% trans 'Actualizado' %}:</span><span class="v">{{ object.display_updated }}</span></div>{% endif %}
+  </section>
+  {% endif %}
+{% endblock %}

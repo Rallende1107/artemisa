@@ -1,0 +1,5 @@
+{% comment %}Acciones del correo enviado (solo lectura): Reenviar + Borrar. Arriba y abajo.{% endcomment %}
+<form method="post" action="{% url 'panel:email-message_resend' object.pk %}" style="display:inline">{% csrf_token %}
+  <button class="chip" type="submit"><span class="ico"><i class="bi bi-send"></i></span> Reenviar</button>
+</form>
+<a class="chip chip--danger js-delete" href="{% url 'panel:email-message_delete' object.pk %}" data-name="correo a {{ object.to_email }}"><span class="ico"><i class="bi bi-trash"></i></span> Borrar</a>

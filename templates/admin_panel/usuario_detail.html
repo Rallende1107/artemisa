@@ -1,0 +1,5 @@
+{% extends 'admin_panel/detail.html' %}
+
+{# Acciones de usuario (solo superusuario). Mismas arriba y abajo → un partial. #}
+{% block detail_actions_top %}{% include 'admin_panel/_usuario_actions.html' %}{% endblock %}
+{% block detail_actions %}{% include 'admin_panel/_usuario_actions.html' %}{% endblock %}

@@ -1,0 +1,13 @@
+{% comment %} Campos de año — patrón Hades/Poseidon.
+   PARCIAL que INCLUYE admin_panel/form.html (el cuadro: card, botones, csrf) porque la
+   vista Create/Update lo declara: form_template = "…/form/<modelo>.html".
+   Edita libremente el orden/HTML de cada campo aquí. Los booleanos se
+   auto-agrupan abajo, no van en este bloque.
+   Sincroniza:  python manage.py sync_forms  {% endcomment %}
+
+    <div class="field">
+      <label for="{{ form.year.id_for_label }}">{{ form.year.label }}{% if form.year.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.year }}
+      {% for e in form.year.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.year.help_text %}<span class="field__hint">{{ form.year.help_text }}</span>{% endif %}
+    </div>

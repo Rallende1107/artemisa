@@ -1,0 +1,242 @@
+/* COMPONENTE: form  ↔  crear / editar (mismo estilo en admin, perfil y contacto)
+   Estilo Hades: card CENTRADA, ancha, SEMITRANSPARENTE con borde cian,
+   campos que llenan el ancho en varias columnas responsivas. */
+.form-card {
+  width: 100%; max-width: 1500px; margin: 0 auto;      /* centrada + más ancha (usa ~85% en 1920px) */
+  background: var(--panel);                            /* semitransparente (glass) */
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);                     /* borde cian visible */
+  border-radius: var(--radius);
+  padding: 30px 30px 24px;
+  /* sin box-shadow (pedido): la card queda plana sobre el fondo */
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));   /* auto-FIT: columnas vacías colapsan y los campos llenan el ancho; min(...,100%) evita overflow en pantallas angostas */
+  gap: 16px 18px;
+}
+.form-grid .full { grid-column: 1 / -1; }
+/* MÓVIL-SEGURO: los items del grid pueden ENCOGER. Sin esto, el min-content de
+   un input ancho (p. ej. el selector de archivo nativo, ~340px indivisible)
+   ensancha el track 1fr y DESBORDA la página en pantallas angostas. */
+.form-grid > * { min-width: 0; }
+.form-grid .form-row > .field { min-width: 0; }
+.field input:not([type="checkbox"]):not([type="radio"]), .field select { width: 100%; min-width: 0; }
+/* Campos "grandes" (texto largo, selección múltiple) ocupan toda la fila */
+.form-grid .field:has(textarea) { grid-column: 1 / -1; }
+.form-grid .field:has(select[multiple]) { grid-column: 1 / -1; }
+/* Selector de archivo: fila COMPLETA (si comparte fila, el nombre del archivo se corta). */
+.form-grid .field:has(input[type="file"]) { grid-column: 1 / -1; }
+
+/* ── Utilidades de ANCHO por campo ───────────────────────────────────────────
+   Úsalas en la plantilla de la entidad (apps/<app>/templates/<app>/form/<x>.html):
+   añade la clase al <div class="field ...">.
+     col-full → ocupa toda la fila (un campo solo por fila)
+     col-2    → ocupa 2 columnas
+     col-3    → ocupa 3 columnas
+   Para forzar N columnas EXACTAS en TODO un formulario, pon la clase en el
+   <div class="form-grid"> del bloque: grid-2 / grid-3.                        */
+.form-grid .field.col-full { grid-column: 1 / -1; }
+.form-grid .field.col-2 { grid-column: span 2; }
+.form-grid .field.col-3 { grid-column: span 3; }
+.form-grid.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.form-grid.grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+/* ── AGRUPADOR DE FILA (modelo "fila → columnas", tipo row > col) ─────────────
+   Envuelve varios <div class="field"> en <div class="form-row"> y esa fila ocupa
+   TODO el ancho; sus campos se reparten en columnas iguales según CUÁNTOS metas:
+     fila con 2 campos → 2 columnas
+     fila con 1 campo  → 1 columna (fila completa)
+     fila con 3 campos → 3 columnas
+   Así controlás fila por fila sin depender del auto-fill global.               */
+.form-grid .form-row {
+  grid-column: 1 / -1;                                        /* la fila toma todo el ancho */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); /* columnas iguales; min(...,100%) evita overflow en móvil */
+  gap: 16px 18px;
+}
+/* Anchos asimétricos opcionales dentro de una fila (p. ej. principal más ancho): */
+.form-grid .form-row.form-row-2-1 { grid-template-columns: 2fr 1fr; }
+.form-grid .form-row.form-row-1-2 { grid-template-columns: 1fr 2fr; }
+
+.field { display: flex; flex-direction: column; gap: 7px; }
+.field label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.field label .req { color: var(--accent); }
+.field input, .field select, .field textarea {
+  height: 42px; padding: 0 13px;
+  background: var(--surface); border: 1px solid var(--border-soft); border-radius: 9px;
+  color: var(--text); font-size: 14px; font-family: inherit;
+  transition: border-color .15s, box-shadow .15s;
+}
+.field textarea { height: auto; padding: 11px 13px; resize: vertical; min-height: 84px; }
+/* Campos numéricos: ocultar las flechas ▲▼ nativas (aumentar/disminuir). */
+.field input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+.field input[type="number"]::-webkit-inner-spin-button,
+.field input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-10); }
+.field input::placeholder { color: var(--faint); }
+/* Select nativo: sin la flecha del navegador (inconsistente); chevron propia a tono. */
+.field select {
+  -webkit-appearance: none; -moz-appearance: none; appearance: none;
+  padding-right: 36px; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16' fill='none' stroke='%237a7a8c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 13px center;
+}
+.field select option { background: var(--elevated); color: var(--text); }
+
+/* Input de archivo: sin caja (quedaba un recuadro ancho medio vacío); solo el botón
+   tematizado + el nombre del archivo. Va en fila completa (no se corta el nombre). */
+.field input[type="file"] { height: auto; padding: 7px 10px; line-height: 1.6; color: var(--muted); font-size: 13px; background: var(--surface); border: 1px solid var(--border-soft); border-radius: 9px; }
+.field input[type="file"]::file-selector-button {
+  margin-right: 12px; padding: 7px 14px;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--accent-08); color: var(--accent);
+  font-weight: 600; font-size: 12.5px; cursor: pointer;
+  transition: background .12s, border-color .12s, color .12s;
+}
+.field input[type="file"]::file-selector-button:hover {
+  background: var(--accent-12); border-color: var(--accent); color: var(--text);
+}
+
+/* Checkbox/radio con NUESTRO estilo (oscuro + check cian), no el nativo blanco.
+   appearance:none para dibujarlos nosotros (el accent-color solo pinta el marcado).
+   Cubre booleanos (Activo/Es staff…) y el «Eliminar» del selector de imagen. */
+.form-card input[type="checkbox"], .form-card input[type="radio"] {
+  -webkit-appearance: none; appearance: none;
+  width: 18px; height: 18px; padding: 0; margin: 0 6px 0 0; flex: none;
+  background: var(--surface); border: 1px solid var(--border-soft);
+  border-radius: 5px; cursor: pointer; position: relative; vertical-align: middle;
+  transition: background .14s, border-color .14s, box-shadow .14s;
+}
+.form-card input[type="radio"] { border-radius: 50%; }
+.form-card input[type="checkbox"]:hover, .form-card input[type="radio"]:hover { border-color: var(--accent); }
+.form-card input[type="checkbox"]:checked, .form-card input[type="radio"]:checked {
+  background: var(--accent); border-color: var(--accent);
+}
+.form-card input[type="checkbox"]:checked::after {
+  content: ""; position: absolute; left: 5px; top: 1px; width: 4px; height: 9px;
+  border: solid #06121a; border-width: 0 2px 2px 0; transform: rotate(45deg);
+}
+.form-card input[type="radio"]:checked::after {
+  content: ""; position: absolute; inset: 4px; border-radius: 50%; background: #06121a;
+}
+.form-card input[type="checkbox"]:focus-visible, .form-card input[type="radio"]:focus-visible {
+  outline: none; box-shadow: 0 0 0 3px var(--accent-10);
+}
+
+/* Check + texto en una línea, alineados verticalmente (aceptar términos, etc.). */
+.check-inline { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; color: var(--muted); line-height: 1.4; }
+.check-inline input[type="checkbox"] { flex: none; margin: 0; width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+.check-inline a { color: var(--accent); }
+
+/* Previsualización de la imagen ACTUAL al editar (encima del selector de archivo). */
+.img-preview {
+  position: relative; width: 128px; height: 128px; margin-bottom: 4px;
+  border-radius: 10px; overflow: hidden;
+  border: 1px solid var(--border-soft); background: var(--elevated-2, var(--surface));
+}
+.img-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.img-preview__tag {
+  position: absolute; bottom: 6px; left: 6px; padding: 1px 7px; border-radius: 20px;
+  background: rgba(0,0,0,.6); color: var(--muted); font-size: 10px; font-family: var(--mono);
+}
+
+/* Mini-panel «Opciones»: agrupa los booleanos (is_active, +18…) aparte de los
+   campos de texto — estilo Hades (form__checkbox). */
+.form-checkbox {
+  margin-top: 22px; padding: 15px 18px;
+  background: var(--surface); border: 1px solid var(--border-soft); border-radius: 12px;
+}
+.form-checkbox__title {
+  display: block; font-family: var(--mono); font-size: 11px; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 13px;
+}
+.form-checkbox__grid { display: flex; flex-wrap: wrap; gap: 14px 26px; }
+.form-checkbox .opt {
+  display: inline-flex; align-items: center; gap: 9px; cursor: pointer;
+  color: var(--text-2); font-size: 13.5px;
+}
+.form-checkbox .opt:hover { color: var(--text); }
+.form-checkbox .opt input[type="checkbox"] {
+  width: 18px; height: 18px; padding: 0; flex: none; accent-color: var(--accent); cursor: pointer;
+}
+
+/* Toggle (checkbox estilizado) */
+.check-row { display: flex; align-items: center; gap: 10px; padding: 4px 0; }
+.check-row .box { width: 40px; height: 22px; border-radius: 20px; background: var(--elevated-2); border: 1px solid var(--border-soft); position: relative; flex: none; cursor: pointer; }
+.check-row .box.on { background: var(--accent-12); border-color: var(--accent); }
+.check-row .box::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--muted); transition: transform .16s, background .16s; }
+.check-row .box.on::after { transform: translateX(18px); background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
+.check-row label { font-size: 13.5px; color: var(--text); }
+
+.form-actions { display: flex; justify-content: center; gap: 12px; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border-soft); }
+
+
+/* Selector de color por muestras (estados de colección). */
+.swatches { display: flex; flex-wrap: wrap; gap: 9px; }
+.sw { width: 34px; height: 34px; border-radius: 9px; border: 2px solid transparent; background: var(--sw); cursor: pointer; padding: 0; transition: transform .12s; }
+.sw:hover { transform: scale(1.08); }
+.sw.is-sel { border-color: #fff; box-shadow: 0 0 0 2px var(--sw); }
+
+/* "Ver contraseña" (lo instala public.js en todo input[type=password]):
+   el ojo va DENTRO del campo, a la derecha; el input cede ese espacio. */
+.pwd-wrap { position: relative; display: block; }
+.pwd-wrap input { width: 100%; padding-right: 42px; }
+.pwd-toggle {
+  position: absolute; top: 50%; right: 8px; transform: translateY(-50%);
+  background: none; border: 0; padding: 4px 6px; cursor: pointer;
+  color: var(--muted); font-size: 15px; line-height: 1;
+}
+.pwd-toggle:hover { color: var(--accent); }
+
+/* Prefijo fijo pegado a un input (p. ej. +56 del teléfono). */
+.input-prefix { display: flex; align-items: stretch; }
+.input-prefix > span {
+  display: flex; align-items: center; padding: 0 12px;
+  background: var(--accent-03); border: 1px solid var(--border-soft); border-right: 0;
+  border-radius: 9px 0 0 9px; color: var(--muted);
+  font-family: var(--mono); font-size: 13px; white-space: nowrap;
+}
+.input-prefix input { flex: 1; border-radius: 0 9px 9px 0; }
+
+/* Campo IMAGEN: miniatura chica a la IZQUIERDA (el detalle lo da «Ver imagen»
+   en el lightbox) y TODO el resto del ancho para los controles. Sin centrar:
+   ocupa la fila como cualquier campo, sin espacio muerto. */
+.img-field {
+  display: grid; grid-template-columns: auto minmax(min(240px, 100%), 1fr);
+  gap: 18px; align-items: start;
+}
+.img-field .img-slot {
+  margin: 0; display: flex; flex-direction: column; gap: 6px;
+  border: 1px solid var(--border-soft); border-radius: 12px; padding: 10px;
+  background: var(--surface);
+}
+.img-field .img-slot figcaption {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--muted); text-align: center;
+}
+.img-field .img-preview {
+  width: 150px; height: 150px; max-width: none; margin: 0;
+  display: grid; place-items: center;
+}
+.img-field .img-preview img { width: 100%; height: 100%; object-fit: contain; cursor: zoom-in; }
+.img-field .img-preview img[hidden] { display: none; }   /* respeta hidden (el display:block genérico lo pisaba) */
+.img-field .img-empty { color: var(--faint); font-size: 12.5px; }
+/* Controles: llenan el resto del ancho */
+.img-field .img-controls { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.img-field .img-controls input[type="file"] { width: 100%; min-width: 0; }
+.img-field .img-controls button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  height: 38px; padding: 0 14px; border-radius: 9px; font-size: 13px;
+  background: transparent; color: var(--text-2); border: 1px solid var(--border-soft);
+  cursor: pointer; transition: all .12s;
+}
+.img-field .img-controls button:hover { color: var(--accent); border-color: var(--accent); }
+.img-field .js-img-clear:hover { color: var(--danger); border-color: var(--danger-22); background: var(--danger-08); }
+.img-field .js-img-clear.on { color: var(--danger); border-color: var(--danger-22); background: var(--danger-08); font-weight: 700; }
+/* "Eliminar" marcado → la imagen se apaga (feedback inmediato) */
+.img-field.js-clearing .img-preview { opacity: .35; filter: grayscale(1); }
+@media (max-width: 560px) {
+  .img-field { grid-template-columns: 1fr; }
+  .img-field .img-slot { display: none; }   /* en chico: sin miniatura, formulario normal */
+}

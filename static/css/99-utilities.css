@@ -1,0 +1,27 @@
+/* =====================================================================
+   99-utilities.css  ·  utilidades + breakpoints globales (SIEMPRE al final)
+   Gana a propósito sobre todo lo anterior (regla 3 del LEEME).
+   ===================================================================== */
+
+/* Responsive: header + sidebar + main */
+@media (max-width: 900px) {
+    .header__brand { min-width: auto; }
+    .brand-txt { display: none; }
+    .sidebar { transform: translateX(-100%); box-shadow: 0 0 40px rgba(0, 0, 0, 0.6); }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; padding: 22px 18px 0; }
+    .footer { margin: 28px -18px 0; padding: 16px 18px; }
+    .lang { display: none; }
+}
+@media (max-width: 560px) {
+    .user-chip span { display: none; }
+    .toolbar__search { min-width: 0; width: 100%; margin-left: 0; order: 3; }
+    .form-grid { grid-template-columns: 1fr; }
+    .form-grid .form-row { grid-template-columns: 1fr; }   /* las filas también caen a 1 columna */
+    .form-grid .form-row-2-1, .form-grid .form-row-1-2 { grid-template-columns: 1fr; }
+    .detail-grid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}

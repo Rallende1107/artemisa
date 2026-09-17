@@ -1,0 +1,10 @@
+/* COMPONENTE: pager  ↔  partials/_pager.html */
+.pager { display: flex; gap: 4px; }
+.pager button {
+  min-width: 30px; height: 30px; padding: 0 8px;
+  background: var(--surface); color: var(--muted);
+  border: 1px solid var(--border-soft); border-radius: 6px;
+  font-size: 12.5px; font-variant-numeric: tabular-nums;
+}
+.pager button:hover { color: var(--text); border-color: var(--border); }
+.pager button.active { color: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }

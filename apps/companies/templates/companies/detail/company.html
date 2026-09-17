@@ -1,0 +1,61 @@
+{% extends 'detail/base_detail.html' %}
+{% load i18n ficha %}
+{% comment %}FICHA de compañía (gestión y público): fundación, disolución y país en el lateral (y el MAL id si tiene ficha MAL); biografía y sus obras
+en TODOS los medios, un grupo por papel (`obras()` del modelo).
+Lo propio de esta entidad se escribe AQUÍ; la Ficha técnica (id, slug, activo, fechas) la pone el cuadro.{% endcomment %}
+
+{% block side %}
+  {% if object.founded_year %}<div class="mal-row"><span class="k">{% trans 'Fundada' %}:</span><span class="v">{{ object.founded_year }}</span></div>{% endif %}
+  {% if object.disolved_year %}<div class="mal-row"><span class="k">{% trans 'Disuelta' %}:</span><span class="v">{{ object.disolved_year }}</span></div>{% endif %}
+  {% if object.country %}<div class="mal-row"><span class="k">{% trans 'País' %}:</span><span class="v">{{ object.country }}</span></div>{% endif %}
+  {% if object.company_mal %}{% with m=object.company_mal %}
+  {% if m.name_japanese %}<div class="mal-row"><span class="k">{% trans 'Nombre japonés' %}:</span><span class="v">{{ m.name_japanese }}</span></div>{% endif %}
+  <div class="mal-row"><span class="k">MAL id:</span><span class="v"><a href="{{ m.mal_url }}" target="_blank" rel="noopener">{{ m.mal_id }}</a></span></div>
+  {% if m.favorites %}<div class="mal-row"><span class="k">{% trans 'Favoritos (MAL)' %}:</span><span class="v">{{ m.favorites }}</span></div>{% endif %}
+  {% if m.links %}<h4>{% trans 'Enlaces' %}</h4>{% for u in m.links %}<div class="mal-row"><span class="v"><a href="{{ u }}" target="_blank" rel="noopener">{{ u|truncatechars:40 }}</a></span></div>{% endfor %}{% endif %}
+  {% endwith %}{% endif %}
+{% endblock %}
+
+{% block cuerpo %}
+  {% with grupos=object.obras %}
+
+  <section class="dsection" data-tab="detalles" data-label="{% trans 'Detalles' %}" style="padding-top:0;">
+    <h3>{% trans 'Biografía' %}</h3>
+    <div class="synopsis-area">
+      {% if object.biography %}<p class="synopsis">{{ object.biography|linebreaksbr }}</p>{% endif %}
+    </div>
+    {% for clave, etiqueta, filas in grupos %}{% if filas %}
+      <h3 style="margin-top:24px;">{{ etiqueta }}<a class="page-sub mas" href="#{{ clave }}">{% trans 'Más' %} ({{ filas|length }}) →</a></h3>
+      {% include 'detail/_obras.html' with filas=filas|slice:":6" columnas="2" %}
+    {% endif %}{% endfor %}
+  </section>
+
+  {% for clave, etiqueta, filas in grupos %}{% if filas %}
+    <section class="dsection" data-tab="{{ clave }}" data-label="{{ etiqueta }}" style="padding-top:0;">
+      <h3>{{ etiqueta }} <span class="page-sub" style="font-size:12px">({{ filas|length }})</span>
+        {% with href=tab_url|get_item:clave %}{% if href and filas|length > 30 %}<a class="page-sub mas" href="{{ href }}">{% trans 'Ver en lista' %} →</a>{% endif %}{% endwith %}</h3>
+      {% include 'detail/_obras.html' with filas=filas columnas="2" %}
+    </section>
+  {% endif %}{% endfor %}
+
+  {% endwith %}
+
+  {# Imágenes: logos y demás de la compañía (0, 1 o 100), en su orden. Sin imágenes, no hay pestaña. #}
+  {% with fotos=object|fotos %}{% if fotos %}
+    <section class="dsection" data-tab="imagenes" data-label="{% trans 'Imágenes' %}" style="padding-top:0;">
+      <h3>{% trans 'Imágenes' %} <span class="page-sub" style="font-size:12px">({{ fotos|length }})</span></h3>
+      <div class="gallery">{% for f in fotos %}{% if f|imagen %}<img class="shot" src="{{ f|imagen }}" alt="{{ object }}" loading="lazy">{% endif %}{% endfor %}</div>
+    </section>
+  {% endif %}{% endwith %}
+  {% if es_gestion %}
+  {# Ficha técnica (solo gestión): lo que el registro ES — id, slug, activo, fechas. Muévela o amplíala aquí. #}
+  <section class="dsection" data-tab="tecnica" data-label="{% trans 'Ficha técnica' %}" style="padding-top:0;">
+    <h3>{% trans 'Ficha técnica' %}</h3>
+    <div class="mal-row"><span class="k">Id:</span><span class="v">{{ object.pk }}</span></div>
+    {% if object.slug %}<div class="mal-row"><span class="k">Slug:</span><span class="v">{{ object.slug }}</span></div>{% endif %}
+    {% if object.is_active is not None %}<div class="mal-row"><span class="k">{% trans 'Activo' %}:</span><span class="v">{{ object.display_is_active }}</span></div>{% endif %}
+    {% if object.created_at %}<div class="mal-row"><span class="k">{% trans 'Creado' %}:</span><span class="v">{{ object.display_created }}</span></div>{% endif %}
+    {% if object.updated_at %}<div class="mal-row"><span class="k">{% trans 'Actualizado' %}:</span><span class="v">{{ object.display_updated }}</span></div>{% endif %}
+  </section>
+  {% endif %}
+{% endblock %}

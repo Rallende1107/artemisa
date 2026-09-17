@@ -1,0 +1,331 @@
+/* PERILLA UX: todo hover de controles de lista (botones, menú de fila, paginación,
+   cabeceras ordenables, toggle) pinta en var(--accent) = cian. Cámbialo aquí.
+   COMPONENTE: datatables-theme  ·  DataTables + toggle cards/lista con tokens Artemisa
+   (se carga DESPUÉS de vendor/datatables/*.css). Estilo oscuro translúcido + cian. */
+
+/* ---- Contenedor / tabla: CRISTAL oscuro (perillas --dt-glass-* en 00-tokens.css) ---- */
+.dt-wrap {
+  position: relative; isolation: isolate;
+  border: 1px solid var(--dt-glass-border); border-radius: 14px; padding: 8px 12px 12px;
+  box-shadow: inset 0 1px 0 var(--dt-glass-rim), var(--dt-glass-shadow);
+}
+/* El CRISTAL va en el ::before, no en el contenedor: un backdrop-filter en el contenedor convierte a
+   .dt-wrap en «containing block» de los hijos position:fixed y descoloca el menú Acciones de cada
+   fila (que se posiciona con coordenadas de ventana). El pseudo no tiene hijos, así que no molesta. */
+.dt-wrap::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: -1;
+  background:
+    linear-gradient(135deg, var(--dt-glass-shine) 0%, transparent 38%, transparent 70%, rgba(255, 255, 255, 0.03) 100%),
+    var(--dt-glass-bg);
+  -webkit-backdrop-filter: blur(var(--dt-glass-blur)) saturate(var(--dt-glass-saturate));
+  backdrop-filter: blur(var(--dt-glass-blur)) saturate(var(--dt-glass-saturate));
+}
+.dt-container { color: var(--dt-glass-text); }
+.dt-container .dt-info, .dt-container .dt-length, .dt-container .dt-search { color: var(--dt-glass-muted); }
+table.dataTable {
+  width: 100% !important; border-collapse: collapse;
+  font-size: 13.5px; color: var(--dt-glass-text);
+}
+table.dataTable thead th {
+  background: var(--dt-glass-head); color: var(--dt-glass-muted);
+  font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+  border-bottom: 1px solid var(--border-soft); padding: 11px 12px; text-align: left;
+}
+table.dataTable thead th.dt-orderable-asc:hover,
+table.dataTable thead th.dt-orderable-desc:hover { color: var(--accent); cursor: pointer; }
+table.dataTable thead .dt-column-order::before,
+table.dataTable thead .dt-column-order::after { opacity: .5; }
+table.dataTable tbody td { padding: 10px 12px; border-bottom: 1px solid var(--dt-glass-line); }
+table.dataTable tbody tr { background: transparent; }
+table.dataTable tbody tr:nth-child(even) { background: var(--dt-glass-row); }
+table.dataTable tbody tr:hover { background: var(--dt-glass-hover); }
+table.dataTable tbody td.td-actions { text-align: right; white-space: nowrap; overflow: visible; }
+table.dataTable th.th-actions, table.dataTable td.td-actions { width: 1%; }
+
+/* ---- Selector de acciones por fila (menú ⋯) ---- */
+.row-menu { position: relative; display: inline-block; text-align: left; }
+.row-menu__btn {
+  height: 30px; padding: 0 10px; display: inline-flex; align-items: center; gap: 7px;
+  background: var(--dt-glass-ctrl); color: var(--muted); border: 1px solid var(--dt-glass-border);
+  border-radius: 8px; cursor: pointer; font-size: 12.5px; line-height: 1; white-space: nowrap;
+  transition: color .14s, border-color .14s;
+}
+.row-menu__btn:hover, .row-menu.open .row-menu__btn { color: var(--accent); border-color: var(--accent); }
+.row-menu__caret { font-size: 10px; transition: transform .15s; }
+.row-menu.open .row-menu__caret { transform: rotate(180deg); }
+.row-menu__list {
+  position: fixed; z-index: 1000;   /* fixed → no lo recorta la tabla */
+  min-width: 152px; padding: 5px; display: none; flex-direction: column;
+  background: var(--dt-glass-menu); border: 1px solid var(--border);
+  -webkit-backdrop-filter: blur(var(--dt-glass-menu-blur)); backdrop-filter: blur(var(--dt-glass-menu-blur));
+  border-radius: 10px; box-shadow: 0 12px 30px rgba(0, 0, 0, .55);
+}
+.row-menu.open .row-menu__list { display: flex; }
+.row-menu__list a {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 10px; border-radius: 7px;
+  color: var(--text-2); font-size: 13px; white-space: nowrap;
+  transition: color .12s, background .12s;
+}
+.row-menu__list a .ic { width: 16px; text-align: center; opacity: .85; }
+.row-menu__list a:hover { background: var(--dt-glass-hover); color: var(--accent); }
+.row-menu__list a:hover .ic { opacity: 1; }
+.row-menu__list a.row-menu__danger:hover { background: var(--danger-06, rgba(255,80,80,.1)); color: var(--danger, #ff6b6b); }
+
+/* ---- Toolbar (search / length / buttons / info) ---- */
+.dt-search, .dt-length { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
+/* Buscador (panel y catálogo): sin la etiqueta «Buscar:», lupa dentro y el texto a su derecha, píldora
+   oscura, brillo al enfocar. `div.dt-container … input.dt-input` gana al vendor (div.dt-container .dt-search input). */
+.dt-container .dt-search label { display: none; }
+div.dt-container .dt-search input.dt-input { width: 320px; max-width: 60vw; height: 38px; box-sizing: border-box; margin: 0;
+  padding: 0 14px 0 38px; border-radius: 999px; font-size: 13.5px; color: var(--text, #fff); color-scheme: dark;
+  background-color: rgba(12, 14, 20, .75); border: 1px solid var(--dt-glass-border, rgba(255,255,255,.14));
+  background-repeat: no-repeat; background-position: 13px center; background-size: 15px 15px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%2300e5ff'><path d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398l3.85 3.85a1 1 0 0 0 1.415-1.414zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0'/></svg>"); }
+div.dt-container .dt-search input.dt-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-10, rgba(0,229,255,.15)); }
+div.dt-container .dt-search input.dt-input::placeholder { color: var(--muted, #9aa); }
+/* Selects en línea de las filas (estado, nota…): el MISMO estilo oscuro que los del panel de filtros */
+.st-inline { color-scheme: dark; background-color: var(--dt-glass-btn, rgba(12, 14, 20, .85)) !important; color: var(--dt-glass-btn-text, #fff) !important;
+  border: 1px solid var(--dt-glass-border, rgba(255,255,255,.14)) !important; border-radius: 8px !important; }
+.st-inline option { background: #12141b; color: #fff; }
+/* Miniatura en la lista (columna ImageField): checkbox · foto · nombre… como en el catálogo público */
+.dt-container .dt-thumb { width: 34px; height: 48px; object-fit: cover; border-radius: 5px; vertical-align: middle; display: inline-block;
+  border: 1px solid var(--dt-glass-border, rgba(255,255,255,.14)); background: var(--dt-glass-ctrl, rgba(255,255,255,.05)); }
+/* Celda «ficha» estilo MAL (catálogo, gestión y colección): portada 50×70, título y línea de meta */
+.dt-title--col { display: flex; align-items: center; gap: 12px; }
+.dt-container .dt-thumb.dt-thumb--lg { width: 50px; height: 70px; border-radius: 6px; margin: 0; flex: 0 0 auto; }
+.dt-name { display: block; font-weight: 600; }
+.dt-meta { display: block; font-size: 12px; color: var(--muted, #9aa); margin-top: 2px; }
+/* Modo tarjetas: fuera copiar/CSV/Excel/PDF/imprimir/columnas; solo queda «Mostrar» (controla cuántas) */
+.dt-container--cards .dt-buttons .dt-button:not(.buttons-page-length) { display: none; }
+.dt-container .cards-grid { margin: 10px 0 14px; }
+.dt-search input, .dt-length select {
+  height: 34px; padding: 0 12px; font-size: 13px; font-family: inherit; color: var(--dt-glass-btn-text);
+  background: var(--dt-glass-btn); border: 1px solid var(--dt-glass-border); border-radius: 8px; outline: none;
+}
+.dt-search input:focus, .dt-length select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-10); }
+.dt-length select option { background: var(--elevated); color: var(--text); }
+/* el select nativo de «Mostrar N filas», con la chevron de la casa (sin la flecha del navegador) */
+.dt-length select {
+  -webkit-appearance: none; -moz-appearance: none; appearance: none; padding-right: 30px; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16' fill='none' stroke='%23aeb2c2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+}
+.dt-info { color: var(--muted); font-size: 12.5px; font-family: var(--mono); }
+
+.dt-buttons { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+.dt-button {
+  height: 34px; min-width: 104px; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  font-size: 13px; font-weight: 500; line-height: 1;
+  color: var(--dt-glass-btn-text) !important; background: var(--dt-glass-btn) !important;
+  border: 1px solid var(--dt-glass-border) !important; border-radius: 8px !important; cursor: pointer; box-shadow: none !important;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.dt-button .bi { font-size: 14px; line-height: 1; opacity: .85; }
+/* HOVER: el base lleva !important (para ganar al vendor), así que el hover también, o no se ve. */
+.dt-button:hover,
+div.dt-buttons > .dt-button:hover:not(.disabled),
+.dt-button:focus-visible {
+  color: var(--accent) !important; border-color: var(--accent) !important; background: var(--dt-glass-hover) !important;
+  box-shadow: 0 0 0 1px var(--accent) !important;
+}
+.dt-button:hover .bi { opacity: 1; }
+/* El contenedor de la tabla NO recorta: el desplegable «Columnas» se pinta encima
+   (responsive ya resuelve el ancho, no hace falta scroll horizontal). */
+.dt-wrap { overflow: visible; }
+
+/* ---- Paginación ---- */
+.dt-paging { margin-top: 4px; }
+.dt-paging .dt-paging-button {
+  min-width: 34px; height: 34px; padding: 0 10px; margin: 0 2px; display: inline-flex; align-items: center; justify-content: center;
+  color: var(--dt-glass-btn-text) !important; background: var(--dt-glass-btn) !important; border: 1px solid var(--dt-glass-border) !important;
+  border-radius: 8px !important; font-size: 13px; cursor: pointer; box-shadow: none !important;
+}
+.dt-paging .dt-paging-button:hover { color: var(--accent); border-color: var(--accent) !important; background: var(--dt-glass-hover); }
+.dt-paging .dt-paging-button.current,
+.dt-paging .dt-paging-button.current:hover {
+  background: var(--dt-glass-ctrl) !important; color: var(--accent) !important; border-color: var(--accent) !important;
+  box-shadow: 0 0 0 1px var(--accent);
+}
+/* Especificidad ALTA a propósito: el CSS del vendor pinta el desactivado con rgba(0,0,0,.5) + !important
+   desde «div.dt-container …», y sobre cristal negro eso es invisible. */
+div.dt-container .dt-paging .dt-paging-button.disabled,
+div.dt-container .dt-paging .dt-paging-button.disabled:hover,
+div.dt-container .dt-paging .dt-paging-button.disabled:active {
+  color: var(--dt-glass-btn-off) !important; background: var(--dt-glass-btn) !important;
+  border-color: var(--dt-glass-border) !important; opacity: 1 !important; cursor: not-allowed; box-shadow: none !important;
+}
+
+/* ---- Dropdown "Columnas" (colvis) — tema oscuro ---- */
+.dt-button-collection {
+  background: var(--dt-glass-menu) !important; -webkit-backdrop-filter: blur(var(--dt-glass-menu-blur)); backdrop-filter: blur(var(--dt-glass-menu-blur)); border: 1px solid var(--border) !important;
+  border-radius: 9px !important; padding: 5px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .55) !important;
+}
+.dt-button-collection .dt-button {
+  display: flex !important; width: 100%; justify-content: space-between;
+  background: transparent; border: none; color: var(--text-2); border-radius: 6px;
+}
+.dt-button-collection .dt-button:hover,
+div.dt-button-collection .dt-button:hover:not(.disabled) { background: var(--dt-glass-hover); color: var(--accent); }
+.dt-button-collection .dt-button.active { color: var(--accent); }        /* columna visible */
+.dt-button-collection .dt-button.active::after { content: "✓"; color: var(--accent); margin-left: 10px; }
+.dtb-popover-close { color: var(--muted); }
+
+/* separación entre filas del layout (toolbar arriba, info+pager abajo) */
+.dt-layout-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 10px 0; }
+
+/* ---- Toggle cards/lista ---- */
+.view-toggle { display: inline-flex; gap: 4px; margin-left: auto; }
+.view-toggle-btn {
+  width: 34px; height: 34px; display: grid; place-items: center;
+  background: var(--dt-glass-ctrl); color: var(--muted); border: 1px solid var(--dt-glass-border);
+  border-radius: 8px; cursor: pointer; font-size: 15px; transition: all .14s;
+}
+.view-toggle-btn:hover { color: var(--accent); border-color: var(--accent); }
+.view-toggle-btn.active { background: var(--dt-glass-ctrl); color: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+
+/* ---- Grid de tarjetas ---- */
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 18px; margin-top: 8px; }
+.cards-grid .card {
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--panel); border: 1px solid var(--dt-glass-border); border-radius: 14px;
+  transition: transform .16s, border-color .16s, box-shadow .16s;
+}
+.cards-grid .card:hover { transform: translateY(-3px); border-color: var(--border); box-shadow: var(--shadow-card, 0 12px 30px rgba(0,0,0,.4)); }
+.card-image-container { aspect-ratio: 3/4; background: var(--dt-glass-ctrl); display: grid; place-items: center; overflow: hidden; }
+.card-image-container img { width: 100%; height: 100%; object-fit: cover; }
+.card-initial-badge { width: 100%; height: 100%; display: grid; place-items: center; font-size: 44px; font-family: var(--mono); color: var(--accent); background: linear-gradient(135deg, var(--accent-08), transparent); }
+.card-title { padding: 11px 12px; font-size: 13.5px; color: var(--text); font-weight: 600; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* El velo de página que DataTables pone bajo el desplegable «Columnas» (click fuera = cerrar): invisible,
+   que solo los desplegables se oscurezcan, no la página entera. */
+div.dt-button-background { background: transparent !important; opacity: 0 !important; }
+
+/* ---- Aviso de «Copiar» (div.dt-button-info del vendor: caja blanca con texto gris) → cristal de la casa ---- */
+div.dt-button-info {
+  background: var(--dt-glass-menu) !important; color: var(--dt-glass-text) !important;
+  border: 1px solid var(--dt-glass-border) !important; border-radius: 12px !important;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .55) !important;
+  -webkit-backdrop-filter: blur(var(--dt-glass-menu-blur)) saturate(140%); backdrop-filter: blur(var(--dt-glass-menu-blur)) saturate(140%);
+  padding: 0; overflow: hidden;
+}
+div.dt-button-info h2 {
+  background: transparent !important; color: var(--accent) !important; border-bottom: 1px solid var(--dt-glass-border) !important;
+  font-size: 15px; font-weight: 600; padding: 14px 20px; margin: 0;
+}
+div.dt-button-info > div { padding: 16px 20px; font-size: 13.5px; color: var(--dt-glass-muted) !important; }
+
+/* ---- Lista + panel de filtros (list.html): tabla a la izquierda, FILTRO a la derecha ---- */
+.list-layout { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 18px; align-items: start; }
+.list-layout--solo { grid-template-columns: minmax(0, 1fr); }
+.list-main { min-width: 0; }
+.list-filters { position: sticky; top: 16px; padding: 14px 16px; border-radius: 12px;
+  background: var(--card-bg, rgba(16, 20, 30, .55)); backdrop-filter: blur(12px); border: 1px solid var(--border, rgba(255,255,255,.08)); }
+.list-filters__title { margin: 0 0 10px; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; opacity: .8; }
+.list-filters__item { display: block; margin-bottom: 12px; }
+.list-filters__grupo { margin: 14px 0 8px; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); opacity: .9; }
+.list-filters__item span { display: block; font-size: .85rem; margin-bottom: 4px; opacity: .85; }
+/* El <select> del panel con el mismo aspecto que el desplegable «Columnas»: oscuro, borde suave,
+   y `color-scheme: dark` para que la lista desplegada del navegador también salga oscura. */
+.list-filters__item select { width: 100%; height: 34px; padding: 0 30px 0 10px; border-radius: 8px; cursor: pointer;
+  color: var(--dt-glass-btn-text, #fff); background-color: var(--dt-glass-btn, rgba(12, 14, 20, .85));
+  border: 1px solid var(--dt-glass-border, rgba(255,255,255,.14)); color-scheme: dark; font-size: 13px;
+  appearance: none; -webkit-appearance: none; background-repeat: no-repeat; background-position: right 10px center; background-size: 10px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6' fill='%23ffffff'><path d='M0 0l5 6 5-6z'/></svg>"); }
+.list-filters__item select:hover, .list-filters__item select:focus { border-color: var(--accent); outline: none; }
+.list-filters__item option { background: #12141b; color: #fff; }
+/* Desplegable multi (países, géneros, años…): botón como el <select>; abierto, buscador + casillas con scroll */
+.fl-dd { position: relative; }
+.fl-dd__btn { width: 100%; height: 34px; padding: 0 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  font-size: 13px; text-align: left; color: var(--dt-glass-btn-text, #fff); background: var(--dt-glass-btn, rgba(12, 14, 20, .85)); border: 1px solid var(--dt-glass-border, rgba(255,255,255,.14)); }
+.fl-dd__btn:hover, .fl-dd__btn[aria-expanded="true"], .fl-dd--activo .fl-dd__btn { border-color: var(--accent); }
+.fl-dd__texto { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.fl-dd__btn .bi { font-size: 10px; opacity: .8; }
+.fl-dd__menu { position: absolute; left: 0; right: 0; z-index: 30; margin-top: 4px; padding: 6px; border-radius: 10px;
+  background: #12141b; border: 1px solid var(--dt-glass-border, rgba(255,255,255,.14)); box-shadow: 0 10px 30px rgba(0,0,0,.45); }
+.fl-dd__menu[hidden] { display: none; }
+.fl-dd__buscar { width: 100%; height: 30px; margin-bottom: 6px; padding: 0 10px; border-radius: 7px; font-size: 13px;
+  color: #fff; background: rgba(255,255,255,.06); border: 1px solid var(--dt-glass-border, rgba(255,255,255,.14)); color-scheme: dark; }
+.fl-dd__buscar:focus { outline: none; border-color: var(--accent); }
+.fl-dd__opciones { max-height: 220px; overflow-y: auto; }
+.fl-dd__op { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-radius: 6px; font-size: 13px; cursor: pointer; }
+.fl-dd__op:hover { background: rgba(255,255,255,.07); }
+.fl-dd__op[hidden] { display: none; }
+.fl-dd__op input { accent-color: var(--accent); margin: 0; }
+/* Toggle tarjetas/lista: botones de icono junto al de filtros; el activo lleva el acento */
+.view-toggle-btn.active { border-color: var(--accent); color: var(--accent); }
+.list-filters__acciones { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
+.list-filters__cuenta { font-size: .8rem; color: var(--accent); font-family: var(--mono); }
+.list-filters__acciones .btn-primary { height: 34px; padding: 0 16px; font-size: 13px; }
+.list-filters__clear { background: none; border: 0; padding: 0; cursor: pointer; font-size: .85rem; color: var(--danger); text-decoration: underline; }
+.list-filters__clear[hidden] { display: none; }
+.list-filters[hidden] { display: none; }
+/* Filtros COLAPSABLES: cerrado = una línea (nombre + resumen de lo elegido); abierto = el control debajo */
+.fl-item { margin-bottom: 0; border-bottom: 1px solid var(--border-soft); }
+.fl-item > summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 0; cursor: pointer; font-size: .85rem; opacity: .9; }
+.fl-item > summary::-webkit-details-marker { display: none; }
+/* Indicador: la MISMA flecha de la barra lateral, que gira 90 grados al abrir */
+.fl-item > summary::after { content: "\276F"; font-size: 12px; color: var(--muted); margin-left: auto; transition: transform .16s, color .16s; }
+.fl-item[open] > summary::after { transform: rotate(90deg); color: var(--accent); }
+.fl-item[open] > summary { color: var(--accent); opacity: 1; }
+.fl-item > summary span { display: inline; margin: 0; font-size: inherit; opacity: 1; }
+.fl-item > summary .fl-resumen { font-size: .75rem; color: var(--accent); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 55%; }
+.fl-item > summary .fl-resumen:empty { display: none; }
+.fl-item > .fl-dd, .fl-item > select { margin: 2px 0 10px; }
+/* Bloques «Incluir» / «Excluir»: colapsables, con su título en mayúsculas; el de excluir en rojo suave */
+.fl-grupo { margin: 4px 0 10px; }
+.fl-grupo > summary { list-style: none; display: flex; align-items: center; gap: 8px; padding: 6px 0; cursor: pointer;
+  font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); border-bottom: 1px solid var(--border-soft); }
+.fl-grupo > summary::-webkit-details-marker { display: none; }
+.fl-grupo > summary::after { content: "\276F"; font-size: 12px; margin-left: auto; transition: transform .16s; }
+.fl-grupo[open] > summary::after { transform: rotate(90deg); }
+.fl-grupo--excluir > summary { color: var(--danger); }
+.fl-grupo--excluir .fl-dd--activo .fl-dd__btn { border-color: var(--danger); }
+/* Botón «Filtros» de la barra (misma familia que el toggle cards/lista); .f-activos = panel abierto */
+/* Botones de SOLO ICONO de la barra de la lista: fondo gris, icono blanco. `.btn-icon` = home de la
+   sección (izquierda); `.btn-filtros` = filtros (esquina derecha, el panel se despliega debajo). */
+.btn-icon, .btn-filtros { width: 40px; height: 40px; padding: 0; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center;
+  background: linear-gradient(var(--sidebar-veil), var(--sidebar-veil)), var(--sidebar-bg);   /* el mismo fondo que el sidebar */
+  backdrop-filter: blur(24px) saturate(.85); -webkit-backdrop-filter: blur(24px) saturate(.85);
+  border: 1px solid var(--border-soft); color: #fff; cursor: pointer; font-size: 18px; text-decoration: none; }
+.btn-icon:hover, .btn-filtros:hover { border-color: rgba(255, 255, 255, .35); color: #fff; }
+.btn-icon--texto { width: auto; padding: 0 16px 0 12px; gap: 8px; font-size: 13.5px; }   /* home: icono + nombre de la sección */
+.btn-icon--texto .bi { font-size: 18px; }
+/* El resto de botones de la barra de la lista («Nuevo», «Aplicar», «Quitar selección», extras) con el
+   MISMO estilo gris/blanco; el color solo aparece al pasar el ratón: cyan los principales, rojo los de quitar. */
+.toolbar .btn-primary, .toolbar .btn-cancel, .toolbar .btn-back {
+  height: 40px; padding: 0 16px; border-radius: 8px; font-size: 13.5px; font-weight: 500;
+  background: linear-gradient(var(--sidebar-veil), var(--sidebar-veil)), var(--sidebar-bg);
+  backdrop-filter: blur(24px) saturate(.85); -webkit-backdrop-filter: blur(24px) saturate(.85);
+  border: 1px solid var(--border-soft); color: #fff; box-shadow: none; }
+.toolbar .btn-primary:hover, .toolbar .btn-back:hover { background: var(--accent); border-color: var(--accent); color: #0b0f14; }
+.toolbar .btn-cancel:hover { background: var(--danger); border-color: var(--danger); color: #fff; }
+.btn-filtros.f-activos { border-color: var(--accent); }
+@media (max-width: 900px) { .list-layout { grid-template-columns: minmax(0, 1fr); } .list-filters { position: static; } }
+
+/* Desplegable «Tipo» (listas by por tipo): buscador arriba y el tipo activo marcado */
+.dt-button-collection .dt-type-search { width: calc(100% - 16px); margin: 8px; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface, rgba(0,0,0,.35)); color: var(--text); font: inherit; }
+.dt-button-collection .dt-type-search:focus { outline: none; border-color: var(--accent); }
+.dt-button-collection .dt-type-on { color: var(--accent); }
+/* Botón «Recargar datos» (↻), antes del buscador: gira mientras llega la respuesta; «en-vivo» = auto-recarga activa */
+.dt-search { display: flex; align-items: center; gap: 8px; }
+.btn-recargar { width: 36px; height: 36px; flex: 0 0 36px; display: inline-grid; place-items: center; border-radius: 8px; cursor: pointer;
+  color: var(--dt-glass-btn-text, #fff); background: var(--dt-glass-btn, rgba(12, 14, 20, .85)); border: 1px solid var(--dt-glass-border, rgba(255,255,255,.14)); }
+.btn-recargar:hover { border-color: var(--accent); color: var(--accent); }
+.btn-recargar.en-vivo { border-color: var(--accent); color: var(--accent); }
+.btn-recargar.girando .bi { display: inline-block; animation: dt-girar .8s linear infinite; }
+@keyframes dt-girar { to { transform: rotate(360deg); } }
+/* Barra de botones de la lista: se envuelve a una segunda hilera cuando no caben */
+.list-barra { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; row-gap: 8px; }
+
+/* Pantallas pequeñas: de la barra de la tabla quedan solo «Columnas» y «Mostrar»; exportar (Copiar, CSV, Excel, PDF,
+   Imprimir) se oculta, que ahí no se usa y ocupa tres hileras. */
+@media (max-width: 720px) {
+  /* `div.dt-buttons > .dt-button` es la regla del vendor (misma especificidad y carga después): aquí se sube con el
+     nombre del botón, así no hace falta !important. */
+  div.dt-buttons > .dt-button.buttons-copy, div.dt-buttons > .dt-button.buttons-csv,
+  div.dt-buttons > .dt-button.buttons-excel, div.dt-buttons > .dt-button.buttons-pdf,
+  div.dt-buttons > .dt-button.buttons-print { display: none; }
+}
+

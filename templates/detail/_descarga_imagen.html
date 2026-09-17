@@ -1,0 +1,12 @@
+{% load i18n %}
+{% comment %}Pestaña «Descarga» de una fila de imagen (ModelBaseImage): de dónde viene, cómo le fue al descargador y dónde
+quedó el archivo. La incluyen las fichas <entidad>_image.html, solo en gestión.{% endcomment %}
+<section class="dsection" data-tab="descarga" data-label="{% trans 'Descarga' %}" style="padding-top:0;">
+  <h3>{% trans 'Descarga' %}</h3>
+  <div class="mal-row"><span class="k">{% trans 'Estado' %}:</span><span class="v">{{ object.estado_descarga }}</span></div>
+  {% if object.image_url %}<div class="mal-row"><span class="k">{% trans 'URL' %}:</span><span class="v"><a href="{{ object.image_url }}" target="_blank" rel="noopener" style="word-break:break-all">{{ object.image_url }}</a></span></div>{% endif %}
+  {% if object.image %}<div class="mal-row"><span class="k">{% trans 'Archivo' %}:</span><span class="v" style="word-break:break-all">{{ object.image.name }}</span></div>{% endif %}
+  <div class="mal-row"><span class="k">{% trans 'Intentos fallidos' %}:</span><span class="v">{{ object.download_attempts }}</span></div>
+  {% if object.download_error %}<div class="mal-row"><span class="k">{% trans 'Último error' %}:</span><span class="v">{{ object.download_error }}</span></div>{% endif %}
+  {% if object.download_checked_at %}<div class="mal-row"><span class="k">{% trans 'Último intento' %}:</span><span class="v">{{ object.download_checked_at|date:"d M Y · H:i:s" }}</span></div>{% endif %}
+</section>

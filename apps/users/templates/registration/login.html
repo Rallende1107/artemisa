@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/components/form.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/auth.css' %}?v={{ ASSET_VERSION }}">
+{% endblock %}
+
+{% block content %}
+  <div class="auth">
+    <div class="auth__glow"></div>
+    <div class="auth__card">
+      <h1>{% trans 'Bienvenido de vuelta' %}</h1>
+      <p class="sub">{% trans 'Entra para gestionar tu colección friki' %}</p>
+
+      {% if form.non_field_errors %}
+        <div class="auth__error">{{ form.non_field_errors|first }}</div>
+      {% endif %}
+
+      <form method="post" action="{% url 'users:login' %}" class="form-grid">
+        {% csrf_token %}
+        <div class="field">
+          <label for="{{ form.username.id_for_label }}">{% trans 'Usuario o correo' %}</label>
+          {{ form.username }}
+          {% for e in form.username.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+        </div>
+        <div class="field">
+          <label for="{{ form.password.id_for_label }}">{% trans 'Contraseña' %}</label>
+          {{ form.password }}
+          {% for e in form.password.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+        </div>
+        {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
+        <button class="auth__submit" type="submit"><i class="bi bi-box-arrow-in-right"></i> {% trans 'Ingresar' %}</button>
+        <div class="auth__reset"><a href="{% url 'users:password_reset' %}">{% trans '¿Olvidaste tu contraseña?' %}</a></div>
+      </form>
+
+      <div class="auth__foot">{% trans '¿No tienes cuenta?' %} <a href="{% url 'users:register' %}">{% trans 'Crear cuenta' %}</a></div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    // "Ingresar" queda deshabilitado hasta que hay usuario y contraseña.
+    (function () {
+      var form = document.querySelector(".auth__card form");
+      if (!form) return;
+      var u = form.querySelector('input[name="username"]');
+      var p = form.querySelector('input[name="password"]');
+      var btn = form.querySelector('button[type="submit"]');
+      if (!u || !p || !btn) return;
+      var sync = function () { btn.disabled = !(u.value.trim() && p.value.trim()); };
+      [u, p].forEach(function (el) { el.addEventListener("input", sync); });
+      sync();  // estado inicial
+    })();
+  </script>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% comment %} Campos de compañía — patrón Hades/Poseidon.
+   PARCIAL que INCLUYE admin_panel/form.html (el cuadro: card, botones, csrf) porque la
+   vista Create/Update lo declara: form_template = "…/form/<modelo>.html".
+   Edita libremente el orden/HTML de cada campo aquí. Los booleanos se
+   auto-agrupan abajo, no van en este bloque.
+   Sincroniza:  python manage.py sync_forms  {% endcomment %}
+
+    <div class="field">
+      <label for="{{ form.name.id_for_label }}">{{ form.name.label }}{% if form.name.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.name }}
+      {% for e in form.name.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.name.help_text %}<span class="field__hint">{{ form.name.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.founded_year.id_for_label }}">{{ form.founded_year.label }}{% if form.founded_year.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.founded_year }}
+      {% for e in form.founded_year.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.founded_year.help_text %}<span class="field__hint">{{ form.founded_year.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.disolved_year.id_for_label }}">{{ form.disolved_year.label }}{% if form.disolved_year.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.disolved_year }}
+      {% for e in form.disolved_year.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.disolved_year.help_text %}<span class="field__hint">{{ form.disolved_year.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.biography.id_for_label }}">{{ form.biography.label }}{% if form.biography.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.biography }}
+      {% for e in form.biography.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.biography.help_text %}<span class="field__hint">{{ form.biography.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.country.id_for_label }}">{{ form.country.label }}{% if form.country.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.country }}
+      {% for e in form.country.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.country.help_text %}<span class="field__hint">{{ form.country.help_text }}</span>{% endif %}
+    </div>

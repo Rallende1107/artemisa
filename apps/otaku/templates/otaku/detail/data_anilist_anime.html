@@ -1,0 +1,8 @@
+{% extends 'detail/base_data.html' %}
+{% load i18n ficha %}
+{% comment %}FICHA de datos de anime de AniList (gestión): cuadro compartido detail/base_data.html; aquí solo los ids externos.{% endcomment %}
+
+{% block id_externo %}
+  {% if object.anilist_id %}<div class="mal-row"><span class="k">{% trans 'AniList id' %}:</span><span class="v">{% if object.url %}<a href="{{ object.url }}" target="_blank" rel="noopener">{{ object.anilist_id }}</a>{% else %}{{ object.anilist_id }}{% endif %}</span></div>{% endif %}
+  {% if object.id_mal %}<div class="mal-row"><span class="k">{% trans 'MAL id' %}:</span><span class="v">{{ object.id_mal }}</span></div>{% endif %}
+{% endblock %}

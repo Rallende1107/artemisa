@@ -1,0 +1,45 @@
+{% extends 'panel/base.html' %}
+{% load i18n %}
+{% comment %}Cargar tags de VNDB · paso 1: el formulario (subir / descargar / releer). El resumen es otra vista: vndb_tags_summary.html{% endcomment %}
+
+{% block title %}{{ title }} · {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div class="breadcrumbs">
+      <a href="{% url 'panel:home' %}">{% trans "panel" %}</a><span class="sep">/</span>
+      <a href="{% url section_url %}">{{ section_label }}</a><span class="sep">/</span>
+      <span>{% trans "tags de VNDB" %}</span>
+    </div>
+    <h1 class="page-title">{{ title }}</h1>
+    <p class="page-sub">{% trans "Dump oficial de VNDB: cont y ero → géneros (ero como explícito), tech → etiquetas. Se cruza por id: un dump nuevo renombra, no duplica; lo que ya no viene queda inactivo." %}</p>
+  </div>
+
+  <div class="form-card" style="max-width:720px">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% for e in form.non_field_errors %}<div class="field__err">{{ e }}</div>{% endfor %}
+      <div class="field{% if form.archivo.errors %} field--error{% endif %}">
+        <label for="archivo">{{ form.archivo.label }} (<code>vndb-tags-latest.json.gz</code>)</label>
+        {{ form.archivo }}
+        {% for e in form.archivo.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+        <span class="field__hint">{% trans "Solo .json o .json.gz. Se guarda en dump/ con la fecha y se muestra el resumen antes de aplicar nada." %}</span>
+      </div>
+      {# lo que hace la pantalla, y salir. «Cancelar» va en rojo porque es la salida, no una opción más. #}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:18px">
+        <button class="btn-save" type="submit" name="paso" value="subir">{% trans "Leer el archivo" %}</button>
+        <a class="btn-cancel" href="{{ cancel_href }}">{% trans "Cancelar" %}</a>
+      </div>
+      {% comment %}Otras formas de conseguir el mismo dump: el rótulo ENCIMA y los botones debajo, neutros
+      para que no compitan con «Leer el archivo» ni se confundan con «Cancelar».{% endcomment %}
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border-soft)">
+        <p class="field__hint" style="margin:0 0 10px">{% trans "¿Sin archivo a mano?" %}</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-soft" type="submit" name="paso" value="descargar" formnovalidate>{% trans "Descargar de VNDB y leer" %}</button>
+          {% if ultimo %}<button class="btn-soft" type="submit" name="paso" value="ultimo" formnovalidate>{% trans "Releer el último" %} ({{ ultimo.name }})</button>{% endif %}
+        </div>
+      </div>
+    </form>
+    <p class="field__hint" style="margin-top:12px">{% trans "Fuente:" %} <a href="{{ url_dump }}" target="_blank" rel="noopener">{{ url_dump }}</a></p>
+  </div>
+{% endblock %}

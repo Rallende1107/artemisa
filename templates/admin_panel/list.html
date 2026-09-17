@@ -1,0 +1,112 @@
+{% extends page_template|default:'admin_panel/base_admin.html' %}
+{% load static i18n %}
+
+{# fondo: lo pone la vista (background_image) → base_admin #}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'vendor/datatables/dataTables.dataTables.min.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'vendor/datatables/buttons.dataTables.min.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'vendor/datatables/responsive.dataTables.min.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/datatables-theme.css' %}?v={{ ASSET_VERSION }}">
+{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div class="breadcrumbs">
+      <a href="{% url 'panel:home' %}">{% trans "panel" %}</a><span class="sep">/</span>
+      {% if section_url %}<a href="{% url section_url %}">{{ section_label|lower }}</a><span class="sep">/</span>{% endif %}
+      {% if lista_href %}<a href="{{ lista_href }}">{{ lista_label }}</a><span class="sep">/</span><span>{{ page_title|lower }}</span>
+      {% else %}<span>{{ label_plural }}</span>{% endif %}
+    </div>
+    <h1 class="page-title">{{ page_title }}</h1>   {# lo declara la vista: title = _("Lista de países") #}
+  </div>
+
+
+  <div class="toolbar" style="justify-content:space-between;">
+    {# La barra se ENVUELVE: si no caben, pasan a una segunda hilera (flex-wrap) #}
+    <div class="list-barra">
+      {% comment %}La barra: inicio · Nuevo · los `buttons` de la lista · los especiales (Importar, datos crudos,
+      lista real, Generar dump). La arma `botones_barra()` con lo que cada lista declare.{% endcomment %}
+      {% for b in botones %}
+        <a class="{{ b.clase }}" href="{{ b.href }}"{% if b.nueva %} target="_blank" rel="noopener"{% endif %}{% if b.title %} title="{{ b.title }}"{% endif %}>{% if b.icono %}<i class="bi bi-{{ b.icono }}" aria-hidden="true"></i> {% endif %}{{ b.texto }}</a>
+      {% endfor %}
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      {% if bulk_actions %}
+        <form id="bulk-form" method="post" action="{{ bulk_url }}" class="bulk-bar" hidden>
+          {% csrf_token %}<input type="hidden" name="ids" id="bulk-ids"><input type="hidden" name="volver" value="{{ request.get_full_path }}"><input type="hidden" name="entidad" value="{{ entity }}">
+          <span class="bulk-bar__count"><b id="bulk-n">0</b> {% trans "seleccionadas" %}</span>
+          <select name="accion" id="bulk-accion" aria-label="{% trans "Acción masiva" %}">
+            {% for valor, etiqueta in bulk_actions %}<option value="{{ valor }}">{{ etiqueta }}</option>{% endfor %}
+          </select>
+          <button type="submit" class="btn-primary">{% trans "Aplicar" %}</button>
+          <button type="button" class="btn-cancel" id="bulk-clear">{% trans "Quitar selección" %}</button>
+        </form>
+      {% endif %}
+      {% if process_href %}
+        <form method="post" action="{{ process_href }}" style="margin:0">
+          {% csrf_token %}<input type="hidden" name="action" value="process">
+          {% if process_destino %}<input type="hidden" name="destino" value="{{ process_destino }}">{% endif %}
+          <button type="submit" class="btn-cancel" title="{% trans "Convierte en entidades reales todo lo descargado y aún no procesado de esta fuente" %}">↻ {% trans "Procesar pendientes" %}</button>
+        </form>
+      {% endif %}
+      {# El botón de filtros va el ÚLTIMO: pegado a la esquina derecha, justo encima del panel que despliega #}
+      {# Tarjetas / lista: extra de la vista (enable_cards), dos botones de icono a la IZQUIERDA del de filtros, que cierra la barra #}
+      {% if enable_cards %}
+      <button id="view-cards" class="btn-icon view-toggle-btn" type="button" title="{% trans "Ver como tarjetas" %}"><i class="bi bi-grid-3x3-gap"></i></button>
+      <button id="view-table" class="btn-icon view-toggle-btn active" type="button" title="{% trans "Ver como lista" %}"><i class="bi bi-list-ul"></i></button>
+      {% endif %}
+      {% if filtros or type_tabs %}<button type="button" id="btn-panel-filtros" class="btn-filtros" aria-controls="panel-filtros" title="{% trans "Filtros" %}" aria-label="{% trans "Mostrar u ocultar el panel de filtros" %}"><i class="bi bi-funnel"></i></button>{% endif %}
+    </div>
+  </div>
+
+  {# Rejilla: a la izquierda el interior de la lista, a la derecha el panel de filtros, a la MISMA altura. #}
+  <div class="list-layout{% if not filtros and not type_tabs %} list-layout--solo{% endif %}">
+  <div class="list-main">
+  {# El INTERIOR de la lista son piezas aparte: la tabla (list_table.html) y las tarjetas (list_cards.html). #}
+  {# La barra, el buscador y la paginación son de esta página; el toggle ≣/▦ cambia solo lo de dentro.   #}
+  {% include "components/list_table.html" %}
+  {% if enable_cards %}{% include "components/list_cards.html" %}{% endif %}
+  </div>
+
+  {% if filtros or type_tabs %}{% include filters_template|default:"components/list_filters.html" %}{% endif %}   {# panel de filtros: pieza aparte (components/list_filters.html), la trae la vista #}
+  </div>
+{% endblock %}
+
+{% block foot_meta %}list · server-side{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'vendor/jquery/jquery.min.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script src="{% static 'vendor/datatables/dataTables.min.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script src="{% static 'vendor/datatables/jszip.min.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script src="{% static 'vendor/datatables/pdfmake.min.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script src="{% static 'vendor/datatables/vfs_fonts.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script src="{% static 'vendor/datatables/dataTables.buttons.min.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script src="{% static 'vendor/datatables/buttons.html5.min.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script src="{% static 'vendor/datatables/buttons.print.min.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script src="{% static 'vendor/datatables/buttons.colVis.min.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script src="{% static 'vendor/datatables/dataTables.responsive.min.js' %}?v={{ ASSET_VERSION }}"></script>
+  {% trans "Procesando…" as dt_processing %}{% trans "Buscar:" as dt_search %}{% trans "Mostrar _MENU_ filas" as dt_length %}{% trans "Mostrando _START_–_END_ de _TOTAL_" as dt_info %}{% trans "Sin registros" as dt_empty %}{% trans "(filtrado de _MAX_)" as dt_filtered %}{% trans "Sin coincidencias" as dt_zero %}{% trans "Sin registros todavía" as dt_emptytable %}{% trans "Copiar" as dt_copy %}{% trans "Imprimir" as dt_print %}{% trans "Columnas" as dt_colvis %}
+  <script>
+    window.DT_LANG = {
+      processing: "{{ dt_processing|escapejs }}", search: "{{ dt_search|escapejs }}",
+      lengthMenu: "{{ dt_length|escapejs }}", info: "{{ dt_info|escapejs }}",
+      infoEmpty: "{{ dt_empty|escapejs }}", infoFiltered: "{{ dt_filtered|escapejs }}",
+      zeroRecords: "{{ dt_zero|escapejs }}", emptyTable: "{{ dt_emptytable|escapejs }}",
+      copy: "{{ dt_copy|escapejs }}", print: "{{ dt_print|escapejs }}", colvis: "{{ dt_colvis|escapejs }}"
+    };
+    window.DT_NCOLS = {{ headers|length }};
+    window.DT_ENTITY = "{{ entity }}";
+    // Listas «by» por tipo (mapa filter_config): botón «Tipo» en la barra, junto a Columnas y Mostrar, con buscador
+    window.DT_TIPO_ACTUAL = {% if tipo_actual %}{"tipo": "{{ tipo_actual|escapejs }}", "valor": "{{ valor_actual|escapejs }}"}{% else %}null{% endif %};
+    window.DT_TYPE_TABS = {% if type_tabs %}[{% for g in type_tabs %}{"label": "{{ g.label|escapejs }}", "tabs": [{% for t in g.tabs %}{"label": "{{ t.label|escapejs }}", "href": "{{ t.href|escapejs }}", "on": {% if t.on %}true{% else %}false{% endif %}}{% if not forloop.last %},{% endif %}{% endfor %}]}{% if not forloop.last %},{% endif %}{% endfor %}]{% else %}null{% endif %};
+    window.CARDS_ENABLED = {% if enable_cards %}true{% else %}false{% endif %};
+    window.DT_CARDS_INSIDE = true;   // las tarjetas van DENTRO del contenedor: «Mostrando x de N» y paginación quedan al final
+    window.DT_BULK = {% if bulk_actions %}true{% else %}false{% endif %};
+    window.DT_ID = {% if con_id %}true{% else %}false{% endif %};   // columna Id (pk) visible y exportable
+    window.DT_NO_ACTIONS = {% if actions %}false{% else %}true{% endif %};   // la Data apaga la pieza «Acciones»
+    window.DT_FILTROS_ABIERTO = {% if request.GET %}true{% else %}false{% endif %};   // llegó con filtros → panel abierto
+    window.DT_AUTORECARGA = {{ auto_recarga|default:0 }};   // segundos; >0 = se recarga sola mientras la Data diga que hay trabajo en curso
+  </script>
+  <script src="{% static 'js/datatable.js' %}?v={{ ASSET_VERSION }}"></script>
+{% endblock %}

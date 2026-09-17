@@ -1,0 +1,35 @@
+{% extends page_template|default:'admin_panel/base_admin.html' %}
+{% load i18n %}
+
+
+{% block content %}
+  <div class="page-head">
+    <div class="breadcrumbs">
+      <a href="{% url 'panel:home' %}">{% trans "panel" %}</a><span class="sep">/</span>
+      <a href="{% url list_url %}">{{ label_plural }}</a><span class="sep">/</span><span>{% trans "eliminar" %}</span>
+    </div>
+    <h1 class="page-title">{{ page_title }}</h1>   {# el título lo declara la vista: title = _("Eliminar país") #}
+  </div>
+
+  <div class="form-card">
+    <p style="color:var(--text);font-size:15px;line-height:1.6">
+      {% blocktrans with obj=object %}¿Seguro que quieres eliminar <b>«{{ obj }}»</b>? Esta acción no se puede deshacer.{% endblocktrans %}
+    </p>
+    {% if arrastra %}
+    {# Lo que se borra en cascada (lo calcula la vista con el Collector de Django) #}
+    <p class="delete-cascade" style="color:var(--danger);font-size:14px;line-height:1.6">
+      {% trans "Se eliminarán también:" %}
+      {% for nombre, n in arrastra %}<b>{{ n }}</b> {{ nombre }}{% if not forloop.last %} · {% endif %}{% endfor %}
+    </p>
+    {% endif %}
+    <form method="post" style="margin-top:20px">
+      {% csrf_token %}
+      <div class="form-actions" style="border:0;padding:0;margin:0">
+        <button class="btn-save" type="submit" style="background:var(--danger);color:#fff;box-shadow:none">{% trans "Sí, eliminar" %}</button>
+        <a class="btn-cancel" href="{% url cancel_url %}">{% trans "Cancelar" %}</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}
+
+{% block foot_meta %}delete{% endblock %}

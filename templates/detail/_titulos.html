@@ -1,0 +1,13 @@
+{% load i18n %}
+{% comment %}Títulos alternativos en el LATERAL, compactos como MAL: una línea por idioma, los títulos separados por « · »
+(un título puede llevar comas, no puntos medios). A la vista 4 idiomas y 3 títulos por idioma; «+N» / «+N idiomas
+más» despliegan el resto en la página (botones con data-abre → id del bloque plegado).{% endcomment %}
+{% if titulos or original %}
+  <h4>{% trans 'Títulos alternativos' %}</h4>
+  {% if original %}<div class="mal-row"><span class="k">{% trans 'Original' %}:</span><span class="v">{{ original }}</span></div>{% endif %}
+  {% regroup titulos by title_lang as grupos %}
+  {% for g in grupos %}{% if forloop.counter == 5 %}<div id="titulos-mas-{{ pk }}" hidden>{% endif %}
+    <div class="mal-row"><span class="k">{{ g.grouper.name_esp|default:g.grouper|default:_("Sinónimos") }}:</span>
+      <span class="v">{% for t in g.list %}{% if forloop.counter == 4 %}<span id="titulos-mas-{{ pk }}-{{ forloop.parentloop.counter }}" hidden>{% endif %}{% if not forloop.first %} · {% endif %}{{ t.title }}{% if forloop.last and g.list|length > 3 %}</span> <button type="button" class="mal-toggle" data-abre="titulos-mas-{{ pk }}-{{ forloop.parentloop.counter }}" data-mas="+{{ g.list|length|add:"-3" }}">+{{ g.list|length|add:"-3" }}</button>{% endif %}{% endfor %}</span></div>
+  {% if forloop.last and grupos|length > 4 %}</div><div class="mal-row"><button type="button" class="mal-toggle" data-abre="titulos-mas-{{ pk }}" data-mas="+{{ grupos|length|add:"-4" }} {% trans 'idiomas más' %}">+{{ grupos|length|add:"-4" }} {% trans 'idiomas más' %}</button></div>{% endif %}{% endfor %}
+{% endif %}

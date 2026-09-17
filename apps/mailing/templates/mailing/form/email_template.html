@@ -1,0 +1,43 @@
+{% comment %} Campos de plantilla de correo — patrón Hades/Poseidon.
+   PARCIAL que INCLUYE admin_panel/form.html (el cuadro: card, botones, csrf) porque la
+   vista Create/Update lo declara: form_template = "…/form/<modelo>.html".
+   Edita libremente el orden/HTML de cada campo aquí. Los booleanos se
+   auto-agrupan abajo, no van en este bloque.
+   Sincroniza:  python manage.py sync_forms  {% endcomment %}
+
+    <div class="field">
+      <label for="{{ form.key.id_for_label }}">{{ form.key.label }}{% if form.key.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.key }}
+      {% for e in form.key.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.key.help_text %}<span class="field__hint">{{ form.key.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.name.id_for_label }}">{{ form.name.label }}{% if form.name.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.name }}
+      {% for e in form.name.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.name.help_text %}<span class="field__hint">{{ form.name.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.subject.id_for_label }}">{{ form.subject.label }}{% if form.subject.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.subject }}
+      {% for e in form.subject.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.subject.help_text %}<span class="field__hint">{{ form.subject.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.body_html.id_for_label }}">{{ form.body_html.label }}{% if form.body_html.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.body_html }}
+      {% for e in form.body_html.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.body_html.help_text %}<span class="field__hint">{{ form.body_html.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.body_text.id_for_label }}">{{ form.body_text.label }}{% if form.body_text.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.body_text }}
+      {% for e in form.body_text.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.body_text.help_text %}<span class="field__hint">{{ form.body_text.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.description.id_for_label }}">{{ form.description.label }}{% if form.description.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.description }}
+      {% for e in form.description.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.description.help_text %}<span class="field__hint">{{ form.description.help_text }}</span>{% endif %}
+    </div>

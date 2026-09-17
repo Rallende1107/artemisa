@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ title_tab }} · {{ block.super }}{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/components/hero.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/cover.css' %}?v={{ ASSET_VERSION }}">
+{% endblock %}
+
+{# En la landing el nav de sección va BAJO el hero (no arriba, como en las hijas). #}
+{% block seccion_nav %}{% endblock %}
+
+{% block content %}
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero__glow"></div>
+      {# Sin póster decorativo: era espacio muerto — el hero es solo texto + CTAs. #}
+      <div class="hero__inner">
+        <div class="hero__body">
+          <h1>{{ title }}</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# Las pestañas las declara la VISTA (nav_tabs, de los `group` de sus filas); si no hay, el nav de sección. #}
+  {% if nav_tabs %}{% include 'components/tabs.html' %}{% else %}{% include 'partials/_seccion_nav.html' %}{% endif %}
+
+  {# El hero va centrado; el CONTENIDO usa el ancho completo (nada de espacio muerto). #}
+  <div class="home-body">
+    {% for r in rows %}
+      <div class="psection" data-group="{{ r.group_key }}">
+        <div class="psection__head"><h2>{{ r.title }}</h2>{% if r.url %}<a href="{{ r.url }}">{% trans 'Todos' %} →</a>{% endif %}</div>
+        {% if r.items %}
+        <div class="row">
+          {% for it in r.items %}
+            <a class="cover" href="{{ it.url|default:'#' }}">
+              <div class="cover__art {{ it.theme }}">
+                {% if it.image %}<img class="cover__img" src="{{ it.image }}" alt="{{ it.name }}" loading="lazy">
+                {% else %}<img class="cover__img" src="{% static 'image/default/sin-imagen.webp' %}" alt="Sin imagen" loading="lazy">{% endif %}
+                <span class="cover__tag">{{ it.tag }}</span>
+                {% if it.rate %}<span class="cover__rate">★ {{ it.rate }}</span>{% endif %}
+                <span class="cover__name">{{ it.name }}</span>
+              </div>
+              <span class="cover__sub">{{ it.sub }}</span>
+            </a>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="psection__empty">
+          <p>{{ r.empty }}</p>
+          <img src="{% static 'image/default/bg-in-progress.webp' %}" alt="" loading="lazy" onerror="this.remove()">
+        </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+{% endblock %}

@@ -1,0 +1,15 @@
+/* COMPONENTE: toast  ·  feedback de acción (reemplaza SweetAlert) */
+.toast {
+  position: fixed; bottom: 22px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  z-index: var(--z-toast);
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 16px;
+  background: var(--elevated-2); border: 1px solid var(--border);
+  border-radius: 9px; font-size: 13.5px;
+  box-shadow: var(--shadow-toast);
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s, transform .2s;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast .ok { color: var(--accent); }

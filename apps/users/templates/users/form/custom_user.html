@@ -1,0 +1,49 @@
+{% comment %} Campos de usuario — patrón Hades/Poseidon.
+   PARCIAL que INCLUYE admin_panel/form.html (el cuadro: card, botones, csrf) porque la
+   vista Create/Update lo declara: form_template = "…/form/<modelo>.html".
+   Edita libremente el orden/HTML de cada campo aquí. Los booleanos se
+   auto-agrupan abajo, no van en este bloque.
+   Sincroniza:  python manage.py sync_forms  {% endcomment %}
+
+    <div class="field">
+      <label for="{{ form.username.id_for_label }}">{{ form.username.label }}{% if form.username.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.username }}
+      {% for e in form.username.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.username.help_text %}<span class="field__hint">{{ form.username.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.email.id_for_label }}">{{ form.email.label }}{% if form.email.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.email }}
+      {% for e in form.email.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.email.help_text %}<span class="field__hint">{{ form.email.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}{% if form.first_name.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.first_name }}
+      {% for e in form.first_name.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.first_name.help_text %}<span class="field__hint">{{ form.first_name.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}{% if form.last_name.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.last_name }}
+      {% for e in form.last_name.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.last_name.help_text %}<span class="field__hint">{{ form.last_name.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}{% if form.phone.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.phone }}
+      {% for e in form.phone.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.phone.help_text %}<span class="field__hint">{{ form.phone.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.birth_date.id_for_label }}">{{ form.birth_date.label }}{% if form.birth_date.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.birth_date }}
+      {% for e in form.birth_date.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.birth_date.help_text %}<span class="field__hint">{{ form.birth_date.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.password.id_for_label }}">{{ form.password.label }}{% if form.password.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.password }}
+      {% for e in form.password.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.password.help_text %}<span class="field__hint">{{ form.password.help_text }}</span>{% endif %}
+    </div>

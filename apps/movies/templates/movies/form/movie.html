@@ -1,0 +1,69 @@
+{% comment %} Campos de película — patrón Hades/Poseidon.
+   PARCIAL que INCLUYE admin_panel/form.html (el cuadro: card, botones, csrf) porque la
+   vista Create/Update lo declara: form_template = "…/form/<modelo>.html".
+   Edita libremente el orden/HTML de cada campo aquí. Los booleanos se
+   auto-agrupan abajo, no van en este bloque.
+   Sincroniza:  python manage.py sync_forms  {% endcomment %}
+
+    <div class="field">
+      <label for="{{ form.title.id_for_label }}">{{ form.title.label }}{% if form.title.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.title }}
+      {% for e in form.title.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.title.help_text %}<span class="field__hint">{{ form.title.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.title_secundary.id_for_label }}">{{ form.title_secundary.label }}{% if form.title_secundary.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.title_secundary }}
+      {% for e in form.title_secundary.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.title_secundary.help_text %}<span class="field__hint">{{ form.title_secundary.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.release_year.id_for_label }}">{{ form.release_year.label }}{% if form.release_year.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.release_year }}
+      {% for e in form.release_year.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.release_year.help_text %}<span class="field__hint">{{ form.release_year.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.duration_minutes.id_for_label }}">{{ form.duration_minutes.label }}{% if form.duration_minutes.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.duration_minutes }}
+      {% for e in form.duration_minutes.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.duration_minutes.help_text %}<span class="field__hint">{{ form.duration_minutes.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.synopsis.id_for_label }}">{{ form.synopsis.label }}{% if form.synopsis.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.synopsis }}
+      {% for e in form.synopsis.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.synopsis.help_text %}<span class="field__hint">{{ form.synopsis.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.movie_type.id_for_label }}">{{ form.movie_type.label }}{% if form.movie_type.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.movie_type }}
+      {% for e in form.movie_type.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.movie_type.help_text %}<span class="field__hint">{{ form.movie_type.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.movie_rating.id_for_label }}">{{ form.movie_rating.label }}{% if form.movie_rating.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.movie_rating }}
+      {% for e in form.movie_rating.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.movie_rating.help_text %}<span class="field__hint">{{ form.movie_rating.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.genres.id_for_label }}">{{ form.genres.label }}{% if form.genres.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.genres }}
+      {% for e in form.genres.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.genres.help_text %}<span class="field__hint">{{ form.genres.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.producers.id_for_label }}">{{ form.producers.label }}{% if form.producers.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.producers }}
+      {% for e in form.producers.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.producers.help_text %}<span class="field__hint">{{ form.producers.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.distributors.id_for_label }}">{{ form.distributors.label }}{% if form.distributors.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.distributors }}
+      {% for e in form.distributors.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.distributors.help_text %}<span class="field__hint">{{ form.distributors.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+    </div>

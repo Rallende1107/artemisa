@@ -1,0 +1,60 @@
+/* =====================================================================
+   02-layout.css  ·  esqueleto: shell, main, vistas, colapso del sidebar
+   ===================================================================== */
+
+/* ---- Main (contenedor de contenido) --------------------------------- */
+.main {
+    position: relative; z-index: var(--z-main);
+    margin-left: var(--side-w);
+    margin-top: var(--header-h);
+    min-height: calc(100vh - var(--header-h));
+    display: flex; flex-direction: column;
+    padding: 28px 32px 0;
+    transition: margin-left .22s ease;
+}
+/* El contenido crece para llenar el alto → el footer queda abajo cuando el
+   contenido es corto; el padding-bottom lo separa cuando el contenido es largo. */
+.main__content { flex: 1 0 auto; padding-bottom: 40px; }
+/* Páginas de cuenta (login/registro/reset): el contenido se vuelve columna flex
+   para que `.auth` rellene el hueco y se centre SIN pedir otro 100vh. Scopeado
+   con :has() → ninguna otra vista pública se ve afectada. */
+.main__content:has(> .auth) { display: flex; flex-direction: column; }
+
+/* ---- Sidebar RAIL (solo-iconos) por defecto en desktop ---------------
+   El sidebar arranca colapsado a un rail de iconos; el contenido reserva solo
+   ese ancho. Se expande con HOVER (overlay, no empuja) o se FIJA abierto con el
+   toggle (body.nav-expanded, empuja el contenido). Ver components/sidebar.css.
+   Móvil (≤900px, en 99-utilities.css) usa drawer y NO se ve afectado.        */
+@media (min-width: 901px) {
+  body:not(.nav-expanded) .main { margin-left: var(--rail-w); }
+  body.nav-expanded .main       { margin-left: var(--side-w); }
+}
+
+/* ---- Vistas conmutables --------------------------------------------- */
+/* Vista activa como flex-column + footer con margin-top:auto = sticky   */
+/* footer: baja al fondo si el contenido es corto, fluye si es largo.    */
+.view { display: none; flex: 1; animation: fade .25s ease; }
+.view.active { display: flex; flex-direction: column; }
+.view.active > .footer { margin-top: auto; }
+@keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* ---- Cabecera de página + breadcrumbs ------------------------------- */
+.page-head { margin-bottom: 24px; }
+.breadcrumbs {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 12px; color: var(--muted);
+    margin-bottom: 10px;
+}
+.breadcrumbs .sep { color: var(--faint); }
+.breadcrumbs a:hover { color: var(--accent); }
+.page-title { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; }
+.page-title .accent { color: var(--accent); }
+.page-sub { color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+/* ---- Scrim (drawer móvil) ------------------------------------------- */
+.scrim {
+    position: fixed; inset: 0; z-index: var(--z-scrim);
+    background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(2px);
+    opacity: 0; pointer-events: none; transition: opacity .2s;
+    }
+.scrim.show { opacity: 1; pointer-events: auto; }

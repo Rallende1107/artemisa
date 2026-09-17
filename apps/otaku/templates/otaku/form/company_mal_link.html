@@ -1,0 +1,32 @@
+{% load i18n %}
+{% comment %} Ficha MAL para una compañía EXISTENTE (CompanyMALExistentForm): se elige la compañía y se
+   rellenan su MAL id y su url; los datos de la compañía no se tocan. Para una NUEVA está company_mal.html.
+   El CUADRO (card, botones, csrf) vive en admin_panel/form.html. {% endcomment %}
+
+    <h3>{% trans "Compañía existente" %}</h3>
+    <div class="field">
+      <label for="{{ form.company.id_for_label }}">{{ form.company.label }} <span class="req">*</span></label>
+      {{ form.company }}
+      {% for e in form.company.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.company.help_text %}<span class="field__hint">{{ form.company.help_text }}</span>{% endif %}
+    </div>
+
+    <h3>{% trans "MyAnimeList" %}</h3>
+    <div class="field">
+      <label for="{{ form.kind.id_for_label }}">{{ form.kind.label }} <span class="req">*</span></label>
+      {{ form.kind }}
+      {% for e in form.kind.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.kind.help_text %}<span class="field__hint">{{ form.kind.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.mal_id.id_for_label }}">{{ form.mal_id.label }} <span class="req">*</span></label>
+      {{ form.mal_id }}
+      {% for e in form.mal_id.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.mal_id.help_text %}<span class="field__hint">{{ form.mal_id.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.url.id_for_label }}">{{ form.url.label }}{% if form.url.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.url }}
+      {% for e in form.url.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.url.help_text %}<span class="field__hint">{{ form.url.help_text }}</span>{% endif %}
+    </div>

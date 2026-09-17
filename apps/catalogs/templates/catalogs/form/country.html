@@ -1,0 +1,49 @@
+
+    <div class="form-row">
+      <div class="field">
+        <label for="{{ form.name.id_for_label }}">{{ form.name.label }}{% if form.name.field.required %} <span class="req">*</span>{% endif %}</label>
+        {{ form.name }}
+        {% for e in form.name.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+        {% if form.name.help_text %}<span class="field__hint">{{ form.name.help_text }}</span>{% endif %}
+      </div>
+      <div class="field">
+        <label for="{{ form.name_esp.id_for_label }}">{{ form.name_esp.label }}{% if form.name_esp.field.required %} <span class="req">*</span>{% endif %}</label>
+        {{ form.name_esp }}
+        {% for e in form.name_esp.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+        {% if form.name_esp.help_text %}<span class="field__hint">{{ form.name_esp.help_text }}</span>{% endif %}
+      </div>
+    </div>
+    <div class="form-row">
+
+    <div class="field">
+        <label for="{{ form.code.id_for_label }}">{{ form.code.label }}{% if form.code.field.required %} <span class="req">*</span>{% endif %}</label>
+        {{ form.code }}
+        {% for e in form.code.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+        {% if form.code.help_text %}<span class="field__hint">{{ form.code.help_text }}</span>{% endif %}
+      </div>
+      <div class="field">
+        <label for="{{ form.numeric_code.id_for_label }}">{{ form.numeric_code.label }}{% if form.numeric_code.field.required %} <span class="req">*</span>{% endif %}</label>
+        {{ form.numeric_code }}
+        {% for e in form.numeric_code.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+        {% if form.numeric_code.help_text %}<span class="field__hint">{{ form.numeric_code.help_text }}</span>{% endif %}
+      </div>
+    </div>
+    {# ROW · descripción SOLA (textarea = fila completa) #}
+    <div class="form-row">
+      <div class="field">
+        <label for="{{ form.description.id_for_label }}">{{ form.description.label }}{% if form.description.field.required %} <span class="req">*</span>{% endif %}</label>
+        {{ form.description }}
+        {% for e in form.description.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+        {% if form.description.help_text %}<span class="field__hint">{{ form.description.help_text }}</span>{% endif %}
+      </div>
+    </div>
+    {# ROW · imagen SOLA (archivo = fila completa) #}
+    <div class="form-row">
+      <div class="field">
+        <label for="{{ form.image.id_for_label }}">{{ form.image.label }}{% if form.image.field.required %} <span class="req">*</span>{% endif %}</label>
+      {% if form.image.value %}<div class="img-preview"><img src="{{ MEDIA_URL }}{{ form.image.value }}" alt="{{ form.image.label }} actual"><span class="img-preview__tag">actual</span></div>{% endif %}
+        {{ form.image }}
+        {% for e in form.image.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+        {% if form.image.help_text %}<span class="field__hint">{{ form.image.help_text }}</span>{% endif %}
+      </div>
+    </div>

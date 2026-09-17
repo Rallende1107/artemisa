@@ -1,0 +1,27 @@
+{% comment %}
+COMPONENTE «pestañas» (.snav). Lo declara la VISTA en `nav_tabs`, una lista de dicts:
+
+    [{"label": "Anime", "key": "anime"},          → BOTÓN: filtra en la página, sin recargar
+     {"label": "Anime", "url": "/catalog/anime/", "icon": "bi-stars", "on": True}]   → ENLACE: navega
+
+Los botones muestran solo los bloques con `data-group="<key>"` (`key` vacío = todos) dentro del contenedor que
+diga `nav_tabs_target` (por defecto, toda la página). Lo mueve js/tabs.js, que atiende a cualquier `[data-tabs]`
+de la página; no hace falta script propio en cada plantilla.
+
+    {% include 'components/tabs.html' %}
+    {% include 'components/tabs.html' with nav_tabs=SECCION_NAV %}
+{% endcomment %}
+{% if nav_tabs %}
+  <nav class="snav" aria-label="{{ nav_tabs_label|default:_('Secciones') }}"
+       data-tabs{% if nav_tabs_target %} data-tabs-target="{{ nav_tabs_target }}"{% endif %}>
+    {% for t in nav_tabs %}
+      {% if t.url %}
+        <a class="snav__item{% if t.on %} on{% endif %}" href="{{ t.url }}">
+          {% if t.icon %}<i class="bi {{ t.icon }}"></i> {% endif %}{{ t.label }}</a>
+      {% else %}
+        <button type="button" class="snav__item{% if t.on or forloop.first %} on{% endif %}" data-tab="{{ t.key }}">
+          {% if t.icon %}<i class="bi {{ t.icon }}"></i> {% endif %}{{ t.label }}</button>
+      {% endif %}
+    {% endfor %}
+  </nav>
+{% endif %}

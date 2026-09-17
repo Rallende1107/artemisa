@@ -1,0 +1,46 @@
+/* COMPONENTE: public-header  ↔  partials/_public_header.html
+   (cara pública: nav superior, no sidebar) + utilidades .wrap / .page */
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+/* Variante ANCHA: páginas de tabla (Mi actividad…) usan todo el ancho del área de contenido. */
+.wrap--wide { max-width: none; }
+.page { position: relative; z-index: var(--z-main); padding-top: var(--header-h); }
+
+.phead {
+  position: fixed; top: 0; left: 0; right: 0; height: var(--header-h); z-index: var(--z-header);
+  display: flex; align-items: center; gap: 20px; padding: 0 24px;
+  /* Flotante: degradado en vez de barra sólida → la imagen se ve completa detrás */
+  background: var(--header-scrim);
+  pointer-events: none;   /* el degradado no bloquea; los hijos reactivan clicks */
+}
+.phead > * { pointer-events: auto; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; font-size: 15px; }
+.brand-mark {
+  width: 28px; height: 28px; display: grid; place-items: center; flex: none;
+  border: 1px solid var(--accent); border-radius: 7px; color: var(--accent);
+  box-shadow: 0 0 14px var(--accent-glow), inset 0 0 8px var(--accent-12);
+  font-family: var(--mono); font-size: 15px;
+}
+.brand-txt { background: linear-gradient(90deg, #fff, #b9f6ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+.pnav { display: flex; gap: 4px; margin-left: 8px; }
+.pnav a { padding: 8px 12px; border-radius: 7px; font-size: 14px; color: var(--muted); transition: color .14s, background .14s; }
+.pnav a:hover { color: var(--text); background: var(--hover-soft); }
+.pnav a.active { color: var(--accent); }
+
+.phead__right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.h-search {
+  display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; width: 200px;
+  background: var(--surface); border: 1px solid var(--border-soft); border-radius: 8px; color: var(--muted);
+  transition: border-color .15s, box-shadow .15s, width .2s;
+}
+.h-search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-10); width: 240px; }
+.h-search input { flex: 1; background: none; border: none; outline: none; color: var(--text); font-size: 13.5px; }
+.h-search input::placeholder { color: var(--faint); }
+
+/* .btn-ghost se movió a components/header.css (compartido por ambos headers). */
+.pub-hamburger { display: none; width: 36px; height: 36px; place-items: center; background: var(--surface); border: 1px solid var(--border-soft); border-radius: 8px; color: var(--muted); }
+
+@media (max-width: 900px) {
+  .pnav, .h-search { display: none; }
+  .pub-hamburger { display: grid; }
+}

@@ -1,0 +1,98 @@
+{% extends 'detail/base_detail.html' %}
+{% load static i18n ficha %}
+{% comment %}FICHA de artista (gestión y público): información en el side; secciones Detalles (biografía e
+integrantes), Discografía e Imágenes, cada una con su pestaña en la página.{% endcomment %}
+
+{% block side %}
+  {% if object.artist_type %}<div class="mal-row"><span class="k">{% trans 'Tipo' %}:</span><span class="v"><a href="{% by by_url 'tipo' object.artist_type %}">{{ object.artist_type }}</a></span></div>{% endif %}
+  {% if object.start_year %}<div class="mal-row"><span class="k">{% trans 'Inicio' %}:</span><span class="v">{{ object.start_year }}</span></div>{% endif %}
+  {% if object.year_end %}<div class="mal-row"><span class="k">{% trans 'Fin' %}:</span><span class="v">{{ object.year_end }}</span></div>{% endif %}
+  {% with generos=object.genres.all %}{% if generos %}
+    <div class="mal-row"><span class="k">{% trans 'Géneros' %}:</span><span class="v">{% for g in generos %}<a href="{% by by_url 'genero' g %}">{{ g }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>
+  {% endif %}{% endwith %}
+  <div class="mal-row"><span class="k">{% trans 'Álbumes' %}:</span><span class="v">{{ object.albums.count }}</span></div>
+  {% if es_gestion %}
+    {% if object.deezer_id %}<div class="mal-row"><span class="k">Deezer:</span><span class="v"><a href="https://www.deezer.com/artist/{{ object.deezer_id }}" target="_blank" rel="noopener">{{ object.deezer_id }}</a></span></div>{% endif %}
+    <div class="mal-row"><span class="k">{% trans 'Activo' %}:</span><span class="v">{{ object.display_is_active }}</span></div>
+    <div class="mal-row"><span class="k">{% trans 'Creado' %}:</span><span class="v">{{ object.display_created }}</span></div>
+  {% endif %}
+{% endblock %}
+
+{% block cuerpo %}
+  <section class="dsection" data-tab="detalles" data-label="{% trans 'Detalles' %}" style="padding-top:0;">
+    <h3>{% trans 'Biografía' %}</h3>
+    {% if object.biography %}<p class="synopsis">{{ object.biography|linebreaksbr }}</p>
+    {% else %}<p class="page-sub">{% trans 'Sin biografía todavía.' %}</p>{% endif %}
+
+    {% with miembros=object.members.all %}{% if miembros %}
+      <h3 style="margin-top:22px;">{% trans 'Integrantes' %} <span class="page-sub" style="font-size:12px">({{ miembros|length }})</span>
+        {% if tab_url.integrantes and miembros|length > 30 %}<a class="page-sub" style="margin-left:auto;font-size:12px" href="{{ tab_url.integrantes }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      <div class="mal-rows">
+        {% for m in miembros %}
+          <div class="mr">
+            <div class="mr-ent">
+              <a class="mr-thumb" href="{% url 'personas:person-detail' m.person.pk %}">
+                {% if m.person.image %}<img src="{{ m.person.image.url }}" alt="{{ m.person }}" loading="lazy">
+                {% else %}<img src="{% static 'image/default/sin-imagen.webp' %}" alt="{% trans 'Sin imagen' %}" loading="lazy">{% endif %}
+              </a>
+              <div>
+                <div class="mr-name"><a href="{% url 'personas:person-detail' m.person.pk %}">{{ m.person }}</a></div>
+                {% if m.join_date or m.leave_date %}<div class="mr-sub">{{ m.join_date|date:"Y" }}–{{ m.leave_date|date:"Y" }}</div>{% endif %}
+              </div>
+            </div>
+            {% if m.role %}<div class="mr-vas"><div class="mr-va"><div><div class="mr-name">{{ m.role }}</div><div class="mr-sub">{% trans 'Rol' %}</div></div></div></div>{% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}{% endwith %}
+    {% with albumes=object.albums.all %}{% if albumes %}
+      <h3 style="margin-top:22px;">{% trans 'Discografía' %}<a class="page-sub mas" href="#discografia">{% trans 'Más álbumes' %} ({{ albumes|length }}) →</a></h3>
+      <div class="gallery">{% for al in albumes|slice:":4" %}{% if al.image %}<a href="{% if es_gestion %}{% url 'panel:album_detail' al.pk %}{% else %}{% url 'music:album-detail' al.pk %}{% endif %}"><img class="shot" src="{{ al.image.url }}" alt="{{ al }}" loading="lazy" title="{{ al }}"></a>{% endif %}{% endfor %}</div>
+    {% endif %}{% endwith %}
+  </section>
+
+  {% with albumes=object.albums.all %}{% if albumes %}
+    <section class="dsection" data-tab="discografia" data-label="{% trans 'Discografía' %}">
+      <h3>{% trans 'Discografía' %} <span class="page-sub" style="font-size:12px">({{ albumes|length }})</span>
+        {% if tab_url.albumes and albumes|length > 30 %}<a class="page-sub" style="margin-left:auto;font-size:12px" href="{{ tab_url.albumes }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      <div class="mal-rows">
+        {% for al in albumes %}
+          <div class="mr">
+            <div class="mr-ent">
+              <a class="mr-thumb" href="{% if es_gestion %}{% url 'panel:album_detail' al.pk %}{% else %}{% url 'music:album-detail' al.pk %}{% endif %}">
+                {% if al.image %}<img src="{{ al.image.url }}" alt="{{ al }}" loading="lazy">
+                {% else %}<img src="{% static 'image/default/sin-imagen.webp' %}" alt="{% trans 'Sin imagen' %}" loading="lazy">{% endif %}
+              </a>
+              <div>
+                <div class="mr-name"><a href="{% if es_gestion %}{% url 'panel:album_detail' al.pk %}{% else %}{% url 'music:album-detail' al.pk %}{% endif %}">{{ al }}</a></div>
+                <div class="mr-sub">{% if al.album_type %}{{ al.album_type }}{% endif %}{% if al.release_date %} · {{ al.release_date|date:"Y" }}{% endif %}</div>
+              </div>
+            </div>
+            <div class="mr-vas"><div class="mr-va"><div><div class="mr-name">{{ al.songs.count }}</div><div class="mr-sub">{% trans 'pistas' %}</div></div></div></div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}{% endwith %}
+
+  {% with fotos=object|fotos %}{% if fotos %}
+    <section class="dsection" data-tab="imagenes" data-label="{% trans 'Imágenes' %}">
+      <h3>{% trans 'Imágenes' %} <span class="page-sub" style="font-size:12px">({{ fotos|length }})</span>
+        {% if tab_url.imagenes and fotos|length > 40 %}<a class="page-sub" style="margin-left:auto;font-size:12px" href="{{ tab_url.imagenes }}">{% trans 'Ver en lista' %} →</a>{% endif %}</h3>
+      <div class="gallery">
+        {% for f in fotos %}{% if f|imagen %}<img class="shot" src="{{ f|imagen }}" alt="{{ object }}" loading="lazy">{% endif %}{% endfor %}
+      </div>
+    </section>
+  {% endif %}{% endwith %}
+  {% if es_gestion %}
+  {# Ficha técnica (solo gestión): lo que el registro ES — id, slug, activo, fechas. Muévela o amplíala aquí. #}
+  <section class="dsection" data-tab="tecnica" data-label="{% trans 'Ficha técnica' %}" style="padding-top:0;">
+    <h3>{% trans 'Ficha técnica' %}</h3>
+    <div class="mal-row"><span class="k">Id:</span><span class="v">{{ object.pk }}</span></div>
+    {% if object.slug %}<div class="mal-row"><span class="k">Slug:</span><span class="v">{{ object.slug }}</span></div>{% endif %}
+    {% if object.is_active is not None %}<div class="mal-row"><span class="k">{% trans 'Activo' %}:</span><span class="v">{{ object.display_is_active }}</span></div>{% endif %}
+    {% if object.created_at %}<div class="mal-row"><span class="k">{% trans 'Creado' %}:</span><span class="v">{{ object.display_created }}</span></div>{% endif %}
+    {% if object.updated_at %}<div class="mal-row"><span class="k">{% trans 'Actualizado' %}:</span><span class="v">{{ object.display_updated }}</span></div>{% endif %}
+  </section>
+  {% endif %}
+{% endblock %}

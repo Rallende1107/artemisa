@@ -1,0 +1,107 @@
+{% load i18n %}
+{% comment %}
+  Caja «Mi colección» bajo el póster de la ficha pública (estilo «Add to List» de
+  MAL, filas .cp-row del estándar de la ficha).
+  · NO está en tu colección → botón «Añadir».
+  · SÍ está → caja COLAPSABLE (details/summary): estado (si el medio tiene estados) y
+    nota guardan al cambiar, favorito ★ y quitar en la cabecera, dónde lo ves / lo
+    bajaste en lectura, y «Abrir en mi colección» para editarlo todo.
+  Contexto del tag collect_bar: kind · medio · obj · item · anon · next · statuses ·
+  notas · edit_url · update_url
+{% endcomment %}
+{% if item %}
+  <details class="cpanel" open>
+    <summary class="cpanel__title">{% trans 'Mi colección' %}
+      <span class="cp-acciones" style="margin-left:12px;">
+        <form method="post" action="{{ update_url }}" style="display:inline;" onclick="event.stopPropagation()">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ next }}">
+          {# Marcador: el checkbox desmarcado no viaja; así la vista sabe que el favorito venía en este form. #}
+          <input type="hidden" name="fav_form" value="1">
+          <label class="cp-fav {% if item.is_favorite %}on{% endif %}" title="{% trans 'Favorito' %}">
+            <input type="checkbox" name="is_favorite" onchange="this.form.submit()"
+                   {% if item.is_favorite %}checked{% endif %} style="display:none;">★
+          </label>
+        </form>
+        <form method="post" action="{% url 'collections:remove' medio item.pk %}" style="display:inline;" class="js-quitar-coleccion"
+              data-name="{{ obj }}" onclick="event.stopPropagation()">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ next }}">
+          <button type="submit" class="cp-quitar" title="{% trans 'Quitar de mi colección' %}">{% trans 'Quitar' %}</button>
+        </form>
+        <script>
+          // Quitar con confirmación (SweetAlert, como en el catálogo y la lista): se pierden estado, nota y sitios.
+          (function () {
+            var f = document.currentScript.previousElementSibling;
+            f.addEventListener("submit", function (e) {
+              if (f.dataset.confirmado === "1" || !window.artNotify) return;
+              e.preventDefault();
+              window.artNotify.confirm({
+                title: "{% trans '¿Quitar de tu colección?' %}",
+                html: "<b>«" + f.dataset.name + "»</b><br>{% trans 'Se pierden estado, nota y sitios.' %}",
+                confirmButtonText: "{% trans 'Sí, quitar' %}",
+                customClass: { confirmButton: "swal2-danger" },
+              }).then(function (r) { if (r.isConfirmed) { f.dataset.confirmado = "1"; f.requestSubmit(); } });
+            });
+          })();
+        </script>
+      </span>
+    </summary>
+
+    {# ESTADO (si el medio tiene estados) y NOTA: guardan al cambiar, como el favorito #}
+    {% if statuses %}
+      <form method="post" action="{{ update_url }}" class="cp-row">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <label for="cp-status">{% trans 'Estado' %}</label>
+        <select id="cp-status" name="status" onchange="this.form.submit()" aria-label="{% trans 'Estado' %}">
+          <option value="">{% trans 'sin estado' %}</option>
+          {% for clave, nombre in statuses %}<option value="{{ clave }}" {% if item.status == clave %}selected{% endif %}>{{ nombre }}</option>{% endfor %}
+        </select>
+      </form>
+    {% endif %}
+    <form method="post" action="{{ update_url }}" class="cp-row">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
+      <label for="cp-score">{% trans 'Nota' %}</label>
+      <select id="cp-score" name="score" onchange="this.form.submit()" aria-label="{% trans 'Nota' %}">
+        <option value="">—</option>
+        {% for n in notas %}<option value="{{ n }}" {% if item.score == n %}selected{% endif %}>★ {{ n }}</option>{% endfor %}
+      </select>
+    </form>
+
+    {# Dónde lo veo / de dónde lo descargué: columnas de la fila (se editan en «Mi colección») #}
+    {% if item.watch_site or item.download_site %}
+      <div class="cp-links">
+        {% if item.watch_site %}
+          <div class="cp-link"><span class="cp-link__kind streaming">{% trans 'Lo veo en' %}</span>
+            {% if item.watch_site.url %}<a href="{{ item.watch_site.url }}" target="_blank" rel="noopener">{{ item.watch_site }} <i class="bi bi-box-arrow-up-right"></i></a>{% else %}<span>{{ item.watch_site }}</span>{% endif %}</div>
+        {% endif %}
+        {% if item.download_site %}
+          <div class="cp-link"><span class="cp-link__kind descarga">{% trans 'Lo descargué de' %}</span>
+            {% if item.download_site.url %}<a href="{{ item.download_site.url }}" target="_blank" rel="noopener">{{ item.download_site }} <i class="bi bi-box-arrow-up-right"></i></a>{% else %}<span>{{ item.download_site }}</span>{% endif %}
+            {% if item.download_format or item.download_quality %}<span class="cp-link__meta">{% if item.download_format %}{{ item.download_format }}{% endif %}{% if item.download_format and item.download_quality %} · {% endif %}{% if item.download_quality %}{{ item.download_quality }}{% endif %}</span>{% endif %}</div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="cp-foot"><span></span><a href="{{ edit_url }}"><i class="bi bi-pencil"></i> {% trans 'Abrir en mi colección' %} →</a></div>
+  </details>
+
+{% else %}
+  <div class="cpanel">
+    <div class="cpanel__title cpanel__title--solo">{% trans 'Mi colección' %}
+      {% if anon %}
+        <span class="cp-sum"><a href="{% url 'users:login' %}?next={{ next }}">{% trans 'Inicia sesión' %}</a></span>
+      {% else %}
+        <form method="post" action="{% url 'collections:add' %}" class="cp-add-form">
+          {% csrf_token %}
+          <input type="hidden" name="kind" value="{{ kind }}">
+          <input type="hidden" name="object_id" value="{{ obj.pk }}">
+          <input type="hidden" name="next" value="{{ next }}">
+          <button class="cp-add-mini" type="submit" title="{% trans 'Añadir a mi colección' %}"><i class="bi bi-plus-lg"></i> {% trans 'Añadir' %}</button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+{% endif %}

@@ -1,0 +1,80 @@
+{% extends 'detail/base_detail.html' %}
+{% load static i18n ficha %}
+{% comment %}FICHA de canción (gestión y público): información en el side (álbum, artista, compositores, año,
+pista, versión); secciones Detalles (significado), Letra (video + letra original + traducciones plegables)
+y Más del álbum, cada una con su pestaña en la página.{% endcomment %}
+
+{% block subtitulo %}{% if object.album %}<div class="orig">{{ object.album.artist }} · {{ object.album }}</div>{% endif %}{% endblock %}
+
+{% block side %}
+  {% if object.album %}
+    <div class="mal-row"><span class="k">{% trans 'Álbum' %}:</span><span class="v"><a href="{% if es_gestion %}{% url 'panel:album_detail' object.album.pk %}{% else %}{% url 'music:album-detail' object.album.pk %}{% endif %}">{{ object.album }}</a></span></div>
+    {% if object.album.artist %}<div class="mal-row"><span class="k">{% trans 'Artista' %}:</span><span class="v"><a href="{% if es_gestion %}{% url 'panel:artist_detail' object.album.artist.pk %}{% else %}{% url 'music:artist-detail' object.album.artist.pk %}{% endif %}">{{ object.album.artist }}</a></span></div>{% endif %}
+  {% endif %}
+  {% with creditos=object.composer_credits.all %}
+    {% if creditos %}<div class="mal-row"><span class="k">{% trans 'Compuesta por' %}:</span><span class="v">{% for c in creditos %}<a href="{% url 'personas:person-detail' c.person.pk %}">{{ c.person }}</a>{% if not forloop.last %} / {% endif %}{% endfor %}</span></div>
+    {% elif object.composers %}<div class="mal-row"><span class="k">{% trans 'Compuesta por' %}:</span><span class="v">{{ object.composers }}</span></div>{% endif %}
+  {% endwith %}
+  {% if object.release_year %}<div class="mal-row"><span class="k">{% trans 'Año' %}:</span><span class="v">{{ object.release_year }}</span></div>
+  {% elif object.album.release_date %}<div class="mal-row"><span class="k">{% trans 'Año' %}:</span><span class="v">{{ object.album.release_date|date:"Y" }}</span></div>{% endif %}
+  {% if object.album_song_id %}<div class="mal-row"><span class="k">{% trans 'Pista' %}:</span><span class="v">{{ object.album_song_id }}</span></div>{% endif %}
+  {% if object.title_version %}<div class="mal-row"><span class="k">{% trans 'Versión' %}:</span><span class="v">{{ object.title_version }}</span></div>{% endif %}
+  {% if es_gestion %}
+    {% if object.deezer_id %}<div class="mal-row"><span class="k">Deezer:</span><span class="v"><a href="https://www.deezer.com/track/{{ object.deezer_id }}" target="_blank" rel="noopener">{{ object.deezer_id }}</a></span></div>{% endif %}
+    <div class="mal-row"><span class="k">{% trans 'Activo' %}:</span><span class="v">{{ object.display_is_active }}</span></div>
+    <div class="mal-row"><span class="k">{% trans 'Creado' %}:</span><span class="v">{{ object.display_created }}</span></div>
+  {% endif %}
+{% endblock %}
+
+{% block cuerpo %}
+  <section class="dsection" data-tab="detalles" data-label="{% trans 'Detalles' %}" style="padding-top:0;">
+    <h3>{% trans 'Significado' %}</h3>
+    {% if object.meaning %}<p class="synopsis">{{ object.meaning|linebreaksbr }}</p>
+    {% else %}<p class="page-sub">{% trans 'Sin significado registrado todavía.' %}</p>{% endif %}
+    {% if object.audio_file %}<audio controls preload="none" src="{{ object.audio_file.url }}" style="margin-top:14px;width:100%;max-width:520px;"></audio>{% endif %}
+  </section>
+
+  {% if object.lyrics %}
+    <section class="dsection" data-tab="letra" data-label="{% trans 'Letra' %}">
+      {% if object.video_url %}
+        <div class="letra-video" style="margin-bottom:20px;"><iframe src="{{ object.video_url|youtube_embed }}" title="{{ object }}" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
+      {% endif %}
+      <h3>{% trans 'Letra' %}</h3>
+      <p class="synopsis letra">{{ object.lyrics|linebreaksbr }}</p>
+      {% with traducciones=object.translations.all %}{% if traducciones %}
+        <h3 style="margin-top:22px;">{% trans 'Traducciones' %} <span class="page-sub" style="font-size:12px">({{ traducciones|length }})</span></h3>
+        {% for t in traducciones %}
+          <details class="dsection sec-box">
+            <summary><h3>{{ t.language.name_esp|default:t.language.name }} <span class="sec-flecha">▾</span></h3></summary>
+            <p class="synopsis letra">{{ t.text|linebreaksbr }}</p>
+          </details>
+        {% endfor %}
+      {% endif %}{% endwith %}
+    </section>
+  {% endif %}
+
+  {% if object.album %}{% with otras=object.album.songs.all %}{% if otras|length > 1 %}
+    <section class="dsection" data-tab="album" data-label="{% trans 'Más del álbum' %}">
+      <h3>{{ object.album }} <span class="page-sub" style="font-size:12px">({{ otras|length }})</span>
+        <a class="page-sub" style="margin-left:auto;font-size:12px" href="{% if es_gestion %}{% url 'panel:album_detail' object.album.pk %}{% else %}{% url 'music:album-detail' object.album.pk %}{% endif %}">{% trans 'Ver el álbum' %} →</a></h3>
+      <ol class="tracklist">
+        {% for p in otras %}
+          <li{% if p.pk == object.pk %} style="color:var(--accent)"{% endif %}><span class="tk-n">{{ p.album_song_id|default:forloop.counter|stringformat:"02d" }}</span>
+            {% if p.pk == object.pk %}{{ p.title_short|default:p.title }}{% else %}<a href="{% if es_gestion %}{% url 'panel:song_detail' p.pk %}{% else %}{% url 'music:song-detail' p.pk %}{% endif %}">{{ p.title_short|default:p.title }}</a>{% endif %}
+            {% if p.title_version %}<span class="tk-sub">{{ p.title_version }}</span>{% endif %}</li>
+        {% endfor %}
+      </ol>
+    </section>
+  {% endif %}{% endwith %}{% endif %}
+  {% if es_gestion %}
+  {# Ficha técnica (solo gestión): lo que el registro ES — id, slug, activo, fechas. Muévela o amplíala aquí. #}
+  <section class="dsection" data-tab="tecnica" data-label="{% trans 'Ficha técnica' %}" style="padding-top:0;">
+    <h3>{% trans 'Ficha técnica' %}</h3>
+    <div class="mal-row"><span class="k">Id:</span><span class="v">{{ object.pk }}</span></div>
+    {% if object.slug %}<div class="mal-row"><span class="k">Slug:</span><span class="v">{{ object.slug }}</span></div>{% endif %}
+    {% if object.is_active is not None %}<div class="mal-row"><span class="k">{% trans 'Activo' %}:</span><span class="v">{{ object.display_is_active }}</span></div>{% endif %}
+    {% if object.created_at %}<div class="mal-row"><span class="k">{% trans 'Creado' %}:</span><span class="v">{{ object.display_created }}</span></div>{% endif %}
+    {% if object.updated_at %}<div class="mal-row"><span class="k">{% trans 'Actualizado' %}:</span><span class="v">{{ object.display_updated }}</span></div>{% endif %}
+  </section>
+  {% endif %}
+{% endblock %}

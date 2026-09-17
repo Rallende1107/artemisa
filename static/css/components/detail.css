@@ -1,0 +1,72 @@
+/* COMPONENTE: detail  ↔  partials/_detail.html  (ficha admin) */
+.detail-grid { display: grid; grid-template-columns: 240px 1fr; gap: 28px; align-items: start; }
+/* Sin imagen: una sola columna (no se fuerza el recuadro «sin imagen»). */
+.detail-grid--no-media { grid-template-columns: 1fr; }
+.detail-media {
+  aspect-ratio: 3/4; border-radius: var(--radius); border: 1px solid var(--border-soft);
+  background: linear-gradient(160deg, #16303a, #0c1420 70%);
+  position: relative; overflow: hidden; display: flex; align-items: flex-end;
+}
+.detail-media::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 30% 20%, rgba(0,229,255,0.18), transparent 55%); }
+/* Categorías (género, tema, tipo…): portada ancha 16:10 con imagen o default. */
+.detail-media--wide { aspect-ratio: 16/10; }
+.detail-media span { position: relative; padding: 12px; font-family: var(--mono); font-size: 12px; color: #cfeef5; }
+
+/* Barra de acciones en la cabecera (mismas que abajo, por alcance). */
+.detail-toolbar { margin-top: 16px; }
+
+/* ===== Detalle a ANCHO COMPLETO (estilo único): info a la izquierda, contenido
+   a la derecha llenando el espacio. Sustituye al layout estrecho anterior. ===== */
+.detail-shell { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 30px; align-items: start; }
+.detail-shell--solo { grid-template-columns: 1fr; }      /* sin imagen ni fichas cortas */
+.detail-side { display: grid; gap: 16px; align-content: start; }
+.detail-main { min-width: 0; }
+
+/* Panel TRANSLÚCIDO (glass): lo importante es que DEJA VER el fondo (poca opacidad),
+   con un desenfoque suave para legibilidad. Sin tinte de color marcado. */
+.glass {
+  background: rgba(10,14,20,.38);
+  border: 1px solid rgba(255,255,255,.09);
+  -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+}
+
+/* Recuadro de datos (label/valor) en la columna izquierda. */
+.info-list { border-radius: 14px; padding: 4px 15px; }
+.info-list__row { display: flex; justify-content: space-between; gap: 14px; padding: 11px 0; border-top: 1px solid var(--border-soft); font-size: 14px; }
+.info-list__row:first-child { border-top: 0; }
+.info-list .k { font-family: var(--mono); font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+.info-list .v { color: var(--text); font-weight: 600; text-align: right; overflow-wrap: anywhere; }
+
+@media (max-width: 860px) { .detail-shell { grid-template-columns: 1fr; } }
+
+.facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; margin-bottom: 22px; }
+
+/* Texto largo (mensaje, descripción…) como FILA completa, no celda del grid. */
+.detail-longtext { margin-bottom: 22px; }
+.detail-longtext .k { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); margin-bottom: 8px; }
+.detail-longtext .v {
+  font-size: 15px; line-height: 1.8; color: var(--text); white-space: pre-wrap;
+  overflow-wrap: anywhere; padding: 18px 22px; border-radius: 12px;
+  max-width: none;   /* llena TODA la columna, una sola columna (sin cortar frases) */
+}
+.fact .k { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); }
+.fact .v { font-size: 16px; font-weight: 600; margin-top: 2px; }
+
+.detail-block { padding: 20px 0; border-top: 1px solid var(--border-soft); }
+.detail-block h3 { font-size: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 9px; }
+.detail-block h3::before { content: ""; width: 3px; height: 15px; background: var(--accent); border-radius: 3px; box-shadow: 0 0 8px var(--accent-glow); }
+.detail-block p { color: var(--text-2); max-width: 70ch; }
+
+/* Relaciones / galerías del detalle por entidad (reparto, géneros, fotos extra…). */
+.rel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.rel-card {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; border: 1px solid var(--border-soft); border-radius: 12px;
+  background: var(--surface); font-size: 14px; color: var(--text-2); min-height: 44px;
+}
+.rel-card img { width: 40px; height: 40px; object-fit: cover; border-radius: 8px; flex: none; }
+.rel-card span { overflow: hidden; text-overflow: ellipsis; }
+/* Bloque de solo fotos (galería): tarjetas más grandes, la imagen manda. */
+.rel-grid--photos { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+.rel-grid--photos .rel-card { flex-direction: column; align-items: stretch; padding: 6px; }
+.rel-grid--photos .rel-card img { width: 100%; height: 150px; }

@@ -1,0 +1,91 @@
+/* COMPONENTE: candidatas-mal  ·  el MODAL que sale al crear una persona o compañía MAL con un nombre que ya existe
+   (otaku/form/_candidatas_mal.html). Va sobre SweetAlert2 (swal-theme.css pone el popup base). */
+
+/* PERILLA UX · ancho y respiro del modal */
+.swal2-popup.candidatas-mal-popup { width: min(680px, 94vw); padding: 26px 26px 22px; }
+.candidatas-mal-popup .swal2-html-container { margin: 0; padding: 0; overflow: visible; }
+.candidatas-mal-popup .swal2-actions { margin-top: 18px; gap: 10px; }
+
+/* ---------- cabecera ---------- */
+.cmal-head { display: flex; align-items: flex-start; gap: 14px; text-align: left; margin-bottom: 16px; }
+.cmal-head__title { margin: 0; font-size: 18px; font-weight: 700; color: var(--text); line-height: 1.25; }
+.cmal-head__name { color: var(--accent); }
+.cmal-head__hint { margin: 4px 0 0; font-size: 13px; color: var(--muted); line-height: 1.45; }
+
+/* ---------- buscador ---------- */
+.cmal-search { position: relative; margin-bottom: 10px; }
+.cmal-search input {
+    width: 100%; height: 40px; padding: 0 84px 0 12px;
+    background: var(--glass-2); color: var(--text); font-size: 13.5px;
+    border: 1px solid var(--border-soft); border-radius: 10px; outline: none;
+    transition: border-color .14s, box-shadow .14s;
+}
+.cmal-search input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-10); }
+.cmal-search__count {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    font-size: 11.5px; color: var(--muted); background: var(--elevated-2);
+    padding: 2px 8px; border-radius: 999px;
+}
+
+/* ---------- lista ---------- */
+/* PERILLA UX · filas a la vista antes del scroll: 5 × alto de fila */
+.cmal-list {
+    --cmal-fila: 64px;
+    list-style: none; margin: 0; padding: 4px; max-height: calc(5 * var(--cmal-fila) + 8px); overflow-y: auto;
+    border: 1px solid var(--border-soft); border-radius: 12px; background: rgba(0, 0, 0, .18);
+    scrollbar-width: thin; scrollbar-color: var(--faint) transparent;
+}
+.cmal-list::-webkit-scrollbar { width: 8px; }
+.cmal-list::-webkit-scrollbar-thumb { background: var(--faint); border-radius: 8px; }
+
+.cmal-item {
+    position: relative; display: flex; align-items: center; gap: 12px;
+    min-height: var(--cmal-fila); padding: 8px 10px 8px 12px; border-radius: 9px;
+    text-align: left; transition: background .12s;
+}
+.cmal-item + .cmal-item { margin-top: 2px; }
+.cmal-item:hover { background: var(--accent-06); }
+.cmal-item:hover::before {   /* la barra de acento a la izquierda de la fila activa */
+    content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px; border-radius: 3px; background: var(--accent);
+}
+
+.cmal-avatar {
+    flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%;
+    display: grid; place-items: center; font-size: 13px; font-weight: 700; letter-spacing: .5px;
+    color: var(--accent); background: var(--accent-10); border: 1px solid var(--border);
+}
+.cmal-item--con-ficha .cmal-avatar { color: var(--success); background: var(--success-25); border-color: transparent; }
+
+.cmal-body { min-width: 0; flex: 1; }
+.cmal-name { display: flex; align-items: center; gap: 8px; color: var(--text); font-weight: 600; font-size: 14px; }
+.cmal-name span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cmal-id { font-size: 11px; font-weight: 500; color: var(--muted); background: var(--elevated-2); padding: 1px 7px; border-radius: 999px; }
+.cmal-badge { font-size: 11px; font-weight: 600; color: var(--success); }
+
+.cmal-meta { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 3px; font-size: 12px; color: var(--text-2); }
+.cmal-meta .cmal-vacio { color: var(--faint); font-style: italic; }
+
+/* PERILLA UX · botón de cada fila: «Enlazar» (acento) y «Editar ficha MAL» (neutro) */
+.cmal-accion {
+    flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px;
+    font-size: 12.5px; font-weight: 700; border-radius: 8px; white-space: nowrap; text-decoration: none;
+    transition: background .12s, color .12s, box-shadow .12s, transform .12s;
+}
+.cmal-accion--enlazar { color: var(--accent); border: 1px solid var(--accent); }
+.cmal-accion--enlazar:hover { color: #001014; background: var(--accent); box-shadow: 0 0 14px var(--accent-glow); transform: translateY(-1px); }
+.cmal-accion--editar { color: var(--text-2); border: 1px solid var(--border); font-weight: 600; }
+.cmal-accion--editar:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-06); }
+
+.cmal-empty { display: none; padding: 22px 10px; text-align: center; color: var(--muted); font-size: 13px; }
+.cmal-empty.is-visible { display: block; }
+
+/* «Cancelar» con el rojo de salida del panel (como .btn-cancel), no el gris por defecto del tema */
+.candidatas-mal-popup .swal2-cancel.swal2-styled {
+    color: var(--danger) !important; border-color: var(--danger) !important;
+}
+.candidatas-mal-popup .swal2-cancel.swal2-styled:hover { background: var(--danger) !important; color: #fff !important; }
+
+@media (max-width: 520px) {
+    .cmal-item { flex-wrap: wrap; }
+    .cmal-accion { margin-left: 50px; }
+}

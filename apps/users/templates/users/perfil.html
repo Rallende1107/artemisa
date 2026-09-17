@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/components/detail.css' %}?v={{ ASSET_VERSION }}">
+  <style>
+    /* Avatar circular — SOLO en la vista de perfil (no toca los demás detail-media). */
+    .profile-media {
+      aspect-ratio: 1 / 1; width: min(280px, 100%); margin: 0 auto;
+      border-radius: 50%; overflow: hidden;
+      border: 3px solid var(--accent); box-shadow: 0 0 26px var(--accent-glow);
+      display: grid; place-items: center;
+    }
+    .profile-media img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    /* Datos en 4 columnas; el correo ocupa una fila COMPLETA (no se corta si es largo). */
+    .profile-facts { grid-template-columns: repeat(4, 1fr); }
+    .profile-facts .fact--full { grid-column: 1 / -1; }
+    .profile-facts .fact--full .v { word-break: break-word; }
+    @media (max-width: 780px) { .profile-facts { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .profile-facts { grid-template-columns: 1fr; } }
+    /* Tarjeta oscura SOLO en este bloque: los datos se leen sobre cualquier fondo. */
+    .profile-card {
+      background: rgba(8, 8, 13, 0.68);
+      border: 1px solid var(--border-soft); border-radius: 16px;
+      padding: 26px; backdrop-filter: blur(6px);
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="wrap" style="padding-top:22px;">
+    <div class="page-head">
+      <div class="breadcrumbs"><span>{% trans "mi cuenta" %}</span></div>
+      <h1 class="page-title">{{ user.username }}</h1>
+      <p class="page-sub">{{ user.role }} · {% trans "miembro desde" %} {{ user.created_at|date:"F Y" }}</p>
+    </div>
+
+    <div class="detail-grid profile-card">
+      <div class="detail-media profile-media">
+        {% if user.avatar_url %}
+          <img src="{{ user.avatar_url }}" alt="{{ user.username }}">
+        {% else %}
+          <span style="font-size:120px;color:var(--accent)">◈</span>
+        {% endif %}
+      </div>
+      <div>
+        <div class="facts profile-facts">
+          {# Fila 1 #}
+          <div class="fact"><div class="k">{% trans "Usuario" %}</div><div class="v">{{ user.username }}</div></div>
+          <div class="fact"><div class="k">{% trans "Nombre" %}</div><div class="v">{{ user.get_full_name_display|default:"—" }}</div></div>
+          <div class="fact"><div class="k">{% trans "Teléfono" %}</div><div class="v">{{ user.phone|default:"—" }}</div></div>
+          <div class="fact"><div class="k">{% trans "Nacimiento" %}</div><div class="v">{{ user.birth_date|date:"d M Y"|default:"—" }}{% if user.age %} <span style="color:var(--muted);font-weight:500">({% blocktrans with age=user.age %}{{ age }} años{% endblocktrans %})</span>{% endif %}</div></div>
+          {# Fila 2 #}
+          <div class="fact"><div class="k">{% trans "Rol" %}</div><div class="v">{{ user.role }}</div></div>
+          <div class="fact"><div class="k">{% trans "Estado" %}</div><div class="v">{% if user.is_active %}{% trans "Activo" %}{% else %}{% trans "Inactivo" %}{% endif %}</div></div>
+          <div class="fact"><div class="k">{% trans "Miembro desde" %}</div><div class="v">{{ user.date_joined|date:"d M Y"|default:"—" }}</div></div>
+          <div class="fact"><div class="k">{% trans "Último acceso" %}</div><div class="v">{{ user.last_login|date:"d M Y · H:i"|default:"—" }}</div></div>
+          {# Fila 3: correo a lo ancho para que no se corte #}
+          <div class="fact fact--full"><div class="k">{% trans "Correo" %}</div><div class="v">{{ user.email }}</div></div>
+        </div>
+
+        <div class="detail-block">
+          <h3>{% trans "Acciones" %}</h3>
+          <div class="chip-row">
+            <a class="chip" href="{% url 'users:profile-edit' %}"><span class="ico">✎</span> {% trans "Editar perfil" %}</a>
+            <a class="chip" href="{% url 'users:password_change' %}"><span class="ico">🔒</span> {% trans "Cambiar contraseña" %}</a>
+            <a class="chip" href="{% url 'users:profile-activity' %}"><span class="ico">🕓</span> {% trans "Mi actividad" %}</a>
+            <a class="chip" href="#"><span class="ico">◆</span> {% trans "Mi colección" %}</a>
+            {% if user.is_staff %}<a class="chip" href="{% url 'panel:home' %}"><span class="ico">⚙</span> {% trans "Panel de gestión" %}</a>{% endif %}
+            <form method="post" action="{% url 'users:logout' %}" style="display:inline">
+              {% csrf_token %}<button class="chip" type="submit"><span class="ico">⏻</span> {% trans "Cerrar sesión" %}</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

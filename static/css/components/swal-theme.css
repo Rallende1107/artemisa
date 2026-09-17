@@ -1,0 +1,31 @@
+/* COMPONENTE: swal-theme  ·  SweetAlert2 con los tokens de Artemisa
+   (se carga DESPUÉS de vendor/sweetalert2/sweetalert2.min.css) */
+.swal2-popup {
+  background: var(--elevated) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .6);
+}
+.swal2-title { color: var(--text) !important; font-weight: 700; }
+.swal2-html-container { color: var(--text-2) !important; }
+.swal2-confirm.swal2-styled {
+  background: var(--accent) !important; color: #001014 !important; font-weight: 700;
+  border-radius: 9px; box-shadow: 0 0 16px var(--accent-glow) !important;
+}
+.swal2-cancel.swal2-styled {
+  background: transparent !important; color: var(--muted) !important;
+  border: 1px solid var(--border-soft) !important; border-radius: 9px;
+}
+.swal2-deny.swal2-styled,
+.swal2-confirm.swal2-styled.swal2-danger {
+  background: var(--danger) !important; color: #fff !important; box-shadow: none !important;
+}
+.swal2-icon.swal2-warning { border-color: var(--warning); color: var(--warning); }
+.swal2-icon.swal2-error { border-color: var(--danger); color: var(--danger); }
+.swal2-icon.swal2-success .swal2-success-ring { border-color: var(--success-25); }
+.swal2-icon.swal2-success [class^='swal2-success-line'] { background-color: var(--success); }
+.swal2-icon.swal2-success { border-color: var(--success-25) !important; color: var(--success) !important; }
+.swal2-timer-progress-bar { background: var(--accent); }
+.swal2-toast { background: var(--elevated) !important; border: 1px solid var(--border-soft); color: var(--text) !important; }
+.swal2-toast .swal2-title { color: var(--text) !important; }

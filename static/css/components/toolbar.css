@@ -1,0 +1,11 @@
+/* COMPONENTE: toolbar  ↔  partials/_toolbar.html  (export + búsqueda + crear) */
+.toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.toolbar__search {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 8px;
+  height: 32px; padding: 0 11px; min-width: 220px;
+  background: var(--surface); border: 1px solid var(--border-soft); border-radius: 7px; color: var(--muted);
+}
+.toolbar__search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-10); }
+.toolbar__search input { background: none; border: none; outline: none; color: var(--text); font-size: 13px; flex: 1; }
+.toolbar__search input::placeholder { color: var(--faint); }

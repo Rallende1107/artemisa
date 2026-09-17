@@ -1,0 +1,12 @@
+/* COMPONENTE: gotop  ·  botón flotante para volver arriba */
+#go-top {
+  position: fixed; right: 22px; bottom: 22px; z-index: 50;
+  width: 44px; height: 44px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 18px;
+  color: var(--accent); background: var(--elevated-2);
+  border: 1px solid var(--border); box-shadow: 0 0 16px var(--accent-glow);
+  opacity: 0; pointer-events: none; transform: translateY(10px);
+  transition: opacity .2s, transform .2s, color .15s, background .15s;
+}
+#go-top.show { opacity: 1; pointer-events: auto; transform: none; }
+#go-top:hover { color: #001014; background: var(--accent); }

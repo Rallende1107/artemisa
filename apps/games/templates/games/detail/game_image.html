@@ -1,0 +1,27 @@
+{% extends 'detail/base_detail.html' %}
+{% load i18n ficha %}
+{% comment %}FICHA de imagen de juego (gestión): sus datos en el lateral (una fila por campo) y los textos largos en el cuerpo.
+Lo propio de esta entidad se escribe AQUÍ; la Ficha técnica (id, slug, activo, fechas) la pone el cuadro.{% endcomment %}
+
+{% block side %}
+  {% if object.game %}<div class="mal-row"><span class="k">{% trans 'Juego' %}:</span><span class="v">{% ficha object.game as href %}{% if href %}<a href="{{ href }}">{{ object.game }}</a>{% else %}{{ object.game }}{% endif %}</span></div>{% endif %}
+  {% if object.order is not None %}<div class="mal-row"><span class="k">{% trans 'Orden' %}:</span><span class="v">{{ object.order }}</span></div>{% endif %}
+{% endblock %}
+
+{% block cuerpo %}
+  <section class="dsection" data-tab="detalles" data-label="{% trans 'Detalles' %}" style="padding-top:0;">
+    <p class="page-sub">{% trans 'Sin textos largos: todo está en el lateral y en la ficha técnica.' %}</p>
+  </section>
+  {% if es_gestion %}{% include 'detail/_descarga_imagen.html' %}{% endif %}
+  {% if es_gestion %}
+  {# Ficha técnica (solo gestión): lo que el registro ES — id, slug, activo, fechas. Muévela o amplíala aquí. #}
+  <section class="dsection" data-tab="tecnica" data-label="{% trans 'Ficha técnica' %}" style="padding-top:0;">
+    <h3>{% trans 'Ficha técnica' %}</h3>
+    <div class="mal-row"><span class="k">Id:</span><span class="v">{{ object.pk }}</span></div>
+    {% if object.slug %}<div class="mal-row"><span class="k">Slug:</span><span class="v">{{ object.slug }}</span></div>{% endif %}
+    {% if object.is_active is not None %}<div class="mal-row"><span class="k">{% trans 'Activo' %}:</span><span class="v">{{ object.display_is_active }}</span></div>{% endif %}
+    {% if object.created_at %}<div class="mal-row"><span class="k">{% trans 'Creado' %}:</span><span class="v">{{ object.display_created }}</span></div>{% endif %}
+    {% if object.updated_at %}<div class="mal-row"><span class="k">{% trans 'Actualizado' %}:</span><span class="v">{{ object.display_updated }}</span></div>{% endif %}
+  </section>
+  {% endif %}
+{% endblock %}

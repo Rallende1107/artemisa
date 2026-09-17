@@ -1,0 +1,35 @@
+/* COMPONENTE: glass  ·  «liquid glass» de la casa, el MISMO cristal que las listas (DataTables),
+   aplicado a formularios del panel, tarjeta de login/registro/reset, paneles de detalle del panel
+   y la ficha pública (lateral + columna principal). Se carga el ÚLTIMO para ganar a los fondos
+   propios de cada componente. Perillas: --lq-* en 00-tokens.css (docs/transparencias.md).
+
+   El cristal (fondo + blur + brillo) va en el ::before y NO en el elemento: un backdrop-filter en el
+   elemento lo vuelve «containing block» de sus hijos position:fixed y descoloca menús flotantes. */
+
+.form-card, .auth__card, .glass, .mal-side, .mal-main {
+  position: relative; isolation: isolate;
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  border: 1px solid var(--lq-border) !important;
+  border-radius: 14px;
+  box-shadow: inset 0 1px 0 var(--lq-rim), var(--lq-shadow) !important;
+  color: var(--lq-text);
+}
+.form-card::before, .auth__card::before, .glass::before, .mal-side::before, .mal-main::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: -1;
+  background:
+    linear-gradient(135deg, var(--lq-shine) 0%, transparent 38%, transparent 70%, rgba(255, 255, 255, 0.03) 100%),
+    var(--lq-bg);
+  -webkit-backdrop-filter: blur(var(--lq-blur)) saturate(var(--lq-saturate));
+  backdrop-filter: blur(var(--lq-blur)) saturate(var(--lq-saturate));
+}
+
+/* Ficha pública (estilo MAL): el lateral y la columna principal son dos cristales con aire dentro */
+.mal-side, .mal-main { padding: 18px 20px; }
+.mal-side .poster-box { margin-top: 0; }
+
+/* Textos CLAROS sobre el cristal (nada de grises apagados) */
+.form-card .field label, .form-card .form-label, .auth__card label,
+.mal-side h4, .mal-row .k, .mal-main h3, .glass .k, .glass h3 { color: var(--lq-text); }
+.form-card .field__hint, .form-card .page-sub, .auth__card .page-sub,
+.mal-row .v, .mal-main .synopsis, .mal-main .page-sub, .mr-sub, .glass .v, .glass .page-sub { color: var(--lq-muted); }

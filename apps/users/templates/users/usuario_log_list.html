@@ -1,0 +1,57 @@
+{% extends 'admin_panel/list.html' %}
+{% load static i18n %}
+
+{% comment %} Lista de actividad de usuarios (UserLog): la tabla busca por proceso, mensaje,
+   nombre de usuario y nombre real; arriba, un buscador Select2 REMOTO para fijar
+   un usuario (mismo endpoint panel:user_select que usan los formularios:
+   escala a miles de usuarios, no vuelca la tabla). {% endcomment %}
+
+{% block head %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'vendor/select2/select2.min.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/select2-theme.css' %}?v={{ ASSET_VERSION }}">
+  <style>
+    .log-filter { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+    .log-filter label { font-size:12.5px; color:var(--muted); }
+    .log-filter .select2 { min-width: 280px; }
+  </style>
+{% endblock %}
+
+{% block list_filters %}
+  <div class="log-filter">
+    <label for="log-filter-user">{% trans "Usuario" %}</label>
+    <select id="log-filter-user" data-ajax-url="{% url 'panel:user_select' %}"
+            data-base-url="{% url 'panel:user-log_list' %}">
+      <option value="">{% trans "Todos los usuarios" %}</option>
+      {% if usuario_actual_obj %}<option value="{{ usuario_actual_obj.pk }}" selected>{{ usuario_actual_texto }}</option>{% endif %}
+    </select>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script src="{% static 'vendor/select2/select2.min.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script>
+    (function () {
+      var $ = window.jQuery, $s = $("#log-filter-user");
+      if (!$ || !$s.length || !$.fn.select2) return;
+      $s.select2({
+        width: "resolve",
+        placeholder: "{% trans 'Todos los usuarios' %}",
+        allowClear: true,
+        minimumInputLength: 0,
+        ajax: {
+          url: $s.data("ajax-url"), dataType: "json", delay: 250, cache: true,
+          data: function (p) { return { q: p.term || "", page: p.page || 1 }; },
+          processResults: function (d, p) { p.page = p.page || 1;
+            return { results: d.results, pagination: { more: !!(d.pagination && d.pagination.more) } }; },
+        },
+      });
+      // Elegir (o limpiar) un usuario recarga la lista filtrada por él.
+      $s.on("select2:select select2:clear", function () {
+        var id = $s.val(), base = $s.data("base-url");
+        window.location.href = id ? base + "?user=" + id : base;
+      });
+    })();
+  </script>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends page_template|default:'admin_panel/base_admin.html' %}
+{% load static i18n %}
+
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/components/ficha.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'vendor/flatpickr/flatpickr.min.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/flatpickr-theme.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'vendor/select2/select2.min.css' %}?v={{ ASSET_VERSION }}">
+  <link rel="stylesheet" href="{% static 'css/components/select2-theme.css' %}?v={{ ASSET_VERSION }}">
+{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div class="breadcrumbs">
+      <a href="{% url 'panel:home' %}">{% trans "panel" %}</a><span class="sep">/</span>
+      {% if section_url %}<a href="{% url section_url %}">{{ section_label|lower }}</a><span class="sep">/</span>{% endif %}
+      <a href="{% url list_url %}">{{ label_plural }}</a><span class="sep">/</span>
+      <span>{% if is_create %}{% trans "nuevo" %}{% else %}{% trans "editar" %}{% endif %}</span>
+    </div>
+    <h1 class="page-title">{{ page_title }}</h1>   {# el título lo declara la vista: title = _("Crear país") #}
+  </div>
+
+  <form class="form-card" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% if form.non_field_errors and not form.candidatas %}<div class="flash flash--error">{{ form.non_field_errors }}</div>{% endif %}
+    {% comment %}
+      CUADRO base (patrón Poseidon): la entidad DECLARA qué HTML de campos le aplica
+      (`form_template` en su _Entidad, p. ej. "catalogs/form/country.html") y aquí se
+      INCLUYE. Sin declaración → loop genérico (sirve a cualquier entidad). Los booleanos
+      NO van en el parcial: se auto-agrupan abajo en su mini-panel.
+    {% endcomment %}
+    <div class="form-grid {% block grid_class %}{% endblock %}">
+        {% block campos %}
+          {% if form_template %}
+            {% include form_template %}
+          {% else %}
+            {% for field in form %}
+                {% if field.field.widget.input_type != 'checkbox' %}
+                    <div class="field">
+                        {% if field.field.widget.input_type == 'file' %}
+                            {% include 'admin_panel/_campo_imagen.html' %}
+                        {% else %}
+                        <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="req">*</span>{% endif %}</label>
+                        {{ field }}
+                        {% for e in field.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+                        {% if field.help_text %}<span class="field__hint">{{ field.help_text }}</span>{% endif %}
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endblock campos %}
+    </div>
+
+    {% if has_bool_fields %}
+    {# Opciones: booleanos agrupados en su mini-panel (estilo Hades) #}
+    <div class="form-checkbox">
+      <!-- <span class="form-checkbox__title">Opciones</span> -->
+      <div class="form-checkbox__grid">
+        {% for field in form %}
+          {% if field.field.widget.input_type == 'checkbox' %}
+            <label class="opt"{% if field.help_text %} title="{{ field.help_text }}"{% endif %}>{{ field }} <span>{{ field.label }}</span></label>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    <div class="form-actions">
+      <button class="btn-save" type="submit">{% trans "Guardar" %}</button>
+      <a class="btn-cancel" href="{% url cancel_url %}">{% trans "Cancelar" %}</a>
+    </div>
+  </form>
+{% endblock %}
+
+{% block foot_meta %}form{% endblock %}
+
+{% block scripts %}
+  {% include 'partials/_lightbox.html' %}   {# modal Ver imagen del campo imagen #}
+  <script src="{% static 'vendor/jquery/jquery.min.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script src="{% static 'vendor/select2/select2.min.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script src="{% static 'vendor/flatpickr/flatpickr.min.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script src="{% static 'vendor/flatpickr/es.js' %}?v={{ ASSET_VERSION }}"></script>
+  <script src="{% static 'js/forms.js' %}?v={{ ASSET_VERSION }}"></script>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% comment %} Campos de apodo de creador — patrón Hades/Poseidon.
+   PARCIAL que INCLUYE admin_panel/form.html (el cuadro: card, botones, csrf) porque la
+   vista Create/Update lo declara: form_template = "…/form/<modelo>.html".
+   Edita libremente el orden/HTML de cada campo aquí. Los booleanos se
+   auto-agrupan abajo, no van en este bloque.
+   Sincroniza:  python manage.py sync_forms  {% endcomment %}
+
+    <div class="field">
+      <label for="{{ form.creator.id_for_label }}">{{ form.creator.label }}{% if form.creator.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.creator }}
+      {% for e in form.creator.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.creator.help_text %}<span class="field__hint">{{ form.creator.help_text }}</span>{% endif %}
+    </div>
+    <div class="field">
+      <label for="{{ form.nickname.id_for_label }}">{{ form.nickname.label }}{% if form.nickname.field.required %} <span class="req">*</span>{% endif %}</label>
+      {{ form.nickname }}
+      {% for e in form.nickname.errors %}<span class="field__err">{{ e }}</span>{% endfor %}
+      {% if form.nickname.help_text %}<span class="field__hint">{{ form.nickname.help_text }}</span>{% endif %}
+    </div>

@@ -1,0 +1,24 @@
+{% load static i18n ficha %}
+{% comment %}Filas estilo MAL de RELACIONES (MAL: Related Entries): la obra relacionada (portada, título → su ficha del
+lado, año) y a la derecha el tipo de relación. `filas` son puentes con .related (la obra) y .relation_type; en otaku
+el modelo resuelve .related desde el MAL id y, si la obra no está importada, .related es None y se pinta el id.{% endcomment %}
+{% static 'image/default/sin-imagen.webp' as sin_img %}
+<div class="mal-rows{% if columnas == "2" %} mal-rows--2{% endif %}">
+  {% for r in filas %}{% with obra=r.related %}
+    <div class="mr">
+      <div class="mr-ent">
+        {% if obra %}
+          <a class="mr-thumb" href="{% ficha obra %}"><img src="{{ obra|imagen|default:sin_img }}" alt="{{ obra }}" loading="lazy"></a>
+          <div>
+            <div class="mr-name"><a href="{% ficha obra %}">{{ obra }}</a></div>
+            {% firstof obra.release_year obra.year as anio %}{% if anio %}<div class="mr-sub">{{ anio }}</div>{% endif %}
+          </div>
+        {% else %}
+          <span class="mr-thumb"><img src="{{ sin_img }}" alt="" loading="lazy"></span>
+          <div><div class="mr-name">{{ r.get_to_kind_display }} MAL #{{ r.to_mal_id }}</div><div class="mr-sub">{% trans 'no importado' %}</div></div>
+        {% endif %}
+      </div>
+      <div class="mr-vas"><div class="mr-va"><div><div class="mr-name">{{ r.relation_type|default:_("Relación") }}</div></div></div></div>
+    </div>
+  {% endwith %}{% endfor %}
+</div>

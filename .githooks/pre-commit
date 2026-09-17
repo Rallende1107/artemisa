@@ -1,0 +1,28 @@
+#!/bin/sh
+# pre-commit — corre la suite de tests DENTRO del contenedor web antes de cada commit.
+# Activar una vez por clon:   git config core.hooksPath .githooks
+# Saltar en un commit puntual: SKIP_TESTS=1 git commit ...   (o git commit --no-verify)
+#
+# --noinput: si quedó una base test_artemisa de una corrida interrumpida, la
+# recrea sin preguntar (sin esto el prompt interactivo falla y no corre nada).
+
+if [ "$SKIP_TESTS" = "1" ]; then
+    echo ">> pre-commit: tests omitidos (SKIP_TESTS=1)"
+    exit 0
+fi
+
+if ! docker compose ps --services --status running 2>/dev/null | grep -qx web; then
+    echo ">> pre-commit: el contenedor web no está corriendo; tests omitidos (docker compose up -d)"
+    exit 0
+fi
+
+echo ">> pre-commit: corriendo tests (apps) en el contenedor web..."
+if docker compose exec -T web python manage.py test apps --noinput -v 1; then
+    echo ">> pre-commit: tests OK"
+    exit 0
+fi
+
+echo ""
+echo ">> pre-commit: tests FALLARON — commit cancelado."
+echo "   Para forzar igual: git commit --no-verify   (o SKIP_TESTS=1 git commit ...)"
+exit 1
